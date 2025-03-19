@@ -1,8 +1,8 @@
 package com.jonpeps.gamescms.data
 
-data class DbTableItem<T>(
+data class TableItem<T>(
     val name: String,
-    val dataType: DbDataItemType,
+    val dataType: ItemType,
     val isPrimary: Boolean = false,
     val value: T,
     val editable: Boolean = true,

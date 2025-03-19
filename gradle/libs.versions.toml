@@ -2,6 +2,8 @@
 agp = "8.8.1"
 bom = "<VERSION>"
 bomVersion = "2.31.3"
+hiltAndroid = "2.51.1"
+hiltAndroidCompiler = "2.51.1"
 kotlin = "1.9.24"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -20,6 +22,8 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 bom = { module = "software.amazon.awssdk:bom", version.ref = "bom" }
 bom-v2313 = { module = "software.amazon.awssdk:bom", version.ref = "bomVersion" }
 dynamodb-enhanced = { module = "software.amazon.awssdk:dynamodb-enhanced" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
