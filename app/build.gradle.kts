@@ -1,8 +1,10 @@
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
-    id("com.google.dagger.hilt.android") version "2.51.1" apply false
+    id("com.google.dagger.hilt.android")
+    id("org.jetbrains.kotlin.plugin.compose") version "2.1.0"
 }
 
 android {
@@ -28,8 +30,12 @@ android {
         android.buildFeatures.buildConfig = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "DYNAMO_DB_ACCESS_KEY", "\"" + project.properties["dynamo_db_access_key"])
-        buildConfigField("String", "DYNAMO_DB_SECRET_KEY", "\"" + project.properties["dynamo_db_secret_key"])
+        buildConfigField("String", "DYNAMO_DB_ACCESS_KEY", "\"" + project.properties["dynamo_db_access_key"] + "\"")
+        buildConfigField("String", "DYNAMO_DB_SECRET_KEY", "\"" + project.properties["dynamo_db_secret_key"] + "\"")
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
 
     buildTypes {
@@ -42,14 +48,24 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
+
     kotlinOptions {
         jvmTarget = "17"
     }
     buildFeatures {
         viewBinding = true
+    }
+    kapt {
+        correctErrorTypes = true
+    }
+
+    packaging {
+        resources {
+            resources.excludes += "**/*"
+        }
     }
 }
 
@@ -68,6 +84,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    kotlin("kapt")
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+    implementation(libs.runtime)
 }
