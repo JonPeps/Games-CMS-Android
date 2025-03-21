@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.dynamodb.repositories.core
+package com.jonpeps.gamescms.dynamodb.services.core
 
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
