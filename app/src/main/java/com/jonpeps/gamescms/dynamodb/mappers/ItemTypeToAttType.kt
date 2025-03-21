@@ -2,7 +2,7 @@ package com.jonpeps.gamescms.dynamodb.mappers
 
 import com.jonpeps.gamescms.data.ItemType
 
-sealed class ItemTypeToAttType {
+class ItemTypeToAttType {
     companion object {
         fun get(type: ItemType): String {
             return when (type) {

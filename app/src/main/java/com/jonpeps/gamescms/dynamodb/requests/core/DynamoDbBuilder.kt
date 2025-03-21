@@ -1,11 +1,11 @@
-package com.jonpeps.gamescms.dynamodb
+package com.jonpeps.gamescms.dynamodb.requests.core
 
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 
-sealed class DynamoDbBuilder {
+class DynamoDbBuilder {
     companion object {
         fun build(region: Region, accessKey: String, secretKey: String): DynamoDbClient
             = DynamoDbClient.builder()
