@@ -1,6 +1,6 @@
-package com.jonpeps.gamescms.dynamodb.requests
+package com.jonpeps.gamescms.dynamodb.repositories
 
-import com.jonpeps.gamescms.dynamodb.requests.core.IDynamoDbRequest
+import com.jonpeps.gamescms.dynamodb.repositories.core.IDynamoDbRequest
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent

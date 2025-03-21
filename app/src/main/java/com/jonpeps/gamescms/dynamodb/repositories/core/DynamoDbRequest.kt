@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.dynamodb.requests.core
+package com.jonpeps.gamescms.dynamodb.repositories.core
 
 import com.jonpeps.gamescms.BuildConfig
 import dagger.Module

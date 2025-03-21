@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.dynamodb.requests.core
+package com.jonpeps.gamescms.dynamodb.repositories.core
 
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 
