@@ -1,6 +1,7 @@
 package com.jonpeps.gamescms.dynamodb.services
 
 import com.jonpeps.gamescms.dynamodb.services.core.IDynamoDbRequest
+import dagger.hilt.android.scopes.ViewModelScoped
 import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition
 import software.amazon.awssdk.services.dynamodb.model.CreateTableRequest
 import software.amazon.awssdk.services.dynamodb.model.CreateTableResponse
@@ -13,6 +14,7 @@ interface IDynamoDbCreateTable {
                        schemas: List<KeySchemaElement>): CreateTableResponse
 }
 
+@ViewModelScoped
 class DynamoDbCreateTable @Inject constructor(private val dynamoDbClient: IDynamoDbRequest): IDynamoDbCreateTable {
     override suspend fun create(tableName: String,
                                 attributes: List<AttributeDefinition>,

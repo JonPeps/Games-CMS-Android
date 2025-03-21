@@ -8,7 +8,7 @@ class MappersConstants {
         const val FALSE_INT = "0"
 
         fun toBoolean(value: String): Boolean {
-            return value == MappersConstants.TRUE_STR || value == MappersConstants.TRUE_INT
+            return value == TRUE_STR || value == TRUE_INT
         }
     }
 }
