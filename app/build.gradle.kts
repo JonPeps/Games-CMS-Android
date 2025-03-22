@@ -88,4 +88,8 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     implementation(libs.runtime)
+    testImplementation(libs.junit.v412)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.powermock.module.junit4)
+    testImplementation(libs.powermock.api.mockito)
 }
