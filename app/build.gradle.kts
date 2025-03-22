@@ -89,7 +89,10 @@ dependencies {
     kapt(libs.hilt.android.compiler)
     implementation(libs.runtime)
     testImplementation(libs.junit.v412)
-    testImplementation(libs.mockito.core)
-    testImplementation(libs.powermock.module.junit4)
-    testImplementation(libs.powermock.api.mockito)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockito.inline)
+    testImplementation(libs.mockito.core.v540)
+    testImplementation(libs.mockito.junit.jupiter)
 }
