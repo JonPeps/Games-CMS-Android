@@ -1,8 +1,8 @@
 package com.jonpeps.gamescms.viewmodels
 
+import com.jonpeps.gamescms.data.CreateTableItemData
 import com.jonpeps.gamescms.data.CreateTablePairData
 import com.jonpeps.gamescms.data.ItemType
-import com.jonpeps.gamescms.data.TableItem
 import com.jonpeps.gamescms.dynamodb.mappers.IDynamoDbCreateTableMapper
 import com.jonpeps.gamescms.dynamodb.services.DynamoDbCreateTable
 import com.jonpeps.gamescms.viewmodels.dynamodbservices.CreateTableViewModel
@@ -25,41 +25,33 @@ class CreateTableViewModelTests {
     private lateinit var dynamoDbCreateTable: DynamoDbCreateTable
     private lateinit var dynamoDbCreateTableMapper: IDynamoDbCreateTableMapper
     private lateinit var viewModel: CreateTableViewModel
-    private var testItems: List<TableItem>? = null
+    private var testItems: List<CreateTableItemData>? = null
 
     @Before
     fun setup() {
         testItems =
             listOf(
-                TableItem("id",
+                CreateTableItemData("id",
                     ItemType.INT,
-                    true,
-                    "1",
-                    editable = false,
+                    isPrimary = true,
                     isSortKey = false
                 ),
-                TableItem(
+                CreateTableItemData(
                     "score",
                     ItemType.INT,
-                    false,
-                    "1000",
-                    editable = false,
+                    isPrimary = false,
                     isSortKey = true
                 ),
-                TableItem(
+                CreateTableItemData(
                     "player",
                     ItemType.STRING,
-                    false,
-                    "Peps",
-                    editable = true,
+                    isPrimary = false,
                     isSortKey = false
                 ),
-                TableItem(
+                CreateTableItemData(
                     "email",
                     ItemType.STRING,
-                    false,
-                    "jon.l.peplow@gmail.com",
-                    editable = true,
+                    isPrimary = false,
                     isSortKey = false
                 ))
 

@@ -2,7 +2,7 @@ package com.jonpeps.gamescms.viewmodels.dynamodbservices
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jonpeps.gamescms.data.TableItem
+import com.jonpeps.gamescms.data.CreateTableItemData
 import com.jonpeps.gamescms.dynamodb.mappers.IDynamoDbCreateTableMapper
 import com.jonpeps.gamescms.dynamodb.services.DynamoDbCreateTable
 import kotlinx.coroutines.CoroutineDispatcher
@@ -20,7 +20,7 @@ class CreateTableViewModel
     private val _state = MutableStateFlow(TableRequestViewModelResponse<CreateTableResponse>())
     val state: StateFlow<TableRequestViewModelResponse<CreateTableResponse>> = _state
 
-    fun createTable(tableName: String, items: List<TableItem>) {
+    fun createTable(tableName: String, items: List<CreateTableItemData>) {
         viewModelScope.launch(dispatcher) {
             val mappedItems = dynamoDbCreateTableMapper.mapToCreateTablePair(items)
             try {
