@@ -3,8 +3,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
-    id("com.google.dagger.hilt.android")
     id("org.jetbrains.kotlin.plugin.compose") version "2.1.0"
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -17,8 +17,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_18
+        targetCompatibility = JavaVersion.VERSION_18
     }
 
     defaultConfig {
@@ -85,8 +85,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     kotlin("kapt")
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
     implementation(libs.runtime)
     testImplementation(libs.junit.v412)
     implementation(libs.kotlinx.coroutines.core)
@@ -105,4 +103,9 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.material3)
     testImplementation(libs.junit)
+
+    implementation(libs.hilt.android.v256)
+    kapt(libs.hilt.android.compiler)
+
+
 }

@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.hilt
+package com.jonpeps.gamescms.hilt.bindings
 
 import com.jonpeps.gamescms.dynamodb.mappers.ICoreDynamoDbItemsMapper
 import com.jonpeps.gamescms.dynamodb.mappers.IDynamoDbCreateTableMapper
