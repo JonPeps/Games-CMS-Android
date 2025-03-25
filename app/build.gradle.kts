@@ -95,4 +95,14 @@ dependencies {
     testImplementation(libs.mockito.inline)
     testImplementation(libs.mockito.core.v540)
     testImplementation(libs.mockito.junit.jupiter)
+
+    implementation(libs.androidx.core.ktx.v1120)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose.v182)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.material3)
+    testImplementation(libs.junit)
 }
