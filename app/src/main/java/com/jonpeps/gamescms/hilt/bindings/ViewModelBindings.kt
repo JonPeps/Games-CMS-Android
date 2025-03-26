@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.hilt.bindings
 
 import com.jonpeps.gamescms.ui.createtable.viewmodels.ICreateTableTemplatePagesViewModel
-import com.jonpeps.gamescms.ui.createtable.viewmodels.ICreateTableTemplateViewModel
+import com.jonpeps.gamescms.ui.createtable.viewmodels.ICreateTableTemplatePageViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -13,7 +13,7 @@ import dagger.hilt.components.SingletonComponent
 abstract class ViewModelBindings {
     @Binds
     @ActivityScoped
-    abstract fun bindCreateTableTemplateViewModel(viewModel: ICreateTableTemplateViewModel): ICreateTableTemplateViewModel
+    abstract fun bindCreateTableTemplateViewModel(viewModel: ICreateTableTemplatePageViewModel): ICreateTableTemplatePageViewModel
 
     @Binds
     @ActivityScoped

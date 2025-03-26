@@ -4,7 +4,7 @@ import com.jonpeps.gamescms.data.ItemType
 import com.jonpeps.gamescms.data.TableItem
 import com.jonpeps.gamescms.ui.createtable.viewmodels.data.CreateTableTemplateErrorType
 
-interface ICreateTableTemplateViewModel {
+interface ICreateTableTemplatePageViewModel {
     fun populate(item: TableItem)
     fun setRowName(name: String)
     fun setItemType(type: ItemType)
@@ -21,14 +21,12 @@ interface IOnValuesChangedListener {
     fun isSortKeyChanged(isSort: Boolean)
 }
 
-class CreateTableTemplateViewModel
-    : BaseCreateTableTemplateVm<CreateTableTemplateErrorType>(), ICreateTableTemplateViewModel {
-
+class CreateTableTemplatePageViewModel
+    : BaseCreateTableTemplatesVm<CreateTableTemplateErrorType>(), ICreateTableTemplatePageViewModel {
     private var listener : IOnValuesChangedListener? = null
     private var item = TableItem()
 
     override fun populate(item: TableItem) {
-        mutableErrors.value.clear()
         this.item = item
         setRowName(item.name)
         setItemType(item.dataType)

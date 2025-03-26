@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
-interface ICreateTableTemplatePagesViewModel {
+interface ICreateTableTemplatePagesViewModel : IOnValuesChangedListener {
     fun init(items: List<TableItem>)
     fun addNew()
     fun remove()
@@ -15,13 +15,12 @@ interface ICreateTableTemplatePagesViewModel {
     fun itemCount(): Int
 }
 
-class CreateTableTemplatePagesViewModel @Inject constructor(private val createTableTemplateViewModel: CreateTableTemplateViewModel)
-    : BaseCreateTableTemplateVm<CreateTableTemplatePageErrorType>(), ICreateTableTemplatePagesViewModel {
+class CreateTableTemplatePagesViewModel
+@Inject constructor(private val createTableTemplateViewModel: CreateTableTemplatePageViewModel)
+    : BaseCreateTableTemplatesVm<CreateTableTemplatePageErrorType>(), ICreateTableTemplatePagesViewModel {
 
     private val _items = MutableStateFlow(arrayListOf<TableItem>())
     var items: StateFlow<ArrayList<TableItem>> = _items
-
-
 
     private var index = 0
 
@@ -53,6 +52,30 @@ class CreateTableTemplatePagesViewModel @Inject constructor(private val createTa
     }
 
     override fun itemCount() = _items.value.size
+
+    override fun isPrimaryChanged(isPrimary: Boolean) {
+        removeError(CreateTableTemplatePageErrorType.NO_PRIMARY_KEY)
+        var primaryKeyFound: Boolean
+        _items.value.forEach {
+            primaryKeyFound = it.isPrimary
+            if (primaryKeyFound) {
+                return
+            }
+        }
+        addError(CreateTableTemplatePageErrorType.NO_PRIMARY_KEY)
+    }
+
+    override fun isSortKeyChanged(isSort: Boolean) {
+        removeError(CreateTableTemplatePageErrorType.NO_SORT_KEY)
+        var sortKeyFound: Boolean
+        _items.value.forEach {
+            sortKeyFound = it.isSortKey
+            if (sortKeyFound) {
+                return
+            }
+        }
+        addError(CreateTableTemplatePageErrorType.NO_SORT_KEY)
+    }
 
     private fun decrementPage(): Boolean {
         if (index == 0) return false
