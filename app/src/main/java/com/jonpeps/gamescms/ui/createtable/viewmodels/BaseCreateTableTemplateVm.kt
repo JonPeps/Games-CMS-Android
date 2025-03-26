@@ -3,11 +3,8 @@ package com.jonpeps.gamescms.ui.createtable.viewmodels
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import javax.inject.Inject
 
-open class BaseCreateTableTemplateVm<Errors : Any>
-@Inject constructor(protected val createTableTemplateBridgeVm: ICreateTableTemplateBridgeVm)
-    : ViewModel() {
+open class BaseCreateTableTemplateVm<Errors : Any> : ViewModel() {
     protected val mutableErrors = MutableStateFlow(arrayListOf<Errors>())
     val errors: StateFlow<ArrayList<Errors>> = mutableErrors
 

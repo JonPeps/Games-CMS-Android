@@ -3,7 +3,6 @@ package com.jonpeps.gamescms.ui.createtable.viewmodels
 import com.jonpeps.gamescms.data.ItemType
 import com.jonpeps.gamescms.data.TableItem
 import com.jonpeps.gamescms.ui.createtable.viewmodels.data.CreateTableTemplateErrorType
-import javax.inject.Inject
 
 interface ICreateTableTemplateViewModel {
     fun populate(item: TableItem)
@@ -11,14 +10,21 @@ interface ICreateTableTemplateViewModel {
     fun setItemType(type: ItemType)
     fun setDefaultValue(value: String)
     fun setPrimary(isPrimary: Boolean)
-    fun setSortKey(isSortKey: Boolean)
+    fun setSortKey(isSort: Boolean)
     fun setIsEditable(editable: Boolean)
+    fun setListener(listener: IOnValuesChangedListener)
     fun getItem(): TableItem
 }
 
-class CreateTableTemplateViewModel@Inject constructor(createTableTemplateBridgeVm: ICreateTableTemplateBridgeVm)
-    : BaseCreateTableTemplateVm<CreateTableTemplateErrorType>(createTableTemplateBridgeVm), ICreateTableTemplateViewModel {
+interface IOnValuesChangedListener {
+    fun isPrimaryChanged(isPrimary: Boolean)
+    fun isSortKeyChanged(isSort: Boolean)
+}
 
+class CreateTableTemplateViewModel
+    : BaseCreateTableTemplateVm<CreateTableTemplateErrorType>(), ICreateTableTemplateViewModel {
+
+    private var listener : IOnValuesChangedListener? = null
     private var item = TableItem()
 
     override fun populate(item: TableItem) {
@@ -29,7 +35,6 @@ class CreateTableTemplateViewModel@Inject constructor(createTableTemplateBridgeV
         setDefaultValue(item.value)
         setPrimary(item.isPrimary)
         setSortKey(item.isSortKey)
-        createTableTemplateBridgeVm.update(item)
     }
 
     override fun setRowName(name: String) {
@@ -38,7 +43,6 @@ class CreateTableTemplateViewModel@Inject constructor(createTableTemplateBridgeV
         } else {
             removeError(CreateTableTemplateErrorType.ROW_NAME_EMPTY)
             item.name = name
-            createTableTemplateBridgeVm.update(item)
         }
     }
 
@@ -57,14 +61,20 @@ class CreateTableTemplateViewModel@Inject constructor(createTableTemplateBridgeV
 
     override fun setPrimary(isPrimary: Boolean) {
         item.isPrimary = isPrimary
+        listener?.isPrimaryChanged(isPrimary)
     }
 
-    override fun setSortKey(isSortKey: Boolean) {
-        item.isSortKey = isSortKey
+    override fun setSortKey(isSort: Boolean) {
+        item.isSortKey = isSort
+        listener?.isSortKeyChanged(isSort)
     }
 
     override fun setIsEditable(editable: Boolean) {
         item.editable = editable
+    }
+
+    override fun setListener(listener: IOnValuesChangedListener) {
+        this.listener = listener
     }
 
     override fun getItem(): TableItem = item
