@@ -10,4 +10,12 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+
+    <!-- Create Table Template Error Code strings -->
+    <string name="error_row_name_empty">Row name cannot be empty</string>
+    <string name="error_row_name_exists">Row name already exists</string>
+    <string name="error_no_value_with_not_editable">No value with not editable row</string>
+    <string name="error_no_primary_key">No primary key</string>
+    <string name="error_no_sort_key">No sort key</string>
+
 </resources>

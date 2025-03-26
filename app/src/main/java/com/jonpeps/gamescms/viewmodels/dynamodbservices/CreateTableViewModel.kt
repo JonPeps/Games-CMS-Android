@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.CreateTableItemData
 import com.jonpeps.gamescms.dynamodb.mappers.IDynamoDbCreateTableMapper
 import com.jonpeps.gamescms.dynamodb.services.DynamoDbCreateTable
+import com.jonpeps.gamescms.viewmodels.dynamodbservices.data.TableRequestViewModelResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

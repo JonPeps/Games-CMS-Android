@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.hilt
+package com.jonpeps.gamescms.ui.main
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
