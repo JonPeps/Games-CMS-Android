@@ -50,6 +50,8 @@ mockitoJunitJupiter = "5.4.0"
 mockitoKotlin = "1"
 mockitoMockitoCore = "5.4.0"
 mockk = "{version}"
+moshiKotlinCodegen = "1.14.0"
+moshiKotlinVersion = "1.14.0"
 navigationFragmentKtx = "2.8.9"
 navigationUiKtx = "2.8.9"
 powermockApiMockito = "1.6.2"
@@ -122,9 +124,11 @@ mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito
 mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockitoJunitJupiter" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+moshi-kotlin-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshiKotlinCodegen" }
 powermock-api-mockito = { module = "org.powermock:powermock-api-mockito", version.ref = "powermockApiMockito" }
 powermock-module-junit4 = { module = "org.powermock:powermock-module-junit4", version.ref = "powermockModuleJunit4" }
 runtime = { module = "androidx.compose.runtime:runtime", version.ref = "runtime" }
+squareup-moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshiKotlinVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

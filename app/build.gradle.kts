@@ -103,9 +103,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.material3)
     testImplementation(libs.junit)
-
+    implementation(libs.squareup.moshi.kotlin)
+    implementation(libs.moshi.kotlin.codegen)
     implementation(libs.hilt.android.v256)
     kapt(libs.hilt.android.compiler)
-
-
 }

@@ -9,19 +9,19 @@ interface IBaseCreateTableTemplatesVm<Errors : Any> {
 }
 
 open class BaseCreateTableTemplatesVm<Errors : Any> : ViewModel(), IBaseCreateTableTemplatesVm<Errors> {
-    protected val hasErrors = MutableStateFlow(false)
-    protected val hasGotErrors: StateFlow<Boolean> = hasErrors
+    private val _errorsListChanged = MutableStateFlow(false)
+    protected val errorsListChanged: StateFlow<Boolean> = _errorsListChanged
     private val errors = arrayListOf<Errors>()
 
     protected fun addError(error: Errors) {
         if (errors.contains(error)) return
         errors.add(error)
-        hasErrors.value = true
+        _errorsListChanged.value = true
     }
 
     protected fun removeError(error: Errors) {
         if (errors.contains(error)) errors.remove(error)
-        hasErrors.value = errors.isNotEmpty()
+        _errorsListChanged.value = true
     }
 
     override fun getErrors(): ArrayList<Errors> = errors

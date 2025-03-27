@@ -12,18 +12,19 @@ interface ICreateTableTemplatePageViewModel {
     fun setPrimary(isPrimary: Boolean)
     fun setSortKey(isSort: Boolean)
     fun setIsEditable(editable: Boolean)
-    fun setListener(listener: IOnValuesChangedListener)
+    fun setListener(listener: IOnTemplateTablePageValuesChangedListener)
     fun getItem(): TableItem
 }
 
-interface IOnValuesChangedListener {
+interface IOnTemplateTablePageValuesChangedListener {
+    fun onNameChanged(name: String)
     fun isPrimaryChanged(isPrimary: Boolean)
     fun isSortKeyChanged(isSort: Boolean)
 }
 
 class CreateTableTemplatePageViewModel
     : BaseCreateTableTemplatesVm<CreateTableTemplateErrorType>(), ICreateTableTemplatePageViewModel {
-    private var listener : IOnValuesChangedListener? = null
+    private var listener : IOnTemplateTablePageValuesChangedListener? = null
     private var item = TableItem()
 
     override fun populate(item: TableItem) {
@@ -41,6 +42,7 @@ class CreateTableTemplatePageViewModel
         } else {
             removeError(CreateTableTemplateErrorType.ROW_NAME_EMPTY)
             item.name = name
+            listener?.onNameChanged(name)
         }
     }
 
@@ -71,7 +73,7 @@ class CreateTableTemplatePageViewModel
         item.editable = editable
     }
 
-    override fun setListener(listener: IOnValuesChangedListener) {
+    override fun setListener(listener: IOnTemplateTablePageValuesChangedListener) {
         this.listener = listener
     }
 

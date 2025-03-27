@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
-interface ICreateTableTemplatePagesViewModel : IOnValuesChangedListener {
+interface ICreateTableTemplatePagesViewModel : IOnTemplateTablePageValuesChangedListener {
     fun init(items: List<TableItem>)
     fun addNew()
     fun remove()
@@ -16,21 +16,24 @@ interface ICreateTableTemplatePagesViewModel : IOnValuesChangedListener {
 }
 
 class CreateTableTemplatePagesViewModel
-@Inject constructor(private val createTableTemplateViewModel: CreateTableTemplatePageViewModel)
+@Inject constructor(private val createTableTemplatePageViewModel: CreateTableTemplatePageViewModel)
     : BaseCreateTableTemplatesVm<CreateTableTemplatePageErrorType>(), ICreateTableTemplatePagesViewModel {
 
     private val _items = MutableStateFlow(arrayListOf<TableItem>())
     var items: StateFlow<ArrayList<TableItem>> = _items
 
     private var index = 0
+    private var rowId = 0
 
     override fun init(items: List<TableItem>) {
         _items.value = items as ArrayList<TableItem>
+        createTableTemplatePageViewModel.setListener(this)
+        createTableTemplatePageViewModel.populate(_items.value[index])
     }
 
     override fun addNew() {
         val item = TableItem()
-        createTableTemplateViewModel.populate(item)
+        createTableTemplatePageViewModel.populate(item)
         index++
         _items.value.add(index, item)
     }
@@ -44,7 +47,7 @@ class CreateTableTemplatePagesViewModel
     override fun nextPage() {
         if (index == _items.value.size - 1) return
         index++
-        createTableTemplateViewModel.populate(_items.value[index])
+        createTableTemplatePageViewModel.populate(_items.value[index])
     }
 
     override fun previousPage() {
@@ -53,12 +56,20 @@ class CreateTableTemplatePagesViewModel
 
     override fun itemCount() = _items.value.size
 
+    override fun onNameChanged(name: String) {
+        removeError(CreateTableTemplatePageErrorType.ROW_NAME_EXISTS)
+        _items.value.forEach {
+            if (it.name == name) {
+                addError(CreateTableTemplatePageErrorType.ROW_NAME_EXISTS)
+                return
+            }
+        }
+    }
+
     override fun isPrimaryChanged(isPrimary: Boolean) {
         removeError(CreateTableTemplatePageErrorType.NO_PRIMARY_KEY)
-        var primaryKeyFound: Boolean
         _items.value.forEach {
-            primaryKeyFound = it.isPrimary
-            if (primaryKeyFound) {
+            if (it.isPrimary) {
                 return
             }
         }
@@ -67,10 +78,8 @@ class CreateTableTemplatePagesViewModel
 
     override fun isSortKeyChanged(isSort: Boolean) {
         removeError(CreateTableTemplatePageErrorType.NO_SORT_KEY)
-        var sortKeyFound: Boolean
         _items.value.forEach {
-            sortKeyFound = it.isSortKey
-            if (sortKeyFound) {
+            if (it.isSortKey) {
                 return
             }
         }
@@ -80,7 +89,7 @@ class CreateTableTemplatePagesViewModel
     private fun decrementPage(): Boolean {
         if (index == 0) return false
         index--
-        createTableTemplateViewModel.populate(_items.value[index])
+        createTableTemplatePageViewModel.populate(_items.value[index])
         return true
     }
 }
