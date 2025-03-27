@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.data
+package com.jonpeps.gamescms.data.dataclasses
 
 import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition
 import software.amazon.awssdk.services.dynamodb.model.KeySchemaElement

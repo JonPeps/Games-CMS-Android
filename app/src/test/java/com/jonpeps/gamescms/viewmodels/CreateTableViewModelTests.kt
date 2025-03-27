@@ -1,11 +1,11 @@
 package com.jonpeps.gamescms.viewmodels
 
-import com.jonpeps.gamescms.data.CreateTableItemData
-import com.jonpeps.gamescms.data.CreateTablePairData
-import com.jonpeps.gamescms.data.ItemType
+import com.jonpeps.gamescms.data.dataclasses.CreateTableItemData
+import com.jonpeps.gamescms.data.dataclasses.CreateTablePairData
+import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.dynamodb.mappers.IDynamoDbCreateTableMapper
 import com.jonpeps.gamescms.dynamodb.services.DynamoDbCreateTable
-import com.jonpeps.gamescms.viewmodels.dynamodbservices.CreateTableViewModel
+import com.jonpeps.gamescms.ui.createtable.viewmodels.CreateTableViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -53,7 +53,8 @@ class CreateTableViewModelTests {
                     ItemType.STRING,
                     isPrimary = false,
                     isSortKey = false
-                ))
+                )
+            )
 
         dynamoDbCreateTable = Mockito.mock(DynamoDbCreateTable::class.java)
         dynamoDbCreateTableMapper = Mockito.mock(IDynamoDbCreateTableMapper::class.java)

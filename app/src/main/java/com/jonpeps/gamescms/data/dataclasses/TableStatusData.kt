@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.data
+package com.jonpeps.gamescms.data.dataclasses
 
 data class TableStatusData(
     val tableName: String,

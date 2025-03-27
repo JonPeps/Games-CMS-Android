@@ -1,6 +1,6 @@
 package com.jonpeps.gamescms.hilt.bindings
 
-import com.jonpeps.gamescms.data.io.ISerializeString
+import com.jonpeps.gamescms.data.core.ISerializeString
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

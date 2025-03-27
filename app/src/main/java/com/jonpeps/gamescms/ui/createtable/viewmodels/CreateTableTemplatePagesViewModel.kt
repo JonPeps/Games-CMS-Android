@@ -1,6 +1,6 @@
 package com.jonpeps.gamescms.ui.createtable.viewmodels
 
-import com.jonpeps.gamescms.data.TableItem
+import com.jonpeps.gamescms.data.dataclasses.TableItem
 import com.jonpeps.gamescms.ui.createtable.viewmodels.data.CreateTableTemplatePageErrorType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

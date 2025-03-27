@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.io
 
-import com.jonpeps.gamescms.data.io.SerializeString
-import com.jonpeps.gamescms.data.io.SerializeStringStatus
+import com.jonpeps.gamescms.data.core.SerializeString
+import com.jonpeps.gamescms.data.core.SerializeStringStatus
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4

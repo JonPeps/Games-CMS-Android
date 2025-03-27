@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.viewmodels.dynamodbservices.data
+package com.jonpeps.gamescms.ui.createtable.viewmodels.data
 
 class TableRequestViewModelResponse<T>(
     val success: Boolean? = false,

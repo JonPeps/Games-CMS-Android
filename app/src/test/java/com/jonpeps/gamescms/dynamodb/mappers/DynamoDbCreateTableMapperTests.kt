@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.dynamodb.mappers
 
-import com.jonpeps.gamescms.data.CreateTableItemData
-import com.jonpeps.gamescms.data.ItemType
+import com.jonpeps.gamescms.data.dataclasses.CreateTableItemData
+import com.jonpeps.gamescms.data.dataclasses.ItemType
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,7 +39,8 @@ class DynamoDbCreateTableMapperTests {
                     ItemType.STRING,
                     isPrimary = false,
                     isSortKey = false
-                ))
+                )
+            )
 
     }
 

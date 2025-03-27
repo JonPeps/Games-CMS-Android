@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.ui.createtable.viewmodels
 
-import com.jonpeps.gamescms.data.ItemType
-import com.jonpeps.gamescms.data.TableItem
+import com.jonpeps.gamescms.data.dataclasses.ItemType
+import com.jonpeps.gamescms.data.dataclasses.TableItem
 import com.jonpeps.gamescms.ui.createtable.viewmodels.data.CreateTableTemplateErrorType
 
 interface ICreateTableTemplatePageViewModel {

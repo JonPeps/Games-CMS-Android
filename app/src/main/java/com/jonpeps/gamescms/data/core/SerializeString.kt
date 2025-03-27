@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.data.io
+package com.jonpeps.gamescms.data.core
 
 import java.io.BufferedReader
 import java.io.FileWriter
@@ -16,11 +16,11 @@ data class SerializeStringStatusGroup(val status: SerializeStringStatus, val mes
 interface ISerializeString {
     fun write(fileName: String, fileWriter: FileWriter, fileContents: String)
     fun read(bufferedReader: BufferedReader): String
-    fun getStatus(): SerializeStringStatusGroup?
+    fun getStatus(): SerializeStringStatusGroup
 }
 
 class SerializeString : ISerializeString {
-    private var status: SerializeStringStatusGroup? = null
+    private lateinit var status: SerializeStringStatusGroup
 
     override fun write(fileName: String, fileWriter: FileWriter, fileContents: String) {
         status = SerializeStringStatusGroup(SerializeStringStatus.SUCCESS, "")
@@ -46,9 +46,9 @@ class SerializeString : ISerializeString {
         return stringBuilder.toString()
     }
 
-    override fun getStatus(): SerializeStringStatusGroup? = status
+    override fun getStatus(): SerializeStringStatusGroup = status
 
     companion object {
-        public const val UNCHECKED_IO_MESSAGE = "Failed to read from String buffer!"
+        const val UNCHECKED_IO_MESSAGE = "Failed to read from String buffer!"
     }
 }
