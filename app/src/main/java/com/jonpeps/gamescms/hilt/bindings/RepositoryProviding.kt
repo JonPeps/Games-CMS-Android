@@ -1,0 +1,17 @@
+package com.jonpeps.gamescms.hilt.bindings
+
+import com.jonpeps.gamescms.data.core.IMoshiJsonAdapterCreator
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+class RepositoryProviding {
+    @Provides
+    @Singleton
+    fun provideMoshiJsonAdapterTableItem(moshiJsonAdapterCreator: IMoshiJsonAdapterCreator)
+        = moshiJsonAdapterCreator.getTableItemTemplateJsonAdapter()
+}

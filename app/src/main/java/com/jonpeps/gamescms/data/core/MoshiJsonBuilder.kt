@@ -4,6 +4,6 @@ import com.squareup.moshi.Moshi
 
 class MoshiJsonBuilder {
     companion object {
-        fun build() = Moshi.Builder().build()
+        fun build(): Moshi = Moshi.Builder().build()
     }
 }

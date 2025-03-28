@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.exceptions.base.MockitoException
 import org.mockito.junit.MockitoJUnitRunner
@@ -22,8 +23,11 @@ import software.amazon.awssdk.services.dynamodb.model.CreateTableResponse
 class CreateTableViewModelTests {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val dispatcher = UnconfinedTestDispatcher()
+    @Mock
     private lateinit var dynamoDbCreateTable: DynamoDbCreateTable
+    @Mock
     private lateinit var dynamoDbCreateTableMapper: IDynamoDbCreateTableMapper
+
     private lateinit var viewModel: CreateTableViewModel
     private var testItems: List<CreateTableItemData>? = null
 

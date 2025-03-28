@@ -1,6 +1,7 @@
 package com.jonpeps.gamescms.hilt.bindings
 
-import com.jonpeps.gamescms.data.core.ISerializeString
+import com.jonpeps.gamescms.data.core.IMoshiJsonAdapterCreator
+import com.jonpeps.gamescms.data.core.IStringSerialization
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -12,5 +13,9 @@ import javax.inject.Singleton
 abstract class RepositoryBindings {
     @Binds
     @Singleton
-    abstract fun provideSerializeString(serializeString: ISerializeString): ISerializeString
+    abstract fun provideSerializeString(serializeString: IStringSerialization): IStringSerialization
+
+    @Binds
+    @Singleton
+    abstract fun provideMoshiJsonAdapterCreator(moshiJsonAdapterCreator: IMoshiJsonAdapterCreator): IMoshiJsonAdapterCreator
 }
