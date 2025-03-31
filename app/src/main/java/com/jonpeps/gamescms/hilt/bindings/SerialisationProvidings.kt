@@ -9,7 +9,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class RepositoryProviding {
+class SerialisationProvidings {
     @Provides
     @Singleton
     fun provideMoshiJsonAdapterTableItem(moshiJsonAdapterCreator: IMoshiJsonAdapterCreator)

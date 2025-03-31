@@ -1,6 +1,5 @@
 package com.jonpeps.gamescms.data.serialization
 
-import com.jonpeps.gamescms.data.core.StringSerialization
 import com.jonpeps.gamescms.data.core.MoshiJsonAdapterCreator
 import com.jonpeps.gamescms.data.dataclasses.TableItem
 import com.jonpeps.gamescms.data.dataclasses.TableItemList

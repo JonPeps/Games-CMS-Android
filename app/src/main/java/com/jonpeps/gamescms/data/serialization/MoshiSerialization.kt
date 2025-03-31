@@ -1,6 +1,5 @@
 package com.jonpeps.gamescms.data.serialization
 
-import com.jonpeps.gamescms.data.core.IStringSerialization
 import com.squareup.moshi.JsonAdapter
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

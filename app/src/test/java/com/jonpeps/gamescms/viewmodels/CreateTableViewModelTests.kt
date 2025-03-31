@@ -73,7 +73,7 @@ class CreateTableViewModelTests {
         Mockito.`when`(dynamoDbCreateTable.create("testTable", listOf(), listOf())).thenReturn(createTableResponse)
         viewModel.createTable("testTable", testItems!!)
         val response = viewModel.state.value
-        assert(response.success!!)
+        assert(response.success)
         assert(response.response == createTableResponse)
         assert(response.exception == null)
     }
@@ -86,7 +86,7 @@ class CreateTableViewModelTests {
             MockitoException::class.java)
         viewModel.createTable("testTable", testItems!!)
         val response = viewModel.state.value
-        assert(!response.success!!)
+        assert(!response.success)
         assert(response.response == null)
         assert(response.exception != null)
     }
