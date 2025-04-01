@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.data.serialization
+package com.jonpeps.gamescms.data.serialization.base
 
 import java.io.BufferedReader
 import java.io.FileWriter

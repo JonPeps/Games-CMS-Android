@@ -1,5 +1,6 @@
-package com.jonpeps.gamescms.data.serialization
+package com.jonpeps.gamescms.data.serialization.string
 
+import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileWriter
@@ -9,10 +10,12 @@ interface IStrFileStorageWriteContents {
     fun getDirectory(): File
     fun getFile(): File
     fun getContents(): String
+    fun getFileWriter(): FileWriter
 }
 
 interface IStrFileStorageReadContents {
     fun getAbsoluteFile(): File
+    fun getBufferedReader(): BufferedReader
 }
 
 interface IStringFileStorageStrSerialisation {
@@ -23,11 +26,13 @@ interface IStringFileStorageStrSerialisation {
 }
 
 class StringFileStorageStrSerialisation
-@Inject constructor(private val stringSerialization: IStringSerialization) : IStringFileStorageStrSerialisation {
+@Inject constructor(private val stringSerialization: IStringSerialization) :
+    IStringFileStorageStrSerialisation {
     private var contents: String = ""
     private var errorMsg: String = ""
 
     override fun write(toWrite: IStrFileStorageWriteContents): Boolean {
+        errorMsg = ""
         val directory = toWrite.getDirectory()
         val file = toWrite.getFile()
         try {
@@ -47,10 +52,12 @@ class StringFileStorageStrSerialisation
             errorMsg = ex.message.toString()
             return false
         }
-        return stringSerialization.write(file.name, FileWriter(file), toWrite.getContents())
+        return stringSerialization.write(file.name, toWrite.getFileWriter(), toWrite.getContents())
     }
 
     override fun read(toRead: IStrFileStorageReadContents): Boolean {
+        errorMsg = ""
+        contents = ""
         val file = toRead.getAbsoluteFile()
         try {
             if (!file.exists()) {
@@ -61,7 +68,7 @@ class StringFileStorageStrSerialisation
             errorMsg = ex.message.toString()
             return false
         }
-        if (stringSerialization.read(FileInputStream(file).bufferedReader())) {
+        if (stringSerialization.read(toRead.getBufferedReader())) {
             contents = stringSerialization.getContents()
             return true
         }

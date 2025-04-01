@@ -1,6 +1,6 @@
 package com.jonpeps.gamescms.hilt.bindings
 
-import com.jonpeps.gamescms.data.core.IMoshiJsonAdapterCreator
+import com.jonpeps.gamescms.data.serialization.moshi.IMoshiJsonAdapterCreator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

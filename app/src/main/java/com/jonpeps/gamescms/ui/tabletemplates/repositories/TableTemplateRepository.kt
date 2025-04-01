@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.ui.tabletemplates.repositories
 
 import com.jonpeps.gamescms.data.dataclasses.TableItem
-import com.jonpeps.gamescms.data.serialization.ITableItemListMoshiSerialization
+import com.jonpeps.gamescms.data.serialization.moshi.ITableItemListMoshiSerialization
 import javax.inject.Inject
 
 interface ITableTemplateRepository {
@@ -14,7 +14,8 @@ interface ITableTemplateRepository {
 
 class TableTemplateRepository
 @Inject constructor(
-    private val tableTemplateRepository: ITableItemListMoshiSerialization)
+    private val tableTemplateRepository: ITableItemListMoshiSerialization
+)
     : ITableTemplateRepository {
 
     override fun loadTemplate(name: String): Boolean {

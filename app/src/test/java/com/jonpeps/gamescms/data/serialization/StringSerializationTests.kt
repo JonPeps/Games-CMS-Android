@@ -1,6 +1,6 @@
-package com.jonpeps.gamescms.data.core
+package com.jonpeps.gamescms.data.serialization
 
-import com.jonpeps.gamescms.data.serialization.StringSerialization
+import com.jonpeps.gamescms.data.serialization.string.StringSerialization
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4

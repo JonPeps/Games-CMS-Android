@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.data.core
+package com.jonpeps.gamescms.data.serialization.moshi
 
 import com.jonpeps.gamescms.data.dataclasses.TableItemList
 import com.squareup.moshi.JsonAdapter

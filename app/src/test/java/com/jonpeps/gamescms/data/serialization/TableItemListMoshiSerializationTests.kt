@@ -1,8 +1,10 @@
 package com.jonpeps.gamescms.data.serialization
 
-import com.jonpeps.gamescms.data.core.MoshiJsonAdapterCreator
+import com.jonpeps.gamescms.data.serialization.moshi.MoshiJsonAdapterCreator
 import com.jonpeps.gamescms.data.dataclasses.TableItem
 import com.jonpeps.gamescms.data.dataclasses.TableItemList
+import com.jonpeps.gamescms.data.serialization.moshi.TableItemListMoshiSerialization
+import com.jonpeps.gamescms.data.serialization.string.StringSerialization
 import com.squareup.moshi.JsonAdapter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
