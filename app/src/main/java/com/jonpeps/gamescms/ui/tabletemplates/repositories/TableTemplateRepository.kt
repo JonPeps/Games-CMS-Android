@@ -1,27 +1,22 @@
 package com.jonpeps.gamescms.ui.tabletemplates.repositories
 
-import com.jonpeps.gamescms.data.dataclasses.TableItemList
+import com.jonpeps.gamescms.data.dataclasses.TableItem
 import com.jonpeps.gamescms.data.serialization.ITableItemListMoshiSerialization
 import javax.inject.Inject
-
-data class TableTemplateRepositoryStatus(
-    var success: Boolean,
-    var item: TableItemList,
-    var message: String?,
-    var ex: Exception?)
 
 interface ITableTemplateRepository {
     fun loadTemplate(name: String): Boolean
     fun saveTemplate(name: String): Boolean
     fun deleteTemplate(name: String): Boolean
-    fun getRepositoryStatus(): TableTemplateRepositoryStatus
+    fun getItem(): TableItem?
+    fun getErrorMsg(): String
 }
 
-class TableTemplateRepository@Inject
-constructor(
+class TableTemplateRepository
+@Inject constructor(
     private val tableTemplateRepository: ITableItemListMoshiSerialization)
     : ITableTemplateRepository {
-        
+
     override fun loadTemplate(name: String): Boolean {
         TODO("Not yet implemented")
     }
@@ -34,8 +29,13 @@ constructor(
         TODO("Not yet implemented")
     }
 
-    override fun getRepositoryStatus(): TableTemplateRepositoryStatus {
+    override fun getItem(): TableItem? {
         TODO("Not yet implemented")
     }
+
+    override fun getErrorMsg(): String {
+        TODO("Not yet implemented")
+    }
+
 
 }

@@ -60,8 +60,6 @@ class CreateTableViewModelTests {
                 )
             )
 
-        dynamoDbCreateTable = Mockito.mock(DynamoDbCreateTable::class.java)
-        dynamoDbCreateTableMapper = Mockito.mock(IDynamoDbCreateTableMapper::class.java)
         viewModel = CreateTableViewModel(dynamoDbCreateTable, dynamoDbCreateTableMapper, dispatcher)
     }
 

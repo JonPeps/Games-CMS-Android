@@ -43,12 +43,7 @@ class TableItemListMoshiSerializationTests {
 
     @Before
     fun setup() {
-        bufferedReader = mock(BufferedReader::class.java)
-        fileWriter = mock(FileWriter::class.java)
-        serializeString = mock(StringSerialization::class.java)
-        moshiJsonAdapterCreator = mock(MoshiJsonAdapterCreator::class.java)
         moshiJsonAdapter = mock(JsonAdapter::class.java) as JsonAdapter<TableItemList>
-        mockDummyData = mock(TableItemList::class.java)
         serializer = TableItemListMoshiSerialization(moshiJsonAdapterCreator, serializeString, dispatcher)
     }
 
