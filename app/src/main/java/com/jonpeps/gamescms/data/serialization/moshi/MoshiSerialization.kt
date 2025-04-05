@@ -1,54 +1,42 @@
 package com.jonpeps.gamescms.data.serialization.moshi
 
-import com.jonpeps.gamescms.data.serialization.string.IStringSerialization
-import com.jonpeps.gamescms.data.serialization.base.IBaseSerialization
 import com.squareup.moshi.JsonAdapter
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import java.io.BufferedReader
-import java.io.FileWriter
 import java.io.IOException
 
-abstract class MoshiSerialization<T>(private val serializeString: IStringSerialization,
-                                     private val dispatcher: CoroutineDispatcher
-) : IBaseSerialization<T> {
+abstract class MoshiSerialization<T>(private val dispatcher: CoroutineDispatcher
+) : IBaseMoshiSerialization<T> {
     private var item: T? = null
+    private var jsonItem: String = ""
     private var errorMsg: String = ""
 
-    override suspend fun load(fileName: String, reader: BufferedReader): Boolean {
+    override suspend fun fromJson(contents: String): Boolean {
+        item = null
+        errorMsg = ""
         return withContext(dispatcher) {
-            item = null
             var success = false
-            if (serializeString.read(reader)) {
-                try {
-                    item = getMoshiAdapter().fromJson(serializeString.getContents())
-                    success = true
-                } catch (ex : IOException) {
-                    errorMsg = ex.message.toString()
-                }
-            } else {
-                errorMsg = serializeString.getErrorMsg()
+            try {
+                item = getMoshiAdapter().fromJson(contents)
+                success = true
+            } catch (ex : IOException) {
+                errorMsg = ex.message.toString()
             }
             return@withContext success
         }
     }
 
-    override suspend fun save(fileName: String, item: T, writer: FileWriter): Boolean {
+    override suspend fun toJson(item: T): Boolean {
+        errorMsg = ""
         return withContext(dispatcher) {
             var success: Boolean
-            errorMsg = ""
             try {
-                val jsonStr = getMoshiAdapter().toJson(item)
-                if (jsonStr.isNullOrEmpty()) {
+                jsonItem = getMoshiAdapter().toJson(item)
+                if (jsonItem == null || jsonItem.isEmpty()) {
                     success = false
-                    errorMsg = "Failed to write to file $fileName!"
+                    errorMsg = CONVERT_TO_JSON_ERROR_MESSAGE + item.toString()
                 } else {
-                    if (serializeString.write(fileName, writer, jsonStr.toString())) {
-                        success = true
-                    } else {
-                        success = false
-                        errorMsg = serializeString.getErrorMsg()
-                    }
+                    success = true
                 }
             } catch (ex: AssertionError) {
                 success = false
@@ -60,5 +48,10 @@ abstract class MoshiSerialization<T>(private val serializeString: IStringSeriali
 
     abstract fun getMoshiAdapter(): JsonAdapter<T>
     override fun getItem(): T? = item
+    override fun getToJsonItem(): String = jsonItem
     override fun getErrorMsg(): String = errorMsg
+
+    companion object {
+        const val CONVERT_TO_JSON_ERROR_MESSAGE = "Failed to convert item to Json: "
+    }
 }

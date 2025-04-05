@@ -1,79 +1,90 @@
 package com.jonpeps.gamescms.data.serialization.string
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileWriter
 import javax.inject.Inject
 
-interface IStrFileStorageWriteContents {
-    fun getDirectory(): File
-    fun getFile(): File
-    fun getContents(): String
-    fun getFileWriter(): FileWriter
-}
-
-interface IStrFileStorageReadContents {
-    fun getAbsoluteFile(): File
-    fun getBufferedReader(): BufferedReader
-}
-
 interface IStringFileStorageStrSerialisation {
-    fun write(toWrite: IStrFileStorageWriteContents): Boolean
-    fun read(toRead: IStrFileStorageReadContents): Boolean
+    suspend fun write(directory: File,
+                      mainFile: File,
+                      fileWriter: FileWriter,
+                      contents: String): Boolean
+
+    suspend fun read(absoluteFile: File, bufferedReader: BufferedReader): Boolean
+
     fun getContents(): String
     fun getErrorMsg(): String
 }
 
 class StringFileStorageStrSerialisation
-@Inject constructor(private val stringSerialization: IStringSerialization) :
+@Inject constructor(private val stringSerialization: IStringSerialization,
+    private val dispatcher: CoroutineDispatcher
+) :
     IStringFileStorageStrSerialisation {
     private var contents: String = ""
     private var errorMsg: String = ""
 
-    override fun write(toWrite: IStrFileStorageWriteContents): Boolean {
-        errorMsg = ""
-        val directory = toWrite.getDirectory()
-        val file = toWrite.getFile()
-        try {
-            if (!directory.exists()) {
-                if (!directory.mkdir()) {
-                    errorMsg = FAILED_TO_CREATE_DIRECTORY + directory.name
-                    return false
+    override suspend fun write(directory: File,
+                               mainFile: File,
+                               fileWriter: FileWriter,
+                               contents: String): Boolean {
+        return withContext(dispatcher) {
+            errorMsg = ""
+            var success = true
+            try {
+                if (!directory.exists()) {
+                    if (!directory.mkdir()) {
+                        errorMsg = FAILED_TO_CREATE_DIRECTORY + directory.name
+                        success = false
+                    }
                 }
-            }
-            if (!file.exists()) {
-                if (!file.createNewFile()) {
-                    errorMsg = FAILED_TO_CREATE_FILE + file.name
-                    return false
+                if (success) {
+                    if (!mainFile.exists()) {
+                        if (!mainFile.createNewFile()) {
+                            errorMsg = FAILED_TO_CREATE_FILE + mainFile.name
+                            success = false
+                        }
+                    }
                 }
+            } catch (ex: Exception) {
+                errorMsg = ex.message.toString()
+                success = false
             }
-        } catch(ex: Exception) {
-            errorMsg = ex.message.toString()
-            return false
+            if (!success) return@withContext false
+            return@withContext stringSerialization.write(
+                directory.name + mainFile.name,
+                fileWriter,
+                contents
+            )
         }
-        return stringSerialization.write(file.name, toWrite.getFileWriter(), toWrite.getContents())
     }
 
-    override fun read(toRead: IStrFileStorageReadContents): Boolean {
-        errorMsg = ""
-        contents = ""
-        val file = toRead.getAbsoluteFile()
-        try {
-            if (!file.exists()) {
-                errorMsg = FILE_DOES_NOT_EXIST + file.name
-                return false
+    override suspend fun read(absoluteFile: File, bufferedReader: BufferedReader): Boolean {
+        return withContext(dispatcher) {
+            errorMsg = ""
+            contents = ""
+            var success = true
+            try {
+                if (!absoluteFile.exists()) {
+                    errorMsg = FILE_DOES_NOT_EXIST + absoluteFile.name
+                    success = false
+                }
+            } catch (ex: Exception) {
+                errorMsg = ex.message.toString()
+                success = false
             }
-        } catch(ex: Exception) {
-            errorMsg = ex.message.toString()
-            return false
+            if (!success) return@withContext false
+            if (stringSerialization.read(bufferedReader)) {
+                contents = stringSerialization.getContents()
+            } else {
+                success = false
+                errorMsg = stringSerialization.getErrorMsg()
+            }
+            return@withContext success
         }
-        if (stringSerialization.read(toRead.getBufferedReader())) {
-            contents = stringSerialization.getContents()
-            return true
-        }
-        errorMsg = stringSerialization.getErrorMsg()
-        return false
     }
 
     override fun getContents(): String = contents

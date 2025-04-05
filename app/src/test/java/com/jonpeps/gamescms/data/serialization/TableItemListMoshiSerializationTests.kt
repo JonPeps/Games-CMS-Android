@@ -4,7 +4,6 @@ import com.jonpeps.gamescms.data.serialization.moshi.MoshiJsonAdapterCreator
 import com.jonpeps.gamescms.data.dataclasses.TableItem
 import com.jonpeps.gamescms.data.dataclasses.TableItemList
 import com.jonpeps.gamescms.data.serialization.moshi.TableItemListMoshiSerialization
-import com.jonpeps.gamescms.data.serialization.string.StringSerialization
 import com.squareup.moshi.JsonAdapter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -16,8 +15,6 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.mockito.junit.MockitoJUnitRunner
-import java.io.BufferedReader
-import java.io.FileWriter
 import java.io.IOException
 
 @Suppress("UNCHECKED_CAST")
@@ -26,18 +23,9 @@ class TableItemListMoshiSerializationTests {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val dispatcher = UnconfinedTestDispatcher()
     @Mock
-    private lateinit var bufferedReader: BufferedReader
-    @Mock
-    private lateinit var fileWriter: FileWriter
-    @Mock
-    private lateinit var serializeString: StringSerialization
-    @Mock
     private lateinit var moshiJsonAdapterCreator: MoshiJsonAdapterCreator
     @Mock
     private lateinit var moshiJsonAdapter: JsonAdapter<TableItemList>
-
-    @Mock
-    private lateinit var mockDummyData: TableItemList
 
     private lateinit var serializer: TableItemListMoshiSerialization
 
@@ -46,84 +34,63 @@ class TableItemListMoshiSerializationTests {
     @Before
     fun setup() {
         moshiJsonAdapter = mock(JsonAdapter::class.java) as JsonAdapter<TableItemList>
-        serializer = TableItemListMoshiSerialization(moshiJsonAdapterCreator, serializeString, dispatcher)
+        serializer = TableItemListMoshiSerialization(moshiJsonAdapterCreator, dispatcher)
     }
 
     @Test
-    fun `test load Json and convert to table item template success`() = runTest(dispatcher) {
-        Mockito.`when`(serializeString.read(bufferedReader)).thenReturn(true)
-        Mockito.`when`(serializer.getMoshiAdapter()).thenReturn(moshiJsonAdapter)
-        Mockito.`when`(moshiJsonAdapter.fromJson("")).thenReturn(dummyData)
-        Mockito.`when`(serializeString.getContents()).thenReturn("")
-        val success = serializer.load("", bufferedReader)
-        assert(success)
-        assert(serializer.getItem() == dummyData)
-    }
-
-    @Test
-    fun `test load Json and failure to read string error`() = runTest(dispatcher) {
-        Mockito.`when`(serializeString.read(bufferedReader)).thenReturn(false)
-        val success = serializer.load("", bufferedReader)
-        assert(!success)
+    fun `test content converted from Json to table item template success`() = runTest(dispatcher) {
         assert(serializer.getItem() == null)
-        assert(serializer.getErrorMsg() != "")
-    }
-
-    @Test
-    fun `test load Json fails due to IOException thrown when parsing Json`() = runTest(dispatcher) {
-        Mockito.`when`(serializeString.read(bufferedReader)).thenReturn(true)
+        assert(serializer.getErrorMsg() == "")
         Mockito.`when`(serializer.getMoshiAdapter()).thenReturn(moshiJsonAdapter)
-        Mockito.`when`(moshiJsonAdapter.fromJson("")).thenThrow(mock(IOException::class.java))
-        Mockito.`when`(serializeString.getContents()).thenReturn("")
-        val success = serializer.load("", bufferedReader)
-        assert(!success)
-        assert(serializer.getItem() == null)
-        assert(serializer.getErrorMsg() != "")
-    }
-
-    @Test
-    fun `test save table item to Json string success`() = runTest(dispatcher) {
-        Mockito.`when`(serializeString.write("test.txt", fileWriter, "test")).thenReturn(true)
-        Mockito.`when`(serializer.getMoshiAdapter()).thenReturn(moshiJsonAdapter)
-        Mockito.`when`(moshiJsonAdapter.toJson(mockDummyData)).thenReturn("test")
-        val success = serializer.save("test.txt", mockDummyData, fileWriter)
+        Mockito.`when`(moshiJsonAdapter.fromJson("Dummy Json")).thenReturn(dummyData)
+        val success = serializer.fromJson("Dummy Json")
         assert(success)
     }
 
     @Test
-    fun `test save table item to Json string failure when write string fails`() = runTest(dispatcher) {
-        Mockito.`when`(serializeString.write("test.txt", fileWriter, "test")).thenReturn(false)
+    fun `test content converted from Json to table item template failure due to exception`() = runTest(dispatcher) {
+        assert(serializer.getItem() == null)
+        assert(serializer.getErrorMsg() == "")
         Mockito.`when`(serializer.getMoshiAdapter()).thenReturn(moshiJsonAdapter)
-        Mockito.`when`(moshiJsonAdapter.toJson(mockDummyData)).thenReturn("test")
-        Mockito.`when`(serializeString.getErrorMsg()).thenReturn("error")
-        val success = serializer.save("test.txt", mockDummyData, fileWriter)
+        Mockito.`when`(moshiJsonAdapter.fromJson("Dummy Json")).thenThrow(IOException())
+        val success = serializer.fromJson("Dummy Json")
         assert(!success)
-        assert(serializer.getErrorMsg() == "error")
+        assert(serializer.getErrorMsg() != "")
     }
 
     @Test
-    fun `test save table item to Json string failure when conversion to Json is empty string`() = runTest(dispatcher) {
+    fun `test convert to table item template to Json success`() = runTest(dispatcher) {
+        assert(serializer.getErrorMsg() == "")
         Mockito.`when`(serializer.getMoshiAdapter()).thenReturn(moshiJsonAdapter)
-        Mockito.`when`(moshiJsonAdapter.toJson(mockDummyData)).thenReturn("")
-        val success = serializer.save("test.txt", mockDummyData, fileWriter)
-        assert(!success)
-        assert(serializer.getErrorMsg() == "Failed to write to file test.txt!")
+        Mockito.`when`(moshiJsonAdapter.toJson(dummyData)).thenReturn("Dummy Json")
+        val success = serializer.toJson(dummyData)
+        assert(success)
+        assert(serializer.getErrorMsg() == "")
     }
 
     @Test
-    fun `test save table item to Json string failure when conversion to Json is null string`() = runTest(dispatcher) {
+    fun `test convert to table item template to Json fails due to null string`()  = runTest(dispatcher) {
         Mockito.`when`(serializer.getMoshiAdapter()).thenReturn(moshiJsonAdapter)
-        Mockito.`when`(moshiJsonAdapter.toJson(mockDummyData)).thenReturn(null)
-        val success = serializer.save("test.txt", mockDummyData, fileWriter)
+        Mockito.`when`(moshiJsonAdapter.toJson(dummyData)).thenReturn(null)
+        val success = serializer.toJson(dummyData)
         assert(!success)
-        assert(serializer.getErrorMsg() == "Failed to write to file test.txt!")
     }
 
     @Test
-    fun `test save table item to Json string failure when write IOException is thrown`() = runTest(dispatcher) {
+    fun `test convert to table item template to Json fails due to empty string`()  = runTest(dispatcher) {
+        assert(serializer.getErrorMsg() == "")
         Mockito.`when`(serializer.getMoshiAdapter()).thenReturn(moshiJsonAdapter)
-        Mockito.`when`(moshiJsonAdapter.toJson(mockDummyData)).thenThrow(mock(AssertionError::class.java))
-        val success = serializer.save("test.txt", mockDummyData, fileWriter)
+        Mockito.`when`(moshiJsonAdapter.toJson(dummyData)).thenReturn("")
+        val success = serializer.toJson(dummyData)
+        assert(!success)
+    }
+
+    @Test
+    fun `test convert to table item template to Json fails due to assertion exception`()  = runTest(dispatcher) {
+        assert(serializer.getErrorMsg() == "")
+        Mockito.`when`(serializer.getMoshiAdapter()).thenReturn(moshiJsonAdapter)
+        Mockito.`when`(moshiJsonAdapter.toJson(dummyData)).thenThrow(AssertionError())
+        val success = serializer.toJson(dummyData)
         assert(!success)
         assert(serializer.getErrorMsg() != "")
     }
