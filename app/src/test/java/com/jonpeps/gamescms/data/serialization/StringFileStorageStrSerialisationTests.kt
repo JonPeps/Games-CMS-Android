@@ -108,7 +108,6 @@ class StringFileStorageStrSerialisationTests {
     fun `test write to file success when directory creation is achieved`() = runTest(dispatcher) {
         val strFileStorageStrSerialisation
                 = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
-        `when`(directory.name).thenReturn("")
         `when`(file.name).thenReturn("")
 
         commonFileReturnScenariosForWriteStr(

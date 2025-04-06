@@ -38,8 +38,10 @@ class TableTemplateRepository
     override suspend fun loadTemplate(): Boolean {
         errorMsg = ""
         var success = true
-        if (stringFileStorageStrSerialisation.read(absolutePath, bufferedReader)) {
-            if(tableItemListMoshiSerialization.fromJson(stringFileStorageStrSerialisation.getContents())) {
+        val result = stringFileStorageStrSerialisation.read(absolutePath, bufferedReader)
+        if (result) {
+            val contents = stringFileStorageStrSerialisation.getContents()
+            if(tableItemListMoshiSerialization.fromJson(contents)) {
                 tableItemList = tableItemListMoshiSerialization.getItem()
             } else {
                 errorMsg = tableItemListMoshiSerialization.getErrorMsg()

@@ -77,6 +77,16 @@ class TableTemplateRepositoryTests {
     }
 
     @Test
+    fun `test load template with read Json string true`() = runTest(dispatcher) {
+        assert(tableTemplateRepository.getErrorMsg() == "")
+        `when`(stringFileStorageStrSerialisation.read(absolutePath, bufferedReader)).thenReturn(true)
+        `when`(tableItemListMoshiSerialization
+            .fromJson(stringFileStorageStrSerialisation.getContents())).thenReturn(true)
+        val result = tableTemplateRepository.loadTemplate()
+        assert(result)
+    }
+
+    @Test
     fun `test load template fails with read Json file returns false`() = runTest(dispatcher) {
         assert(tableTemplateRepository.getErrorMsg() == "")
         `when`(stringFileStorageStrSerialisation.read(absolutePath, bufferedReader)).thenReturn(false)
