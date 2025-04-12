@@ -20,6 +20,10 @@ class StringSerialization : IStringSerialization {
         var success = true
         errorMsg = ""
         try {
+            if (fileContents.isEmpty()) {
+                errorMsg = CONTENTS_IS_NULL_OR_EMPTY
+                return false
+            }
             fileWriter.write(fileContents)
         } catch (ex: IOException) {
             errorMsg = ex.toString()
@@ -52,5 +56,6 @@ class StringSerialization : IStringSerialization {
 
     companion object {
         const val UNCHECKED_IO_MESSAGE = "Failed to read from String buffer!"
+        const val CONTENTS_IS_NULL_OR_EMPTY = "File contents is null or empty!"
     }
 }

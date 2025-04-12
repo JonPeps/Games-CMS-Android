@@ -25,11 +25,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.ui.applevel.DarkColors
 import com.jonpeps.gamescms.ui.applevel.LightColors
 import dagger.hilt.android.AndroidEntryPoint
+
+
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -51,27 +54,35 @@ class MainActivity : AppCompatActivity() {
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
+                .padding(5.dp)
         ) {
             CreateTableRowTextField("Row name")
             CreateTableRowTextField("Row value")
-            DropdownEnumValues<ItemType>("Select row type") {
+            DropdownEnumValues<ItemType>("Row data type") {
 
             }
+
         }
     }
 
     @Composable
     fun CreateTableRowTextField(label: String) {
         val text = remember { mutableStateOf("") }
-        TextField(
-            value = text.value,
-            onValueChange = { text.value = it },
-            label = { Text(label) },
-            singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-        )
+        Column(modifier = Modifier.padding(4.dp)) {
+            TextField(
+                value = text.value,
+                onValueChange = { text.value = it },
+                label = { Text(label) },
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+            Text(color = Color.Red,
+                text = "Testing 123",
+                modifier = Modifier.padding(bottom = 1.dp, start = 1.dp)
+
+            )
+        }
     }
 
 
@@ -83,7 +94,7 @@ class MainActivity : AppCompatActivity() {
         val items = enumValues<T>()
         var selectedItem by remember { mutableStateOf(items[0]) }
 
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(4.dp)) {
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded },
@@ -96,7 +107,7 @@ class MainActivity : AppCompatActivity() {
                         onDropdownItemChanged(selectedItem)
                     },
                     readOnly = true,
-                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
+                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true).fillMaxWidth()
                 )
                 ExposedDropdownMenu(
                     expanded = expanded,

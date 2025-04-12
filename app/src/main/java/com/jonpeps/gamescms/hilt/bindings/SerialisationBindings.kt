@@ -1,6 +1,7 @@
 package com.jonpeps.gamescms.hilt.bindings
 
 import com.jonpeps.gamescms.data.serialization.moshi.IMoshiJsonAdapterCreator
+import com.jonpeps.gamescms.data.serialization.moshi.IStringListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.string.IStringSerialization
 import com.jonpeps.gamescms.data.serialization.moshi.ITableItemListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
@@ -24,6 +25,10 @@ abstract class SerialisationBindings {
     @Binds
     @Singleton
     abstract fun provideTableItemListMoshiSerialization(tableItemListMoshiSerialization: ITableItemListMoshiSerialization): ITableItemListMoshiSerialization
+
+    @Binds
+    @Singleton
+    abstract fun provideStringListMoshiSerialization(stringListMoshiSerialization: IStringListMoshiSerialization): IStringListMoshiSerialization
 
     @Binds
     @Singleton
