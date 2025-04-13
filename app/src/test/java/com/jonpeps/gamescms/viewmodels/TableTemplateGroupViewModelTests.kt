@@ -3,7 +3,7 @@ package com.jonpeps.gamescms.viewmodels
 import com.jonpeps.gamescms.data.dataclasses.TableItem
 import com.jonpeps.gamescms.data.dataclasses.TableItemList
 import com.jonpeps.gamescms.ui.createtable.viewmodels.TableTemplateGroupViewModel
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateRepository
+import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -32,7 +32,7 @@ class TableTemplateGroupViewModelTests {
     @Mock
     private lateinit var fileWriter: FileWriter
     @Mock
-    private lateinit var tableTemplateRepository: ITableTemplateRepository
+    private lateinit var tableTemplateRepository: ITableTemplateFileRepository
 
     private val dummyData = TableItemList("test_template", listOf(TableItem(1, "test1")))
 

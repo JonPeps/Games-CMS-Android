@@ -4,8 +4,8 @@ import com.jonpeps.gamescms.data.dataclasses.TableItem
 import com.jonpeps.gamescms.data.dataclasses.TableItemList
 import com.jonpeps.gamescms.data.serialization.moshi.ITableItemListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateRepository
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.TableTemplateRepository
+import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
+import com.jonpeps.gamescms.ui.tabletemplates.repositories.TableTemplateFileRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -22,7 +22,7 @@ import java.io.File
 import java.io.FileWriter
 
 @RunWith(MockitoJUnitRunner::class)
-class TableTemplateRepositoryTests {
+class TableTemplateFileRepositoryTests {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val dispatcher = UnconfinedTestDispatcher()
     @Mock
@@ -42,11 +42,11 @@ class TableTemplateRepositoryTests {
 
     private val dummyData = TableItemList("test", listOf(TableItem(1, "test1")))
 
-    private lateinit var tableTemplateRepository: ITableTemplateRepository
+    private lateinit var tableTemplateRepository: ITableTemplateFileRepository
 
     @Before
     fun setup() {
-        tableTemplateRepository = TableTemplateRepository(tableItemListMoshiSerialization, stringFileStorageStrSerialisation)
+        tableTemplateRepository = TableTemplateFileRepository(tableItemListMoshiSerialization, stringFileStorageStrSerialisation)
         tableTemplateRepository.setAbsolutePath(absolutePath)
         tableTemplateRepository.setFile(file)
         tableTemplateRepository.setFilePath(filePath)
@@ -148,6 +148,6 @@ class TableTemplateRepositoryTests {
         `when`(absolutePath.delete()).thenReturn(false)
         val result = tableTemplateRepository.deleteTemplate()
         assert(!result)
-        assert(tableTemplateRepository.getErrorMsg() == TableTemplateRepository.FAILED_TO_DELETE_FILE + absolutePath)
+        assert(tableTemplateRepository.getErrorMsg() == TableTemplateFileRepository.FAILED_TO_DELETE_FILE + absolutePath)
     }
 }

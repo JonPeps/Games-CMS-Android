@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.hilt.bindings
 
 import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateRepository
+import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -17,5 +17,5 @@ abstract class RepositoryBindings {
 
     @Binds
     @Singleton
-    abstract fun provideTableTemplateRepository(repository: ITableTemplateRepository): ITableTemplateRepository
+    abstract fun provideTableTemplateRepository(repository: ITableTemplateFileRepository): ITableTemplateFileRepository
 }

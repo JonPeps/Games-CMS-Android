@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.dataclasses.TableItem
 import com.jonpeps.gamescms.data.dataclasses.TableItemList
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateRepository
+import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,7 +33,7 @@ interface ITableTemplateGroupViewModel : IGlobalWatchCoreValuesChangedListener {
 }
 
 class TableTemplateGroupViewModel
-@Inject constructor(private val tableTemplateRepository: ITableTemplateRepository,
+@Inject constructor(private val tableTemplateRepository: ITableTemplateFileRepository,
                     private val coroutineDispatcher: CoroutineDispatcher)
     : ViewModel(), ITableTemplateGroupViewModel {
 
