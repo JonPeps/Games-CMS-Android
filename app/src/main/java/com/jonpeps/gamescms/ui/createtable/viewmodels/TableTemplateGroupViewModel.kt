@@ -37,7 +37,7 @@ class TableTemplateGroupViewModel
                     private val coroutineDispatcher: CoroutineDispatcher)
     : ViewModel(), ITableTemplateGroupViewModel {
 
-    private val _status = MutableStateFlow(TableTemplateStatus(true, arrayListOf(),0, null, null))
+    private val _status = MutableStateFlow(TableTemplateStatus(true, arrayListOf(),0, "", null))
     val status: StateFlow<TableTemplateStatus> = _status
 
     private val _duplicateName = MutableStateFlow(false)
@@ -51,6 +51,7 @@ class TableTemplateGroupViewModel
 
     private val items = arrayListOf<TableItem>()
     private var index = 0
+    private var templateName = ""
 
     override fun load(absoluteFile: File, bufferedReader: BufferedReader) {
         viewModelScope.launch(coroutineDispatcher) {
@@ -61,6 +62,7 @@ class TableTemplateGroupViewModel
                 var errorMessage = ""
                 val tableListItem = tableTemplateRepository.getItem()
                 tableListItem?.let {
+                    templateName = it.templateName
                     items.clear()
                     items.addAll(it.items)
                     index = 0
@@ -80,47 +82,53 @@ class TableTemplateGroupViewModel
             tableTemplateRepository.setFilePath(filePath)
             tableTemplateRepository.setFile(mainFile)
             tableTemplateRepository.setFileWriter(writer)
-            val fileName = mainFile.name.replace(FILE_EXTENSION, "")
-            if (tableTemplateRepository.save(TableItemList(fileName, items))) {
-                _status.value = TableTemplateStatus(true, items, index, null, null)
+            val tableItemList = TableItemList(templateName, items)
+            if (tableTemplateRepository.save(tableItemList)) {
+                _status.value = TableTemplateStatus(true, items, index, "", null)
             } else {
                 _status.value = TableTemplateStatus(false, items, index,
-                    FAILED_TO_SAVE_TEMPLATE + filePath.name + mainFile.name, null)
+                    FAILED_TO_SAVE_TEMPLATE + templateName, null)
             }
         }
     }
 
     override fun addPage() {
-        val item = TableItem()
-        index++
-        items.add(index, item)
-        _status.value = TableTemplateStatus(true, items, index, null, null)
+        if (items.size >= 1) {
+            index++
+        }
+        items.add(index, TableItem())
+        _status.value = TableTemplateStatus(true, items, index, "", null)
     }
 
     override fun removePage() {
         if (decrementPage()) {
             items.removeAt(index + 1)
-            _status.value = TableTemplateStatus(true, items, index, null, null)
+            _status.value = TableTemplateStatus(true, items, index, "", null)
         }
     }
 
     override fun nextPage() {
-        if (index == _status.value.items.size - 1) return
-        index++
-        _status.value = TableTemplateStatus(true, items, index, null, null)
+        if (index < items.size - 1) {
+            index++
+            _status.value = TableTemplateStatus(true, items, index, "", null)
+        }
     }
 
     override fun previousPage() {
-        decrementPage()
+        if (decrementPage()) {
+            _status.value = TableTemplateStatus(true, items, index, "", null)
+        }
     }
 
-    override fun pageCount() = _status.value.items.size
+    override fun pageCount() = items.size
 
     override fun getCurrentPage(): TableItem = items[index]
 
     override fun onNameChanged(name: String) {
-        if (name.isEmpty()) return
-        _status.value.items.forEach {
+        if (name.isEmpty()) {
+            return
+        }
+        items.forEach {
             if (it.name == name) {
                 _duplicateName.value = true
                 return
@@ -130,7 +138,11 @@ class TableTemplateGroupViewModel
     }
 
     override fun isPrimaryChanged(isPrimary: Boolean) {
-        _status.value.items.forEach {
+        if (isPrimary) {
+            _noPrimaryKeyFound.value = false
+            return
+        }
+        items.forEach {
             if (it.isPrimary) {
                 _noPrimaryKeyFound.value = false
                 return
@@ -140,7 +152,11 @@ class TableTemplateGroupViewModel
     }
 
     override fun isSortKeyChanged(isSort: Boolean) {
-        _status.value.items.forEach {
+        if (isSort) {
+            _noSortKeyFound.value = false
+            return
+        }
+        items.forEach {
             if (it.isSortKey) {
                 _noSortKeyFound.value = false
                 return
@@ -149,8 +165,26 @@ class TableTemplateGroupViewModel
         _noSortKeyFound.value = true
     }
 
+    // For testing:
+    fun addItem(item: TableItem) {
+        items.add(item)
+    }
+    fun clearItems() {
+        items.clear()
+    }
+    fun setTemplateName(name: String) {
+        templateName = name
+    }
+    fun setIndex(index: Int) {
+        this.index = index
+    }
+    fun getIndex() = index
+    ///////////////////////////////
+
     private fun decrementPage(): Boolean {
-        if (index == 0) return false
+        if (index == 0) {
+            return false
+        }
         index--
         return true
     }
