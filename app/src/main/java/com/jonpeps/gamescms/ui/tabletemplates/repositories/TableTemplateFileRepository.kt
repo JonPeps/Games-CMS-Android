@@ -6,13 +6,14 @@ import com.jonpeps.gamescms.data.repositories.IBaseMoshiJsonRepository
 import com.jonpeps.gamescms.data.serialization.moshi.IBaseMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.moshi.ITableItemListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
+import javax.inject.Inject
 
 interface ITableTemplateFileRepository : IBaseMoshiJsonRepository<TableTemplateItemListMoshi> {
     suspend fun deleteTemplate(): Boolean
 }
 
 class TableTemplateFileRepository
-(private val tableTableItemListMoshiSerialization: ITableItemListMoshiSerialization,
+@Inject constructor(private val tableTableItemListMoshiSerialization: ITableItemListMoshiSerialization,
                     stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation)
     :  BaseMoshiJsonRepository<TableTemplateItemListMoshi>(stringFileStorageStrSerialisation), ITableTemplateFileRepository {
 

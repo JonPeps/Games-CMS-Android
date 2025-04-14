@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.dynamodb.mappers
 
-import com.jonpeps.gamescms.data.dataclasses.CreateTableItemData
-import com.jonpeps.gamescms.data.dataclasses.CreateTablePairData
+import com.jonpeps.gamescms.data.dataclasses.createtemplate.CreateTableItemData
+import com.jonpeps.gamescms.data.dataclasses.createtemplate.CreateTablePairData
 import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition
 import software.amazon.awssdk.services.dynamodb.model.KeySchemaElement
 

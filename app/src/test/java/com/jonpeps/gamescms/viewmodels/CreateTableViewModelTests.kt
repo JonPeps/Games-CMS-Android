@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.viewmodels
 
-import com.jonpeps.gamescms.data.dataclasses.CreateTableItemData
-import com.jonpeps.gamescms.data.dataclasses.CreateTablePairData
+import com.jonpeps.gamescms.data.dataclasses.createtemplate.CreateTableItemData
+import com.jonpeps.gamescms.data.dataclasses.createtemplate.CreateTablePairData
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.dynamodb.mappers.IDynamoDbCreateTableMapper
 import com.jonpeps.gamescms.dynamodb.services.DynamoDbCreateTable

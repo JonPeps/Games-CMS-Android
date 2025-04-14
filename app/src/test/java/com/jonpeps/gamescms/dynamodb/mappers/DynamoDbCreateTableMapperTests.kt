@@ -1,6 +1,6 @@
 package com.jonpeps.gamescms.dynamodb.mappers
 
-import com.jonpeps.gamescms.data.dataclasses.CreateTableItemData
+import com.jonpeps.gamescms.data.dataclasses.createtemplate.CreateTableItemData
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import org.junit.Before
 import org.junit.Test

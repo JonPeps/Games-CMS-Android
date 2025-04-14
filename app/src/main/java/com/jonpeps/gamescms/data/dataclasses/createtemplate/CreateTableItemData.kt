@@ -1,4 +1,6 @@
-package com.jonpeps.gamescms.data.dataclasses
+package com.jonpeps.gamescms.data.dataclasses.createtemplate
+
+import com.jonpeps.gamescms.data.dataclasses.ItemType
 
 data class CreateTableItemData(
     val name: String,
