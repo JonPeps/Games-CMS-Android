@@ -32,7 +32,7 @@ abstract class MoshiSerialization<T>(private val dispatcher: CoroutineDispatcher
             var success: Boolean
             try {
                 jsonItem = getMoshiAdapter().toJson(item)
-                if (jsonItem == null) {
+                if (jsonItem.isNullOrEmpty()) {
                     success = false
                     errorMsg = CONVERT_TO_JSON_ERROR_MESSAGE + item.toString()
                 } else {
