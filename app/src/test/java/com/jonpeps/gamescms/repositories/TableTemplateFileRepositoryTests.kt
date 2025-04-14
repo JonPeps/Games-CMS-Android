@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.repositories
 
-import com.jonpeps.gamescms.data.dataclasses.TableItem
-import com.jonpeps.gamescms.data.dataclasses.TableItemList
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.serialization.moshi.ITableItemListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
@@ -40,7 +40,7 @@ class TableTemplateFileRepositoryTests {
     @Mock
     private lateinit var fileWriter: FileWriter
 
-    private val dummyData = TableItemList("test", listOf(TableItem(1, "test1")))
+    private val dummyData = TableTemplateItemListMoshi("test", listOf(TableTemplateItemMoshi(1, "test1")))
 
     private lateinit var tableTemplateRepository: ITableTemplateFileRepository
 

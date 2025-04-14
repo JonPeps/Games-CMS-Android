@@ -6,15 +6,16 @@ import com.jonpeps.gamescms.data.dataclasses.CreateTableItemData
 import com.jonpeps.gamescms.dynamodb.mappers.IDynamoDbCreateTableMapper
 import com.jonpeps.gamescms.dynamodb.services.DynamoDbCreateTable
 import com.jonpeps.gamescms.ui.createtable.viewmodels.data.TableRequestViewModelResponse
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import software.amazon.awssdk.services.dynamodb.model.CreateTableResponse
-import javax.inject.Inject
+
 
 class CreateTableViewModel
-    @Inject constructor(private val dynamoDbCreateTable: DynamoDbCreateTable,
+    (private val dynamoDbCreateTable: DynamoDbCreateTable,
                         private val dynamoDbCreateTableMapper: IDynamoDbCreateTableMapper,
                         private val dispatcher: CoroutineDispatcher)
     : ViewModel() {

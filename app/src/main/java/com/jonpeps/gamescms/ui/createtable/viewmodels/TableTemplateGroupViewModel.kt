@@ -2,9 +2,10 @@ package com.jonpeps.gamescms.ui.createtable.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jonpeps.gamescms.data.dataclasses.TableItem
-import com.jonpeps.gamescms.data.dataclasses.TableItemList
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,11 +13,10 @@ import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileWriter
-import javax.inject.Inject
 
 data class TableTemplateStatus(
     val success: Boolean,
-    val items: ArrayList<TableItem>,
+    val items: ArrayList<TableTemplateItemMoshi>,
     val currentIndex: Int,
     val message: String?,
     val ex: Exception?)
@@ -29,11 +29,11 @@ interface ITableTemplateGroupViewModel : IGlobalWatchCoreValuesChangedListener {
     fun nextPage()
     fun previousPage()
     fun pageCount(): Int
-    fun getCurrentPage(): TableItem
+    fun getCurrentPage(): TableTemplateItemMoshi
 }
 
 class TableTemplateGroupViewModel
-@Inject constructor(private val tableTemplateRepository: ITableTemplateFileRepository,
+(private val tableTemplateRepository: ITableTemplateFileRepository,
                     private val coroutineDispatcher: CoroutineDispatcher)
     : ViewModel(), ITableTemplateGroupViewModel {
 
@@ -49,7 +49,7 @@ class TableTemplateGroupViewModel
     private val _noSortKeyFound = MutableStateFlow(false)
     val noSortKeyFound: StateFlow<Boolean> = _noSortKeyFound
 
-    private val items = arrayListOf<TableItem>()
+    private val items = arrayListOf<TableTemplateItemMoshi>()
     private var index = 0
     private var templateName = ""
 
@@ -82,7 +82,7 @@ class TableTemplateGroupViewModel
             tableTemplateRepository.setFilePath(filePath)
             tableTemplateRepository.setFile(mainFile)
             tableTemplateRepository.setFileWriter(writer)
-            val tableItemList = TableItemList(templateName, items)
+            val tableItemList = TableTemplateItemListMoshi(templateName, items)
             if (tableTemplateRepository.save(tableItemList)) {
                 _status.value = TableTemplateStatus(true, items, index, "", null)
             } else {
@@ -96,7 +96,7 @@ class TableTemplateGroupViewModel
         if (items.size >= 1) {
             index++
         }
-        items.add(index, TableItem())
+        items.add(index, TableTemplateItemMoshi())
         _status.value = TableTemplateStatus(true, items, index, "", null)
     }
 
@@ -122,7 +122,7 @@ class TableTemplateGroupViewModel
 
     override fun pageCount() = items.size
 
-    override fun getCurrentPage(): TableItem = items[index]
+    override fun getCurrentPage(): TableTemplateItemMoshi = items[index]
 
     override fun onNameChanged(name: String) {
         if (name.isEmpty()) {
@@ -166,7 +166,7 @@ class TableTemplateGroupViewModel
     }
 
     // For testing:
-    fun addItem(item: TableItem) {
+    fun addItem(item: TableTemplateItemMoshi) {
         items.add(item)
     }
     fun clearItems() {

@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.dynamodb.mappers
 
 import com.jonpeps.gamescms.data.dataclasses.ItemType
-import com.jonpeps.gamescms.data.dataclasses.TableItem
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
 import software.amazon.awssdk.services.dynamodb.model.AttributeAction
 import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue
@@ -11,8 +11,8 @@ import software.amazon.awssdk.services.dynamodb.model.KeyType
 
 interface ICoreDynamoDbItemsMapper {
     fun getAttributeDefinition(name: String, type: ItemType): AttributeDefinition
-    fun getAttributeValue(item: TableItem): AttributeValue
-    fun getAttributeValueUpdate(item: TableItem, action: AttributeAction): AttributeValueUpdate
+    fun getAttributeValue(item: TableTemplateItemMoshi): AttributeValue
+    fun getAttributeValueUpdate(item: TableTemplateItemMoshi, action: AttributeAction): AttributeValueUpdate
     fun getKeySchemaElementPrimary(name: String): KeySchemaElement
     fun getKeySchemaElementSort(name: String): KeySchemaElement
 }
@@ -25,7 +25,7 @@ class CoreDynamoDbItemsMapper : ICoreDynamoDbItemsMapper {
             .build()
     }
 
-    override fun getAttributeValue(item: TableItem): AttributeValue {
+    override fun getAttributeValue(item: TableTemplateItemMoshi): AttributeValue {
         val builder = AttributeValue.builder()
         when (item.dataType) {
             ItemType.STRING -> builder.s(item.value)
@@ -36,7 +36,7 @@ class CoreDynamoDbItemsMapper : ICoreDynamoDbItemsMapper {
         return builder.build()
     }
 
-    override fun getAttributeValueUpdate(item: TableItem, action: AttributeAction): AttributeValueUpdate {
+    override fun getAttributeValueUpdate(item: TableTemplateItemMoshi, action: AttributeAction): AttributeValueUpdate {
         return AttributeValueUpdate.builder().value(getAttributeValue(item)).action(action).build()
     }
 
@@ -57,7 +57,7 @@ class CoreDynamoDbItemsMapper : ICoreDynamoDbItemsMapper {
         }
     }
 
-    fun getAttValue(item: TableItem): AttributeValue {
+    fun getAttValue(item: TableTemplateItemMoshi): AttributeValue {
         val builder = AttributeValue.builder()
         when (item.dataType) {
             ItemType.STRING -> builder.s(item.value)

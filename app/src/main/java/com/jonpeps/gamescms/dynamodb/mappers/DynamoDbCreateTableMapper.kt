@@ -4,16 +4,13 @@ import com.jonpeps.gamescms.data.dataclasses.CreateTableItemData
 import com.jonpeps.gamescms.data.dataclasses.CreateTablePairData
 import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition
 import software.amazon.awssdk.services.dynamodb.model.KeySchemaElement
-import javax.inject.Inject
 
 interface IDynamoDbCreateTableMapper {
     fun mapToCreateTablePair(items: List<CreateTableItemData>): CreateTablePairData
 }
 
-class DynamoDbCreateTableMapper
-    @Inject constructor(private val coreItemsMapper: ICoreDynamoDbItemsMapper)
+class DynamoDbCreateTableMapper(private val coreItemsMapper: ICoreDynamoDbItemsMapper)
         : IDynamoDbCreateTableMapper {
-
     override fun mapToCreateTablePair(items: List<CreateTableItemData>): CreateTablePairData {
         val attDefItems = arrayListOf<AttributeDefinition>()
         val schemaItems = arrayListOf<KeySchemaElement>()

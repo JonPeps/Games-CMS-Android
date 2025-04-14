@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.viewmodels
 
-import com.jonpeps.gamescms.data.dataclasses.TableItem
-import com.jonpeps.gamescms.data.dataclasses.TableItemList
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.ui.createtable.viewmodels.TableTemplateGroupViewModel
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,7 +34,7 @@ class TableTemplateGroupViewModelTests {
     @Mock
     private lateinit var tableTemplateRepository: ITableTemplateFileRepository
 
-    private val dummyData = TableItemList("test_template", listOf(TableItem(1, "test1")))
+    private val dummyData = TableTemplateItemListMoshi("test_template", listOf(TableTemplateItemMoshi(1, "test1")))
 
     private lateinit var viewModel: TableTemplateGroupViewModel
 
@@ -89,7 +89,7 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `test save template success save to the repository returns true`() = runTest(dispatcher) {
         viewModel.clearItems()
-        viewModel.addItem(TableItem(1, "test1"))
+        viewModel.addItem(TableTemplateItemMoshi(1, "test1"))
         viewModel.setTemplateName("test_template")
         `when`(tableTemplateRepository.save(dummyData)).thenReturn(true)
         viewModel.save(filePath, file, fileWriter)
@@ -101,7 +101,7 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `test save template fails due to save to the repository returns false`() = runTest(dispatcher) {
         viewModel.clearItems()
-        viewModel.addItem(TableItem(1, "test1"))
+        viewModel.addItem(TableTemplateItemMoshi(1, "test1"))
         viewModel.setTemplateName("test_template")
         `when`(tableTemplateRepository.save(dummyData)).thenReturn(false)
         viewModel.save(filePath, file, fileWriter)
@@ -124,7 +124,7 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `test add page when pages exist`() {
         viewModel.clearItems()
-        viewModel.addItem(TableItem(1, "test1"))
+        viewModel.addItem(TableTemplateItemMoshi(1, "test1"))
         viewModel.addPage()
         assert(viewModel.status.value.success)
         assert(viewModel.status.value.message == "")
@@ -228,8 +228,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `test on name changed when name is not empty and duplicates`() {
         viewModel.clearItems()
-        viewModel.addItem(TableItem(1, "test1"))
-        viewModel.addItem(TableItem(2, "test2"))
+        viewModel.addItem(TableTemplateItemMoshi(1, "test1"))
+        viewModel.addItem(TableTemplateItemMoshi(2, "test2"))
         viewModel.onNameChanged("test1")
         assert(viewModel.duplicateName.value)
     }
@@ -237,8 +237,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `test on name changed when name is not empty and no duplicates`() {
         viewModel.clearItems()
-        viewModel.addItem(TableItem(1, "test1"))
-        viewModel.addItem(TableItem(2, "test2"))
+        viewModel.addItem(TableTemplateItemMoshi(1, "test1"))
+        viewModel.addItem(TableTemplateItemMoshi(2, "test2"))
         viewModel.onNameChanged("test3")
         assert(!viewModel.duplicateName.value)
     }
@@ -260,8 +260,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `test primary changed when primary does not exist and current page is not primary`() {
         viewModel.clearItems()
-        viewModel.addItem(TableItem(1, "test1", isPrimary = false))
-        viewModel.addItem(TableItem(2, "test2", isPrimary = false))
+        viewModel.addItem(TableTemplateItemMoshi(1, "test1", isPrimary = false))
+        viewModel.addItem(TableTemplateItemMoshi(2, "test2", isPrimary = false))
         viewModel.isPrimaryChanged(false)
         assert(viewModel.noPrimaryKeyFound.value)
     }
@@ -269,8 +269,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `test primary changed when primary does not exist and current page is primary`() {
         viewModel.clearItems()
-        viewModel.addItem(TableItem(1, "test1", isPrimary = false))
-        viewModel.addItem(TableItem(2, "test2", isPrimary = true))
+        viewModel.addItem(TableTemplateItemMoshi(1, "test1", isPrimary = false))
+        viewModel.addItem(TableTemplateItemMoshi(2, "test2", isPrimary = true))
         viewModel.isPrimaryChanged(true)
         assert(!viewModel.noPrimaryKeyFound.value)
     }
@@ -278,8 +278,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `test primary changed when primary exists and current page is not primary`() {
         viewModel.clearItems()
-        viewModel.addItem(TableItem(1, "test1", isPrimary = false))
-        viewModel.addItem(TableItem(2, "test2", isPrimary = true))
+        viewModel.addItem(TableTemplateItemMoshi(1, "test1", isPrimary = false))
+        viewModel.addItem(TableTemplateItemMoshi(2, "test2", isPrimary = true))
         viewModel.isPrimaryChanged(false)
         assert(!viewModel.noPrimaryKeyFound.value)
     }
@@ -301,8 +301,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `test sort key changed when sort key does not exist and current page is not sort key`() {
         viewModel.clearItems()
-        viewModel.addItem(TableItem(1, "test1", isSortKey = false))
-        viewModel.addItem(TableItem(2, "test2", isSortKey = false))
+        viewModel.addItem(TableTemplateItemMoshi(1, "test1", isSortKey = false))
+        viewModel.addItem(TableTemplateItemMoshi(2, "test2", isSortKey = false))
         viewModel.isSortKeyChanged(false)
         assert(viewModel.noSortKeyFound.value)
     }
@@ -310,8 +310,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `test sort key changed when primary does not exist and current page is sort key`() {
         viewModel.clearItems()
-        viewModel.addItem(TableItem(1, "test1", isSortKey = false))
-        viewModel.addItem(TableItem(2, "test2", isSortKey = true))
+        viewModel.addItem(TableTemplateItemMoshi(1, "test1", isSortKey = false))
+        viewModel.addItem(TableTemplateItemMoshi(2, "test2", isSortKey = true))
         viewModel.isPrimaryChanged(true)
         assert(!viewModel.noSortKeyFound.value)
     }
@@ -319,8 +319,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `test sort key changed when primary exists and current page is not sort key`() {
         viewModel.clearItems()
-        viewModel.addItem(TableItem(1, "test1", isSortKey = false))
-        viewModel.addItem(TableItem(2, "test2", isSortKey = true))
+        viewModel.addItem(TableTemplateItemMoshi(1, "test1", isSortKey = false))
+        viewModel.addItem(TableTemplateItemMoshi(2, "test2", isSortKey = true))
         viewModel.isSortKeyChanged(false)
         assert(!viewModel.noSortKeyFound.value)
     }

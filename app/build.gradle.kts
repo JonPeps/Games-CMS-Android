@@ -70,7 +70,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -107,4 +106,7 @@ dependencies {
     implementation(libs.moshi.kotlin.codegen)
     implementation(libs.hilt.android.v256)
     kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.room.runtime.v270)
+    implementation(libs.androidx.room.ktx.v270)
+    testImplementation(libs.androidx.room.testing)
 }

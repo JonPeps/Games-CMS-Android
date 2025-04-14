@@ -1,8 +1,8 @@
 package com.jonpeps.gamescms.data.serialization
 
 import com.jonpeps.gamescms.data.serialization.moshi.MoshiJsonAdapterCreator
-import com.jonpeps.gamescms.data.dataclasses.TableItem
-import com.jonpeps.gamescms.data.dataclasses.TableItemList
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.serialization.moshi.TableItemListMoshiSerialization
 import com.squareup.moshi.JsonAdapter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,21 +19,21 @@ import java.io.IOException
 
 @Suppress("UNCHECKED_CAST")
 @RunWith(MockitoJUnitRunner::class)
-class TableItemListMoshiSerializationTests {
+class TableTemplateItemMoshiListTests {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val dispatcher = UnconfinedTestDispatcher()
     @Mock
     private lateinit var moshiJsonAdapterCreator: MoshiJsonAdapterCreator
     @Mock
-    private lateinit var moshiJsonAdapter: JsonAdapter<TableItemList>
+    private lateinit var moshiJsonAdapter: JsonAdapter<TableTemplateItemListMoshi>
 
     private lateinit var serializer: TableItemListMoshiSerialization
 
-    private val dummyData = TableItemList("test", listOf(TableItem(1, "test1")))
+    private val dummyData = TableTemplateItemListMoshi("test", listOf(TableTemplateItemMoshi(1, "test1")))
 
     @Before
     fun setup() {
-        moshiJsonAdapter = mock(JsonAdapter::class.java) as JsonAdapter<TableItemList>
+        moshiJsonAdapter = mock(JsonAdapter::class.java) as JsonAdapter<TableTemplateItemListMoshi>
         serializer = TableItemListMoshiSerialization(moshiJsonAdapterCreator, dispatcher)
     }
 

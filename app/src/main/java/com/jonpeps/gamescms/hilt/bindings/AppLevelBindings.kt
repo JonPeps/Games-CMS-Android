@@ -8,13 +8,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class AppLevelBindings {
     @Binds
-    @Singleton
     abstract fun provideApplicationContext(context: ApplicationContext): ApplicationContext
 }
 
@@ -22,7 +20,6 @@ abstract class AppLevelBindings {
 @InstallIn(SingletonComponent::class)
 class AppLevelProvider {
     @Provides
-    @Singleton
-    fun bindDispatcher(dispatcher: CoroutineDispatcher): CoroutineDispatcher = Dispatchers.IO
+    fun bindDispatcher(): CoroutineDispatcher = Dispatchers.IO
 }
 
