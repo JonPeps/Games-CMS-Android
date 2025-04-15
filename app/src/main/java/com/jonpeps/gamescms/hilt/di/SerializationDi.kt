@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.hilt.bindings
+package com.jonpeps.gamescms.hilt.di
 
 import com.jonpeps.gamescms.data.serialization.moshi.IStringListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.moshi.ITableItemListMoshiSerialization
@@ -11,7 +11,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class SerializationBindings {
+abstract class SerializationDi {
     @Binds
     abstract fun provideStringListMoshiSerialization(stringListMoshiSerialization: StringListMoshiSerialization): IStringListMoshiSerialization
 

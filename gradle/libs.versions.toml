@@ -2,6 +2,7 @@
 activityCompose = "1.10.1"
 activityComposeVersion = "1.8.2"
 agp = "8.8.1"
+androidxHiltCompiler = "1.1.0"
 bom = "<VERSION>"
 bomVersion = "2.31.3"
 comGoogleDaggerHiltAndroid = "2.56"
@@ -13,6 +14,7 @@ coreKtxVersion = "1.12.0"
 googleHiltAndroid = "2.48"
 googleHiltAndroidCompiler = "2.28-alpha"
 googleHiltAndroidCompilerVersion = "2.40"
+googleHiltAndroidGradlePlugin = "2.48.1"
 googleHiltAndroidVersion = "2.48.1"
 googleHiltCompiler = "2.55"
 googleHiltCompilerVersion = "2.56"
@@ -71,6 +73,8 @@ androidx-core-ktx-v1120 = { module = "androidx.core:core-ktx", version.ref = "co
 androidx-hilt-common = { module = "androidx.hilt:hilt-common", version.ref = "hiltCommon" }
 androidx-hilt-common-v100 = { module = "androidx.hilt:hilt-common", version.ref = "hiltCommonVersion" }
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCommonVersion" }
+androidx-hilt-compiler-v110 = { module = "androidx.hilt:hilt-compiler", version.ref = "androidxHiltCompiler" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltCommon" }
 androidx-hilt-navigation-fragment = { module = "androidx.hilt:hilt-navigation-fragment", version.ref = "hiltCommonVersion" }
 androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltCommonVersion" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
@@ -97,6 +101,7 @@ hilt-android-compiler-v240 = { module = "com.google.dagger:hilt-android-compiler
 hilt-android-compiler-v244 = { module = "com.google.dagger:hilt-android-compiler", version.ref = "comGoogleDaggerHiltAndroidCompiler" }
 hilt-android-compiler-v248 = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompilerVersion" }
 hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hiltAndroidGradlePlugin" }
+hilt-android-gradle-plugin-v2481 = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "googleHiltAndroidGradlePlugin" }
 hilt-android-gradle-plugin-v256 = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hiltAndroidGradlePluginVersion" }
 hilt-android-v240 = { module = "com.google.dagger:hilt-android", version.ref = "comGoogleDaggerHiltAndroid2" }
 hilt-android-v248 = { module = "com.google.dagger:hilt-android", version.ref = "googleHiltAndroid" }

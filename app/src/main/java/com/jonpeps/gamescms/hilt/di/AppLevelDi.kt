@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.hilt.bindings
+package com.jonpeps.gamescms.hilt.di
 
 import dagger.Binds
 import dagger.Module
