@@ -21,7 +21,7 @@ interface IStringFileStorageStrSerialisation {
 
 class StringFileStorageStrSerialisation
 @Inject constructor(private val stringSerialization: IStringSerialization,
-    private val dispatcher: CoroutineDispatcher
+                    private val dispatcher: CoroutineDispatcher
 ) :
     IStringFileStorageStrSerialisation {
     private var contents: String = ""

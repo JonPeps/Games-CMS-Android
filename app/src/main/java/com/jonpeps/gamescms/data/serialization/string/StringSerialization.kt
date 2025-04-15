@@ -4,6 +4,7 @@ import java.io.BufferedReader
 import java.io.FileWriter
 import java.io.IOException
 import java.io.UncheckedIOException
+import javax.inject.Inject
 
 interface IStringSerialization {
     fun write(fileName: String, fileWriter: FileWriter, fileContents: String): Boolean
@@ -12,7 +13,7 @@ interface IStringSerialization {
     fun getErrorMsg(): String
 }
 
-class StringSerialization : IStringSerialization {
+class StringSerialization@Inject constructor() : IStringSerialization {
     private var contents: String = ""
     private var errorMsg: String = ""
 

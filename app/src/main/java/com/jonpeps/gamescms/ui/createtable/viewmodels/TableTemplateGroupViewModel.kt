@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
+import com.jonpeps.gamescms.ui.createtable.IGlobalWatchCoreValuesChangedListener
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -13,6 +14,7 @@ import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileWriter
+import javax.inject.Inject
 
 data class TableTemplateStatus(
     val success: Boolean,
@@ -32,8 +34,9 @@ interface ITableTemplateGroupViewModel : IGlobalWatchCoreValuesChangedListener {
     fun getCurrentPage(): TableTemplateItemMoshi
 }
 
+@HiltViewModel
 class TableTemplateGroupViewModel
-(private val tableTemplateRepository: ITableTemplateFileRepository,
+@Inject constructor(private val tableTemplateRepository: ITableTemplateFileRepository,
                     private val coroutineDispatcher: CoroutineDispatcher)
     : ViewModel(), ITableTemplateGroupViewModel {
 

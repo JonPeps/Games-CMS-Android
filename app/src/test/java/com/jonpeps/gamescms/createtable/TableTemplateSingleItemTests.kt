@@ -1,9 +1,9 @@
-package com.jonpeps.gamescms.viewmodels
+package com.jonpeps.gamescms.createtable
 
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
-import com.jonpeps.gamescms.ui.createtable.viewmodels.IGlobalWatchCoreValuesChangedListener
-import com.jonpeps.gamescms.ui.createtable.viewmodels.TableTemplateSingleItem
+import com.jonpeps.gamescms.ui.createtable.IGlobalWatchCoreValuesChangedListener
+import com.jonpeps.gamescms.ui.createtable.TableTemplateSingleItem
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,7 +22,9 @@ class TableTemplateSingleItemTests {
     @Before
     fun setup() {
         item = TableItemFinal("test", ItemType.STRING)
-        tableTemplateSingleItem = TableTemplateSingleItem(listener, item)
+        tableTemplateSingleItem = TableTemplateSingleItem()
+        tableTemplateSingleItem.setItem(item)
+        tableTemplateSingleItem.setListener(listener)
     }
 
     @Test

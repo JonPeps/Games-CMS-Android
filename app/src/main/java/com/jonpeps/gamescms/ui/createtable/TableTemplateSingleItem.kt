@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.ui.createtable.viewmodels
+package com.jonpeps.gamescms.ui.createtable
 
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
@@ -13,17 +13,13 @@ interface ITableTemplateSingleItem {
     fun setSortKey(isSort: Boolean)
     fun setIsEditable(editable: Boolean)
     fun getItem(): TableItemFinal
+    fun setListener(listener: IGlobalWatchCoreValuesChangedListener)
+    fun setItem(item: TableItemFinal)
 }
 
-interface IGlobalWatchCoreValuesChangedListener {
-    fun onNameChanged(name: String)
-    fun isPrimaryChanged(isPrimary: Boolean)
-    fun isSortKeyChanged(isSort: Boolean)
-}
-
-class TableTemplateSingleItem(private val listener: IGlobalWatchCoreValuesChangedListener,
-                              private var item: TableItemFinal)
-: ITableTemplateSingleItem {
+class TableTemplateSingleItem : ITableTemplateSingleItem {
+    private lateinit var listener: IGlobalWatchCoreValuesChangedListener
+    private lateinit var item: TableItemFinal
     private var _noValueWithNotEditable = MutableStateFlow(false)
     private var _rowNameEmpty = MutableStateFlow(true)
 
@@ -65,4 +61,12 @@ class TableTemplateSingleItem(private val listener: IGlobalWatchCoreValuesChange
     }
 
     override fun getItem(): TableItemFinal = item
+
+    override fun setListener(listener: IGlobalWatchCoreValuesChangedListener) {
+        this.listener = listener
+    }
+
+    override fun setItem(item: TableItemFinal) {
+        this.item = item
+    }
 }

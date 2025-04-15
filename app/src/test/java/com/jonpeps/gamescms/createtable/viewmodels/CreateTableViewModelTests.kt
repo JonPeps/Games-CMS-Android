@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.viewmodels
+package com.jonpeps.gamescms.createtable.viewmodels
 
 import com.jonpeps.gamescms.data.dataclasses.createtemplate.CreateTableItemData
 import com.jonpeps.gamescms.data.dataclasses.createtemplate.CreateTablePairData
