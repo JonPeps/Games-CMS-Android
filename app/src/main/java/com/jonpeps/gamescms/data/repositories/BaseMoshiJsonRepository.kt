@@ -13,7 +13,7 @@ interface IBaseMoshiJsonRepository<T> {
     fun getItem(): T?
     fun getErrorMsg(): String
 
-    fun setFilePath(path: File)
+    fun setDirectoryFile(path: File)
     fun setFile(file: File)
     fun setAbsolutePath(absoluteFilePath: File)
     fun setBufferReader(bufferedReader: BufferedReader)
@@ -22,7 +22,7 @@ interface IBaseMoshiJsonRepository<T> {
 
 abstract class BaseMoshiJsonRepository<T>(private val stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation
 ): IBaseMoshiJsonRepository<T> {
-    private lateinit var mainFilePath: File
+    private lateinit var directoryFile: File
     private lateinit var mainFile: File
     protected lateinit var mainAbsolutePath: File
     private lateinit var mainBufferedReader: BufferedReader
@@ -61,7 +61,7 @@ abstract class BaseMoshiJsonRepository<T>(private val stringFileStorageStrSerial
             if (toJsonItem == null) {
                 errorMessage = moshiSerializer.getErrorMsg()
             } else {
-                if (stringFileStorageStrSerialisation.write(mainFilePath, mainFile, mainFileWriter, toJsonItem)) {
+                if (stringFileStorageStrSerialisation.write(directoryFile, mainFile, mainFileWriter, toJsonItem)) {
                     success = true
                 } else {
                     errorMessage = stringFileStorageStrSerialisation.getErrorMsg()
@@ -76,8 +76,8 @@ abstract class BaseMoshiJsonRepository<T>(private val stringFileStorageStrSerial
     override fun getItem(): T? = mainItem
     override fun getErrorMsg(): String = errorMessage
 
-    override fun setFilePath(path: File) {
-        mainFilePath = path
+    override fun setDirectoryFile(path: File) {
+        directoryFile = path
     }
     override fun setFile(file: File) {
         mainFile = file

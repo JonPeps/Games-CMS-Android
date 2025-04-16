@@ -42,8 +42,9 @@ class StringFileStorageStrSerialisation
                     }
                 }
                 if (success) {
-                    if (!mainFile.exists()) {
-                        if (!mainFile.createNewFile()) {
+                    val absoluteFile = File(directory.name + mainFile.name)
+                    if (!absoluteFile.exists()) {
+                        if (!absoluteFile.createNewFile()) {
                             errorMsg = FAILED_TO_CREATE_FILE + mainFile.name
                             success = false
                         }
@@ -54,11 +55,7 @@ class StringFileStorageStrSerialisation
                 success = false
             }
             if (!success) return@withContext false
-            return@withContext stringSerialization.write(
-                directory.name + mainFile.name,
-                fileWriter,
-                contents
-            )
+            return@withContext stringSerialization.write(fileWriter, contents)
         }
     }
 

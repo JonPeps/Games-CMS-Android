@@ -18,7 +18,7 @@ class StringSerializationTests {
     fun `success when string written to file`() {
         val serializeString = StringSerialization()
         val mockFileWriter = mock(FileWriter::class.java)
-        val success = serializeString.write("testFile.txt", mockFileWriter, "123")
+        val success = serializeString.write(mockFileWriter, "123")
         Mockito.verify(mockFileWriter).write("123")
         Mockito.verify(mockFileWriter).close()
         assert(success)
@@ -30,7 +30,7 @@ class StringSerializationTests {
         val serializeString = StringSerialization()
         val mockFileWriter = mock(FileWriter::class.java)
         Mockito.`when`(mockFileWriter.write("123")).thenThrow(IOException("Write failed!"))
-        val success = serializeString.write("testFile.txt", mockFileWriter, "123")
+        val success = serializeString.write(mockFileWriter, "123")
         Mockito.verify(mockFileWriter).write("123")
         Mockito.verify(mockFileWriter).close()
         assert(!success)

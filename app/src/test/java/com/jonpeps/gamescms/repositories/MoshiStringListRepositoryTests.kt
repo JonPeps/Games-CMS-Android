@@ -29,7 +29,7 @@ class MoshiStringListRepositoryTests {
     @Mock
     private lateinit var strListMoshiSerialization: IStringListMoshiSerialization
     @Mock
-    private lateinit var filePath: File
+    private lateinit var directoryFile: File
     @Mock
     private lateinit var file: File
     @Mock
@@ -48,7 +48,7 @@ class MoshiStringListRepositoryTests {
         moshiStringListRepository = MoshiStringListRepository(strListMoshiSerialization, stringFileStorageStrSerialisation)
         moshiStringListRepository.setAbsolutePath(absolutePath)
         moshiStringListRepository.setFile(file)
-        moshiStringListRepository.setFilePath(filePath)
+        moshiStringListRepository.setDirectoryFile(directoryFile)
         moshiStringListRepository.setBufferReader(bufferedReader)
         moshiStringListRepository.setFileWriter(fileWriter)
     }
@@ -103,9 +103,9 @@ class MoshiStringListRepositoryTests {
         assert(moshiStringListRepository.getErrorMsg() == "")
         `when`(strListMoshiSerialization.toJson(dummyData)).thenReturn(true)
         `when`(strListMoshiSerialization.getToJsonItem()).thenReturn("test")
-        `when`(stringFileStorageStrSerialisation.write(filePath, file, fileWriter, "test")).thenReturn(true)
+        `when`(stringFileStorageStrSerialisation.write(directoryFile, file, fileWriter, "test")).thenReturn(true)
         val result = moshiStringListRepository.save(dummyData)
-        verify(stringFileStorageStrSerialisation, times(1)).write(filePath, file, fileWriter, "test")
+        verify(stringFileStorageStrSerialisation, times(1)).write(directoryFile, file, fileWriter, "test")
         assert(result)
         assert(moshiStringListRepository.getErrorMsg() == "")
     }
@@ -125,7 +125,7 @@ class MoshiStringListRepositoryTests {
         assert(moshiStringListRepository.getErrorMsg() == "")
         `when`(strListMoshiSerialization.toJson(dummyData)).thenReturn(true)
         `when`(strListMoshiSerialization.getToJsonItem()).thenReturn("test")
-        `when`(stringFileStorageStrSerialisation.write(filePath, file, fileWriter, "test")).thenReturn(false)
+        `when`(stringFileStorageStrSerialisation.write(directoryFile, file, fileWriter, "test")).thenReturn(false)
         val result = moshiStringListRepository.save(dummyData)
         assert(!result)
         verify(stringFileStorageStrSerialisation, times(1)).getErrorMsg()

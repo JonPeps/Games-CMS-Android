@@ -168,7 +168,7 @@ class StringFileStorageStrSerialisationTests {
             createFileReturn = true,
             makeDirectoryReturn = true,
         )
-        `when`(stringSerialization.write(directory.name + file.name, fileWriter, "test")).thenReturn(true)
+        `when`(stringSerialization.write(fileWriter, "test")).thenReturn(true)
         val result = strFileStorageStrSerialisation.write(directory, file, fileWriter, "test")
         assert(result)
     }
@@ -287,6 +287,6 @@ class StringFileStorageStrSerialisationTests {
         `when`(file.exists()).thenReturn(fileReturn)
         `when`(file.createNewFile()).thenReturn(createFileReturn)
         `when`(file.name).thenReturn("test.txt")
-        `when`(stringSerialization.write(file.name, fileWriter, "test")).thenReturn(true)
+        `when`(stringSerialization.write(fileWriter, "test")).thenReturn(true)
     }
 }

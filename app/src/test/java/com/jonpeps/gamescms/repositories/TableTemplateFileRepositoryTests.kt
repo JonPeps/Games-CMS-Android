@@ -30,7 +30,7 @@ class TableTemplateFileRepositoryTests {
     @Mock
     private lateinit var tableItemListMoshiSerialization: ITableItemListMoshiSerialization
     @Mock
-    private lateinit var filePath: File
+    private lateinit var directoryFile: File
     @Mock
     private lateinit var file: File
     @Mock
@@ -49,7 +49,7 @@ class TableTemplateFileRepositoryTests {
         tableTemplateRepository = TableTemplateFileRepository(tableItemListMoshiSerialization, stringFileStorageStrSerialisation)
         tableTemplateRepository.setAbsolutePath(absolutePath)
         tableTemplateRepository.setFile(file)
-        tableTemplateRepository.setFilePath(filePath)
+        tableTemplateRepository.setDirectoryFile(directoryFile)
         tableTemplateRepository.setBufferReader(bufferedReader)
         tableTemplateRepository.setFileWriter(fileWriter)
     }
@@ -106,9 +106,9 @@ class TableTemplateFileRepositoryTests {
         assert(tableTemplateRepository.getErrorMsg() == "")
         `when`(tableItemListMoshiSerialization.toJson(dummyData)).thenReturn(true)
         `when`(tableItemListMoshiSerialization.getToJsonItem()).thenReturn("test")
-        `when`(stringFileStorageStrSerialisation.write(filePath, file, fileWriter, "test")).thenReturn(true)
+        `when`(stringFileStorageStrSerialisation.write(directoryFile, file, fileWriter, "test")).thenReturn(true)
         val result = tableTemplateRepository.save(dummyData)
-        verify(stringFileStorageStrSerialisation, times(1)).write(filePath, file, fileWriter, "test")
+        verify(stringFileStorageStrSerialisation, times(1)).write(directoryFile, file, fileWriter, "test")
         assert(result)
         assert(tableTemplateRepository.getErrorMsg() == "")
     }

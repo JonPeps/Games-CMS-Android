@@ -1,6 +1,7 @@
 package com.jonpeps.gamescms.ui.tabletemplates.repositories
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.Query
@@ -8,16 +9,13 @@ import com.jonpeps.gamescms.data.dataclasses.room.TableItemRoom
 
 @Dao
 @Entity(tableName = "template_table")
-interface TableTemplateRoomRepository {
+interface ITableTemplateRoomRepository {
     @Query("SELECT * FROM template_table WHERE (:templateName)")
-    fun loadAllByTemplateName(templateName: String): List<TableItemRoom>
-
-    @Query("SELECT * FROM template_table")
-    fun loadAll(): List<TableItemRoom>
+    fun load(templateName: String): List<TableItemRoom>
 
     @Insert
-    fun insertAll(vararg items: TableItemRoom)
+    fun insert(vararg items: TableItemRoom)
 
-    @Query("DELETE FROM template_table WHERE (:templateName)")
-    fun deleteAll(templateName: String)
+    @Delete
+    fun delete(vararg items: TableItemRoom)
 }

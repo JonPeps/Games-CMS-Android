@@ -7,7 +7,7 @@ import java.io.UncheckedIOException
 import javax.inject.Inject
 
 interface IStringSerialization {
-    fun write(fileName: String, fileWriter: FileWriter, fileContents: String): Boolean
+    fun write(fileWriter: FileWriter, fileContents: String): Boolean
     fun read(bufferedReader: BufferedReader): Boolean
     fun getContents(): String
     fun getErrorMsg(): String
@@ -17,7 +17,7 @@ class StringSerialization@Inject constructor() : IStringSerialization {
     private var contents: String = ""
     private var errorMsg: String = ""
 
-    override fun write(fileName: String, fileWriter: FileWriter, fileContents: String): Boolean {
+    override fun write(fileWriter: FileWriter, fileContents: String): Boolean {
         var success = true
         errorMsg = ""
         try {

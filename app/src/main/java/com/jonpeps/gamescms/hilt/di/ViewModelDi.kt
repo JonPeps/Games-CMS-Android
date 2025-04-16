@@ -11,7 +11,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 
 @Module
 @InstallIn(SingletonComponent::class)
-class ViewModelDi {
+class ViewModelDiProvider {
     @Provides
     fun provideCreateTableViewModel(dynamoDbCreateTable: IDynamoDbCreateTable,
                                     dynamoDbCreateTableMapper: IDynamoDbCreateTableMapper,
@@ -19,4 +19,9 @@ class ViewModelDi {
     ): CreateTableViewModel {
         return CreateTableViewModel(dynamoDbCreateTable, dynamoDbCreateTableMapper, dispatcher)
     }
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+class ViewModelHelperDiProvider {
 }

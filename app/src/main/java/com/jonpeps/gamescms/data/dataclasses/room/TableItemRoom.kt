@@ -7,7 +7,7 @@ import com.jonpeps.gamescms.data.dataclasses.ItemType
 
 @Entity
 data class TableItemRoom(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     var id: Int = -1,
     @ColumnInfo(name = "templateName")
     var templateName: String = "",
