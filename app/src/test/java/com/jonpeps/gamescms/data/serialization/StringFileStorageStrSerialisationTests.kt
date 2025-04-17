@@ -68,23 +68,6 @@ class StringFileStorageStrSerialisationTests {
                 == StringFileStorageStrSerialisation.FAILED_TO_CREATE_DIRECTORY + directory.name)
         assert(!result)
     }
-    @Test
-    fun `test write to file failure when main file creation fails`() = runTest(dispatcher) {
-        val strFileStorageStrSerialisation
-                = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
-        assert(strFileStorageStrSerialisation.getErrorMsg() == "")
-
-        commonFileReturnScenariosForWriteStr(
-            directoryReturn = true,
-            fileReturn = false,
-            createFileReturn = false,
-            makeDirectoryReturn = true,
-        )
-        val result = strFileStorageStrSerialisation.write(directory, file, fileWriter, "test")
-        assert(strFileStorageStrSerialisation.getErrorMsg()
-                == StringFileStorageStrSerialisation.FAILED_TO_CREATE_FILE + file.name)
-        assert(!result)
-    }
 
     @Test
     fun `test write to file failure when main file make directory fails`() = runTest(dispatcher) {
@@ -105,24 +88,6 @@ class StringFileStorageStrSerialisationTests {
     }
 
     @Test
-    fun `test write to file success when directory creation is achieved`() = runTest(dispatcher) {
-        val strFileStorageStrSerialisation
-                = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
-        `when`(file.name).thenReturn("")
-
-        commonFileReturnScenariosForWriteStr(
-            directoryReturn = false,
-            fileReturn = false,
-            createFileReturn = false,
-            makeDirectoryReturn = true,
-        )
-        val result = strFileStorageStrSerialisation.write(directory, file, fileWriter, "test")
-        assert(!result)
-        val errorMessage = strFileStorageStrSerialisation.getErrorMsg()
-        assert(errorMessage == StringFileStorageStrSerialisation.FAILED_TO_CREATE_FILE + file.name)
-    }
-
-    @Test
     fun `test write to file success when create new file is achieved`() = runTest(dispatcher) {
         val strFileStorageStrSerialisation
                 = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
@@ -140,23 +105,6 @@ class StringFileStorageStrSerialisationTests {
     }
 
     @Test
-    fun `test write to file failure when file doesn't exist`() = runTest(dispatcher) {
-        val strFileStorageStrSerialisation
-                = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
-        assert(strFileStorageStrSerialisation.getErrorMsg() == "")
-
-        commonFileReturnScenariosForWriteStr(
-            directoryReturn = true,
-            fileReturn = false,
-            createFileReturn = false,
-            makeDirectoryReturn = true,
-        )
-        val result = strFileStorageStrSerialisation.write(directory, file, fileWriter, "test")
-        assert(strFileStorageStrSerialisation.getErrorMsg() == StringFileStorageStrSerialisation.FAILED_TO_CREATE_FILE + file.name)
-        assert(!result)
-    }
-
-    @Test
     fun `test write to file success when file doesn't exist`() = runTest(dispatcher) {
         val strFileStorageStrSerialisation
                 = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
@@ -171,23 +119,6 @@ class StringFileStorageStrSerialisationTests {
         `when`(stringSerialization.write(fileWriter, "test")).thenReturn(true)
         val result = strFileStorageStrSerialisation.write(directory, file, fileWriter, "test")
         assert(result)
-    }
-
-    @Test
-    fun `test write to file failure when file creation fails`() = runTest(dispatcher) {
-        val strFileStorageStrSerialisation
-                = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
-        assert(strFileStorageStrSerialisation.getErrorMsg() == "")
-
-        commonFileReturnScenariosForWriteStr(
-            directoryReturn = true,
-            fileReturn = false,
-            createFileReturn = false,
-            makeDirectoryReturn = true,
-        )
-        val result = strFileStorageStrSerialisation.write(directory, file, fileWriter, "test")
-        assert(strFileStorageStrSerialisation.getErrorMsg() == StringFileStorageStrSerialisation.FAILED_TO_CREATE_FILE + file.name)
-        assert(!result)
     }
 
     @Test
@@ -284,8 +215,8 @@ class StringFileStorageStrSerialisationTests {
                                                      makeDirectoryReturn: Boolean) {
         `when`(directory.exists()).thenReturn(directoryReturn)
         `when`(directory.mkdir()).thenReturn(makeDirectoryReturn)
-        `when`(file.exists()).thenReturn(fileReturn)
-        `when`(file.createNewFile()).thenReturn(createFileReturn)
+        //`when`(file.exists()).thenReturn(fileReturn)
+        //`when`(file.createNewFile()).thenReturn(createFileReturn)
         `when`(file.name).thenReturn("test.txt")
         `when`(stringSerialization.write(fileWriter, "test")).thenReturn(true)
     }

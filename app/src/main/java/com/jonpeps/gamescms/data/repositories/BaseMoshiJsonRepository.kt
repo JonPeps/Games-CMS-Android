@@ -15,7 +15,7 @@ interface IBaseMoshiJsonRepository<T> {
 
     fun setDirectoryFile(path: File)
     fun setFile(file: File)
-    fun setAbsolutePath(absoluteFilePath: File)
+    fun setAbsoluteFile(absoluteFile: File)
     fun setBufferReader(bufferedReader: BufferedReader)
     fun setFileWriter(fileWriter: FileWriter)
 }
@@ -83,8 +83,8 @@ abstract class BaseMoshiJsonRepository<T>(private val stringFileStorageStrSerial
         mainFile = file
     }
 
-    override fun setAbsolutePath(absoluteFilePath: File) {
-        mainAbsolutePath = absoluteFilePath
+    override fun setAbsoluteFile(absoluteFile: File) {
+        mainAbsolutePath = absoluteFile
     }
 
     override fun setBufferReader(bufferedReader: BufferedReader) {

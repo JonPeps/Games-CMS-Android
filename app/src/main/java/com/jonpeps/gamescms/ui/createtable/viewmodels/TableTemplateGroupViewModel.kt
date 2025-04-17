@@ -1,10 +1,12 @@
 package com.jonpeps.gamescms.ui.createtable.viewmodels
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
+import com.jonpeps.gamescms.ui.createtable.helpers.ITableTemplateGroupVmRepoHelper
 import com.jonpeps.gamescms.ui.createtable.viewmodels.factories.TableTemplateGroupViewModelFactory
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
 import dagger.assisted.Assisted
@@ -43,12 +45,12 @@ interface ITableTemplateGroupViewModel {
     fun getCurrentPage(): TableTemplateItemMoshi
 }
 
-
 @HiltViewModel(assistedFactory = TableTemplateGroupViewModelFactory.ITableTemplateGroupViewModelFactory::class)
 class TableTemplateGroupViewModel
 @AssistedInject constructor(
     @Assisted private val tableTemplateFilesPath: String,
     private val tableTemplateRepository: ITableTemplateFileRepository,
+    private val tableTemplateGroupVmRepoHelper: ITableTemplateGroupVmRepoHelper,
     private val coroutineDispatcher: CoroutineDispatcher)
     : ViewModel(), ITableTemplateGroupViewModel {
 
@@ -94,8 +96,10 @@ class TableTemplateGroupViewModel
                 } else {
                     errorMessage = FAILED_IO + getAbsolutePathName(tableTemplateFilesPath, name)
                 }
-                _status.value = TableTemplateStatus(success, items, index, errorMessage, exception)
-             }
+             } else {
+                success = false
+            }
+            _status.value = TableTemplateStatus(success, items, index, errorMessage, exception)
         }
     }
 
@@ -211,18 +215,23 @@ class TableTemplateGroupViewModel
     override fun getCurrentPage(): TableTemplateItemMoshi = items[index]
 
     // For testing:
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun addItem(item: TableTemplateItemMoshi) {
         items.add(item)
     }
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun clearItems() {
         items.clear()
     }
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun setTemplateName(name: String) {
         templateName = name
     }
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun setIndex(index: Int) {
         this.index = index
     }
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun getIndex() = index
     ///////////////////////////////
 
@@ -232,7 +241,7 @@ class TableTemplateGroupViewModel
             val absolutePath = getAbsolutePathName(tableTemplateFilesPath, name)
             val absFile = File(absolutePath)
             if (absFile.exists()) {
-                tableTemplateRepository.setAbsolutePath(absFile)
+                tableTemplateRepository.setAbsoluteFile(absFile)
                 tableTemplateRepository.setBufferReader(absFile.bufferedReader())
             } else {
                 success = false

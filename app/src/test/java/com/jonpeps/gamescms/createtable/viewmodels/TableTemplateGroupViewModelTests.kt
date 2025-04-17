@@ -17,7 +17,6 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileWriter
 
-
 @RunWith(MockitoJUnitRunner::class)
 class TableTemplateGroupViewModelTests {
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -44,15 +43,16 @@ class TableTemplateGroupViewModelTests {
 
     @Before
     fun setup() {
-        val file = File.createTempFile(path + templateName, TableTemplateGroupViewModel.FILE_EXTENSION)
+        val file = File.createTempFile(path, "")
         file.deleteOnExit()
 
         viewModel = TableTemplateGroupViewModel(path, tableTemplateRepository, dispatcher)
-        tableTemplateRepository.setDirectoryFile(directoryFile)
-        tableTemplateRepository.setFile(file)
-        tableTemplateRepository.setAbsolutePath(absolutePath)
-        tableTemplateRepository.setBufferReader(bufferedReader)
-        tableTemplateRepository.setFileWriter(fileWriter)
+    }
+
+    @Test
+    fun `test load template success all paths`() = runTest(dispatcher) {
+        `when`(tableTemplateRepository.load()).thenReturn(true)
+        viewModel.load(templateName)
     }
 
     @Test

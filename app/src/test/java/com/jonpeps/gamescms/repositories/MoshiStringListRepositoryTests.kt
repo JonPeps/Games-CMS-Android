@@ -46,7 +46,7 @@ class MoshiStringListRepositoryTests {
     @Before
     fun setup() {
         moshiStringListRepository = MoshiStringListRepository(strListMoshiSerialization, stringFileStorageStrSerialisation)
-        moshiStringListRepository.setAbsolutePath(absolutePath)
+        moshiStringListRepository.setAbsoluteFile(absolutePath)
         moshiStringListRepository.setFile(file)
         moshiStringListRepository.setDirectoryFile(directoryFile)
         moshiStringListRepository.setBufferReader(bufferedReader)

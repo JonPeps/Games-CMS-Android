@@ -47,7 +47,7 @@ class TableTemplateFileRepositoryTests {
     @Before
     fun setup() {
         tableTemplateRepository = TableTemplateFileRepository(tableItemListMoshiSerialization, stringFileStorageStrSerialisation)
-        tableTemplateRepository.setAbsolutePath(absolutePath)
+        tableTemplateRepository.setAbsoluteFile(absolutePath)
         tableTemplateRepository.setFile(file)
         tableTemplateRepository.setDirectoryFile(directoryFile)
         tableTemplateRepository.setBufferReader(bufferedReader)
