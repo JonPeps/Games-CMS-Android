@@ -11,11 +11,11 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import dagger.hilt.android.components.ViewModelComponent
 import kotlinx.coroutines.CoroutineDispatcher
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 class ViewModelDiProvider {
     @Provides
     fun provideCreateTableViewModel(dynamoDbCreateTable: IDynamoDbCreateTable,
@@ -34,8 +34,10 @@ class ViewModelDiProvider {
 }
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 abstract class ViewModelHelperDiBindings {
     @Binds
-    abstract fun bindTableTemplateGroupVmRepoHelper(tableTemplateGroupVmRepoHelper: ITableTemplateGroupVmRepoHelper): ITableTemplateGroupVmRepoHelper
+    abstract fun bindTableTemplateGroupVmRepoHelper(
+        tableTemplateGroupVmRepoHelperImpl: TableTemplateGroupVmRepoHelper
+    ): ITableTemplateGroupVmRepoHelper
 }

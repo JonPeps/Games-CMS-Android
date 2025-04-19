@@ -14,7 +14,11 @@ interface ITableTemplateGroupVmRepoHelper {
 }
 
 class TableTemplateGroupVmRepoHelper@Inject constructor() : ITableTemplateGroupVmRepoHelper {
+    @Throws(RuntimeException::class)
     override fun getAbsoluteFile(directory: String, templateName: String): File {
+        if (directory.isEmpty() || templateName.isEmpty()) {
+            throw RuntimeException("Directory or template name is null or empty!")
+        }
         return File(getAbsolutePathName(directory, templateName))
     }
 
@@ -30,13 +34,16 @@ class TableTemplateGroupVmRepoHelper@Inject constructor() : ITableTemplateGroupV
         return File(templateName)
     }
 
+    @Throws(RuntimeException::class)
     override fun getFileWriter(directory: String, templateName: String): FileWriter {
+        if (directory.isEmpty() || templateName.isEmpty()) {
+            throw RuntimeException("Directory or template name is null or empty!")
+        }
         return FileWriter(getAbsoluteFile(directory, templateName))
     }
 
     companion object {
-        const val FILE_EXTENSION = ".json"
-        const val FAILED_IO = "Failed I/O from repository: "
+        private const val FILE_EXTENSION = ".json"
 
         fun getAbsolutePathName(path: String, fileName: String) = "$path$fileName$FILE_EXTENSION"
     }

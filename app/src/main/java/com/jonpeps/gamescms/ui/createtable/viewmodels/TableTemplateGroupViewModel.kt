@@ -4,8 +4,8 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.dataclasses.ItemType
-import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
 import com.jonpeps.gamescms.ui.createtable.helpers.ITableTemplateGroupVmRepoHelper
 import com.jonpeps.gamescms.ui.createtable.viewmodels.factories.TableTemplateGroupViewModelFactory
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
@@ -16,8 +16,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileWriter
 
 data class TableTemplateStatus(
     val success: Boolean,
@@ -72,16 +70,25 @@ class TableTemplateGroupViewModel
     private var _rowNameEmpty = MutableStateFlow(true)
     val rowNameEmpty: StateFlow<Boolean> = _rowNameEmpty
 
-    private val items = arrayListOf<TableTemplateItemMoshi>()
+    private var items = arrayListOf<TableTemplateItemMoshi>()
     private var index = 0
     private var templateName = ""
     private var exception: Exception? = null
 
+    init {
+        items.add(TableTemplateItemMoshi())
+    }
+
     override fun load(name: String) {
         viewModelScope.launch(coroutineDispatcher) {
-            var success = true
+            exception = null
             var errorMessage = ""
-            if (initRepositoryForLoading(name)) {
+            var success = true
+            try {
+                tableTemplateRepository.setAbsoluteFile(
+                    tableTemplateGroupVmRepoHelper.getAbsoluteFile(tableTemplateFilesPath, name))
+                tableTemplateRepository.setBufferReader(
+                    tableTemplateGroupVmRepoHelper.getBufferReader(tableTemplateFilesPath, name))
                 if (tableTemplateRepository.load()) {
                     val tableListItem = tableTemplateRepository.getItem()
                     tableListItem?.let {
@@ -91,12 +98,15 @@ class TableTemplateGroupViewModel
                         index = 0
                     }?:run {
                         success = false
-                        errorMessage = tableTemplateRepository.getErrorMsg()
+                        errorMessage = JSON_ITEM_TO_SAVE_IS_NULL + name
                     }
                 } else {
-                    errorMessage = FAILED_IO + getAbsolutePathName(tableTemplateFilesPath, name)
+                    success = false
+                    errorMessage = tableTemplateRepository.getErrorMsg()
                 }
-             } else {
+            } catch (ex: Exception) {
+                exception = ex
+                errorMessage = ex.message.toString()
                 success = false
             }
             _status.value = TableTemplateStatus(success, items, index, errorMessage, exception)
@@ -105,17 +115,33 @@ class TableTemplateGroupViewModel
 
     override fun save(name: String) {
         viewModelScope.launch(coroutineDispatcher) {
+            exception = null
             var success = false
             var errorMessage = ""
-            if (initRepositoryForSaving(name)) {
-                val tableItemList = TableTemplateItemListMoshi(name, items)
-                if (tableTemplateRepository.save(tableItemList)) {
-                    success = true
-                } else {
-                    errorMessage = tableTemplateRepository.getErrorMsg()
+            try {
+                tableTemplateRepository.setAbsoluteFile(
+                    tableTemplateGroupVmRepoHelper.getAbsoluteFile(tableTemplateFilesPath, name))
+                tableTemplateRepository.setFile(tableTemplateGroupVmRepoHelper.getMainFile(name))
+                tableTemplateRepository.setDirectoryFile(
+                    tableTemplateGroupVmRepoHelper.getDirectoryFile(tableTemplateFilesPath))
+                tableTemplateRepository.setFileWriter(
+                    tableTemplateGroupVmRepoHelper.getFileWriter(tableTemplateFilesPath, name))
+                tableTemplateRepository.setItem(TableTemplateItemListMoshi(templateName, items))
+                val toSave = tableTemplateRepository.getItem()
+                toSave?.let {
+                    if (tableTemplateRepository.save(it)) {
+                        success = true
+                    } else {
+                        errorMessage = tableTemplateRepository.getErrorMsg()
+                    }
+                }?:run {
+                    success = false
+                    errorMessage = JSON_ITEM_TO_SAVE_IS_NULL + name
                 }
-            } else {
-                errorMessage = FAILED_IO + getAbsolutePathName(tableTemplateFilesPath, name)
+            } catch (ex: Exception) {
+                exception = ex
+                errorMessage = ex.message.toString()
+                success = false
             }
             _status.value = TableTemplateStatus(success, items, index, errorMessage, exception)
         }
@@ -126,15 +152,13 @@ class TableTemplateGroupViewModel
             _rowNameEmpty.value = true
             _duplicateName.value = false
         } else {
-            items[index].name = name
-            _rowNameEmpty.value = false
             items.forEach {
                 if (it.name == name) {
                     _duplicateName.value = true
-                    return
                 }
             }
-            _duplicateName.value = false
+            items[index].name = name
+            _rowNameEmpty.value = false
         }
     }
 
@@ -151,15 +175,15 @@ class TableTemplateGroupViewModel
         items[index].isPrimary = isPrimary
         if (isPrimary) {
             _noPrimaryKeyFound.value = false
-            return
-        }
-        items.forEach {
-            if (it.isPrimary) {
-                _noPrimaryKeyFound.value = false
-                return
+        } else {
+            items.forEach {
+                if (it.isPrimary) {
+                    _noPrimaryKeyFound.value = false
+                    return
+                }
             }
+            _noPrimaryKeyFound.value = true
         }
-        _noPrimaryKeyFound.value = true
     }
 
     override fun setSortKey(isSort: Boolean) {
@@ -233,41 +257,9 @@ class TableTemplateGroupViewModel
     }
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun getIndex() = index
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun getItems() = items
     ///////////////////////////////
-
-    private fun initRepositoryForLoading(name: String): Boolean {
-        var success = true
-        try {
-            val absolutePath = getAbsolutePathName(tableTemplateFilesPath, name)
-            val absFile = File(absolutePath)
-            if (absFile.exists()) {
-                tableTemplateRepository.setAbsoluteFile(absFile)
-                tableTemplateRepository.setBufferReader(absFile.bufferedReader())
-            } else {
-                success = false
-            }
-        } catch (ex: Exception) {
-            exception = ex
-            success = false
-        }
-        return success
-    }
-
-    private fun initRepositoryForSaving(name: String): Boolean {
-        var success = true
-        try {
-            val directoryFile = File(tableTemplateFilesPath)
-            val file = File(name)
-            val absoluteFile = File(directoryFile.name + file.name)
-            tableTemplateRepository.setDirectoryFile(directoryFile)
-            tableTemplateRepository.setFile(file)
-            tableTemplateRepository.setFileWriter(FileWriter(absoluteFile))
-        } catch (ex: Exception) {
-            exception = ex
-            success = false
-        }
-        return success
-    }
 
     private fun decrementPage(): Boolean {
         if (index == 0) {
@@ -278,8 +270,8 @@ class TableTemplateGroupViewModel
     }
 
     companion object {
-        const val FILE_EXTENSION = ".json"
-        private const val FAILED_IO = "Failed I/O from repository: "
+        private const val FILE_EXTENSION = ".json"
+        const val JSON_ITEM_TO_SAVE_IS_NULL = "Json item to save is null for table template: "
 
         fun getAbsolutePathName(path: String, fileName: String) = "$path$fileName$FILE_EXTENSION"
     }

@@ -18,6 +18,8 @@ interface IBaseMoshiJsonRepository<T> {
     fun setAbsoluteFile(absoluteFile: File)
     fun setBufferReader(bufferedReader: BufferedReader)
     fun setFileWriter(fileWriter: FileWriter)
+
+    fun setItem(item: T?)
 }
 
 abstract class BaseMoshiJsonRepository<T>(private val stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation
@@ -93,6 +95,10 @@ abstract class BaseMoshiJsonRepository<T>(private val stringFileStorageStrSerial
 
     override fun setFileWriter(fileWriter: FileWriter) {
         mainFileWriter = fileWriter
+    }
+
+    override fun setItem(item: T?) {
+        this.mainItem = item
     }
 
     abstract fun getMoshiSerializer(): IBaseMoshiSerialization<T>
