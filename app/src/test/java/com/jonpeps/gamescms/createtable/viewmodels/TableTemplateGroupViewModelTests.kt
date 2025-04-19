@@ -446,4 +446,12 @@ class TableTemplateGroupViewModelTests {
         viewModel.setSortKey(false)
         assert(!viewModel.noSortKeyFound.value)
     }
+
+    @Test
+    fun `test page count`() {
+        viewModel.clearItems()
+        viewModel.addPage()
+        viewModel.addPage()
+        assert(viewModel.pageCount() == 2)
+    }
 }

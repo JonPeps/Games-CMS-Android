@@ -248,17 +248,11 @@ class TableTemplateGroupViewModel
         items.clear()
     }
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun setTemplateName(name: String) {
-        templateName = name
-    }
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun setIndex(index: Int) {
         this.index = index
     }
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun getIndex() = index
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun getItems() = items
     ///////////////////////////////
 
     private fun decrementPage(): Boolean {
