@@ -428,21 +428,27 @@ class TableTemplateGroupViewModelTests {
         viewModel.clearItems()
         viewModel.addItem(TableTemplateItemMoshi(1, "test1", isSortKey = false))
         viewModel.setSortKey(true)
+        val item = viewModel.getCurrentPage()
+        assert(item.isSortKey)
         assert(!viewModel.noSortKeyFound.value)
     }
 
     @Test
-    fun `set no sort key with no other rows set as sort key`() {
+    fun `set is not sort key with no other rows set as sort key`() {
         viewModel.clearItems()
         viewModel.addItem(TableTemplateItemMoshi(1, "test1", isSortKey = false))
         viewModel.setSortKey(false)
+        val item = viewModel.getCurrentPage()
+        assert(!item.isSortKey)
         assert(viewModel.noSortKeyFound.value)
     }
 
     @Test
-    fun `set no sort key with other row set as sort key`() {
+    fun `set is not sort key with other row set as sort key`() {
+        viewModel.clearItems()
         viewModel.addItem(TableTemplateItemMoshi(1, "test1", isSortKey = true))
-        viewModel.addItem(TableTemplateItemMoshi(2, "test2", isSortKey = false))
+        viewModel.addItem(TableTemplateItemMoshi(2, "test2", isSortKey = true))
+        viewModel.setIndex(0)
         viewModel.setSortKey(false)
         assert(!viewModel.noSortKeyFound.value)
     }
@@ -453,5 +459,15 @@ class TableTemplateGroupViewModelTests {
         viewModel.addPage()
         viewModel.addPage()
         assert(viewModel.pageCount() == 2)
+    }
+
+    @Test
+    fun `test new table template`() {
+        viewModel.addPage()
+        viewModel.new()
+        assert(viewModel.status.value.success)
+        assert(viewModel.status.value.message == "")
+        assert(viewModel.status.value.ex == null)
+        assert(viewModel.status.value.items.size == 1)
     }
 }

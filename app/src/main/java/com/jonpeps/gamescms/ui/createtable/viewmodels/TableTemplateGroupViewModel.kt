@@ -27,6 +27,7 @@ data class TableTemplateStatus(
 interface ITableTemplateGroupViewModel {
     fun load(name: String)
     fun save(name: String)
+    fun new()
 
     fun setRowName(name: String)
     fun setItemType(type: ItemType)
@@ -75,20 +76,13 @@ class TableTemplateGroupViewModel
     private var templateName = ""
     private var exception: Exception? = null
 
-    init {
-        items.add(TableTemplateItemMoshi())
-    }
-
     override fun load(name: String) {
         viewModelScope.launch(coroutineDispatcher) {
             exception = null
             var errorMessage = ""
             var success = true
             try {
-                tableTemplateRepository.setAbsoluteFile(
-                    tableTemplateGroupVmRepoHelper.getAbsoluteFile(tableTemplateFilesPath, name))
-                tableTemplateRepository.setBufferReader(
-                    tableTemplateGroupVmRepoHelper.getBufferReader(tableTemplateFilesPath, name))
+                initReadFiles(name)
                 if (tableTemplateRepository.load()) {
                     val tableListItem = tableTemplateRepository.getItem()
                     tableListItem?.let {
@@ -119,14 +113,7 @@ class TableTemplateGroupViewModel
             var success = false
             var errorMessage = ""
             try {
-                tableTemplateRepository.setAbsoluteFile(
-                    tableTemplateGroupVmRepoHelper.getAbsoluteFile(tableTemplateFilesPath, name))
-                tableTemplateRepository.setFile(tableTemplateGroupVmRepoHelper.getMainFile(name))
-                tableTemplateRepository.setDirectoryFile(
-                    tableTemplateGroupVmRepoHelper.getDirectoryFile(tableTemplateFilesPath))
-                tableTemplateRepository.setFileWriter(
-                    tableTemplateGroupVmRepoHelper.getFileWriter(tableTemplateFilesPath, name))
-                tableTemplateRepository.setItem(TableTemplateItemListMoshi(templateName, items))
+                initWriteFiles(name)
                 val toSave = tableTemplateRepository.getItem()
                 toSave?.let {
                     if (tableTemplateRepository.save(it)) {
@@ -145,6 +132,12 @@ class TableTemplateGroupViewModel
             }
             _status.value = TableTemplateStatus(success, items, index, errorMessage, exception)
         }
+    }
+
+    override fun new() {
+        items.clear()
+        items.add(TableTemplateItemMoshi())
+        _status.value = TableTemplateStatus(true, items, index, "", null)
     }
 
     override fun setRowName(name: String) {
@@ -263,10 +256,25 @@ class TableTemplateGroupViewModel
         return true
     }
 
-    companion object {
-        private const val FILE_EXTENSION = ".json"
-        const val JSON_ITEM_TO_SAVE_IS_NULL = "Json item to save is null for table template: "
+    private fun initReadFiles(name: String) {
+        tableTemplateRepository.setAbsoluteFile(
+            tableTemplateGroupVmRepoHelper.getAbsoluteFile(tableTemplateFilesPath, name))
+        tableTemplateRepository.setBufferReader(
+            tableTemplateGroupVmRepoHelper.getBufferReader(tableTemplateFilesPath, name))
+    }
 
-        fun getAbsolutePathName(path: String, fileName: String) = "$path$fileName$FILE_EXTENSION"
+    private fun initWriteFiles(name: String) {
+        tableTemplateRepository.setAbsoluteFile(
+            tableTemplateGroupVmRepoHelper.getAbsoluteFile(tableTemplateFilesPath, name))
+        tableTemplateRepository.setFile(tableTemplateGroupVmRepoHelper.getMainFile(name))
+        tableTemplateRepository.setDirectoryFile(
+            tableTemplateGroupVmRepoHelper.getDirectoryFile(tableTemplateFilesPath))
+        tableTemplateRepository.setFileWriter(
+            tableTemplateGroupVmRepoHelper.getFileWriter(tableTemplateFilesPath, name))
+        tableTemplateRepository.setItem(TableTemplateItemListMoshi(templateName, items))
+    }
+
+    companion object {
+        const val JSON_ITEM_TO_SAVE_IS_NULL = "Json item to save is null for table template: "
     }
 }
