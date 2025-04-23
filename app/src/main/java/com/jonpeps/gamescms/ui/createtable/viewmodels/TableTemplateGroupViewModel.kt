@@ -4,8 +4,8 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.dataclasses.ItemType
-import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
-import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
+import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
+import com.jonpeps.gamescms.data.dataclasses.mappers.ITableItemFinalMapper
 import com.jonpeps.gamescms.ui.createtable.helpers.ITableTemplateGroupVmRepoHelper
 import com.jonpeps.gamescms.ui.createtable.viewmodels.factories.TableTemplateGroupViewModelFactory
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 
 data class TableTemplateStatus(
     val success: Boolean,
-    val items: ArrayList<TableTemplateItemMoshi>,
+    val items: ArrayList<TableItemFinal>,
     val currentIndex: Int,
     val message: String?,
     val ex: Exception?)
@@ -41,13 +41,14 @@ interface ITableTemplateGroupViewModel {
     fun nextPage()
     fun previousPage()
     fun pageCount(): Int
-    fun getCurrentPage(): TableTemplateItemMoshi
+    fun getCurrentPage(): TableItemFinal
 }
 
 @HiltViewModel(assistedFactory = TableTemplateGroupViewModelFactory.ITableTemplateGroupViewModelFactory::class)
 class TableTemplateGroupViewModel
 @AssistedInject constructor(
     @Assisted private val tableTemplateFilesPath: String,
+    private val tableItemFinalMapper: ITableItemFinalMapper,
     private val tableTemplateRepository: ITableTemplateFileRepository,
     private val tableTemplateGroupVmRepoHelper: ITableTemplateGroupVmRepoHelper,
     private val coroutineDispatcher: CoroutineDispatcher)
@@ -71,7 +72,7 @@ class TableTemplateGroupViewModel
     private var _rowNameEmpty = MutableStateFlow(true)
     val rowNameEmpty: StateFlow<Boolean> = _rowNameEmpty
 
-    private var items = arrayListOf<TableTemplateItemMoshi>()
+    private var items = arrayListOf<TableItemFinal>()
     private var index = 0
     private var templateName = ""
     private var exception: Exception? = null
@@ -88,7 +89,7 @@ class TableTemplateGroupViewModel
                     tableListItem?.let {
                         templateName = it.templateName
                         items.clear()
-                        items.addAll(it.items)
+                        items.addAll(tableItemFinalMapper.fromTableTemplatesMoshi(it.items))
                         index = 0
                     }?:run {
                         success = false
@@ -136,7 +137,7 @@ class TableTemplateGroupViewModel
 
     override fun new() {
         items.clear()
-        items.add(TableTemplateItemMoshi())
+        items.add(tableItemFinalMapper.getDefaultTableItemFinal())
         _status.value = TableTemplateStatus(true, items, index, "", null)
     }
 
@@ -203,7 +204,7 @@ class TableTemplateGroupViewModel
         if (items.size >= 1) {
             index++
         }
-        items.add(index, TableTemplateItemMoshi())
+        items.add(index, tableItemFinalMapper.getDefaultTableItemFinal())
         _status.value = TableTemplateStatus(true, items, index, "", null)
     }
 
@@ -229,11 +230,11 @@ class TableTemplateGroupViewModel
 
     override fun pageCount() = items.size
 
-    override fun getCurrentPage(): TableTemplateItemMoshi = items[index]
+    override fun getCurrentPage(): TableItemFinal = items[index]
 
     // For testing:
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun addItem(item: TableTemplateItemMoshi) {
+    fun addItem(item: TableItemFinal) {
         items.add(item)
     }
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -271,7 +272,8 @@ class TableTemplateGroupViewModel
             tableTemplateGroupVmRepoHelper.getDirectoryFile(tableTemplateFilesPath))
         tableTemplateRepository.setFileWriter(
             tableTemplateGroupVmRepoHelper.getFileWriter(tableTemplateFilesPath, name))
-        tableTemplateRepository.setItem(TableTemplateItemListMoshi(templateName, items))
+        tableTemplateRepository
+            .setItem(tableItemFinalMapper.toTableTemplateItemListMoshi(name, items))
     }
 
     companion object {

@@ -1,5 +1,7 @@
 package com.jonpeps.gamescms.hilt.di
 
+import com.jonpeps.gamescms.data.dataclasses.mappers.ITableItemFinalMapper
+import com.jonpeps.gamescms.data.dataclasses.mappers.TableItemFinalMapper
 import com.jonpeps.gamescms.data.serialization.moshi.IStringListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.moshi.ITableItemListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.moshi.MoshiJsonAdapterCreator
@@ -37,11 +39,14 @@ class SerializationDiProvider {
     : IStringFileStorageStrSerialisation {
         return StringFileStorageStrSerialisation(stringSerialization, dispatcher)
     }
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class SerializationDiBindings {
-    @Binds
-    abstract fun bindStringSerialization(stringSerialization: StringSerialization): IStringSerialization
+    @Provides
+    fun provideTableItemFinalMapper(): ITableItemFinalMapper {
+        return TableItemFinalMapper()
+    }
+
+    @Provides
+    fun provideStringSerialization(): IStringSerialization {
+        return StringSerialization()
+    }
 }

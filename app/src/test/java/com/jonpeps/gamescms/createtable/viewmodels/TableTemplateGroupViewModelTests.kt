@@ -1,6 +1,8 @@
 package com.jonpeps.gamescms.createtable.viewmodels
 
 import com.jonpeps.gamescms.data.dataclasses.ItemType
+import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
+import com.jonpeps.gamescms.data.dataclasses.mappers.TableItemFinalMapper
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
 import com.jonpeps.gamescms.ui.createtable.helpers.ITableTemplateGroupVmRepoHelper
@@ -25,11 +27,14 @@ class TableTemplateGroupViewModelTests {
     @Mock
     private lateinit var tableTemplateRepository: ITableTemplateFileRepository
     @Mock
+    private lateinit var tableItemFinalMapper: TableItemFinalMapper
+    @Mock
     private lateinit var tableTemplateGroupVmRepoHelper: ITableTemplateGroupVmRepoHelper
     @Mock
     private lateinit var reader: BufferedReader
 
-    private val dummyData = TableTemplateItemListMoshi("test_template", listOf(TableTemplateItemMoshi(1, "test1")))
+    private val dummyData = TableTemplateItemListMoshi("test_template", listOf(TableTemplateItemMoshi("test",
+        dataType = ItemType.STRING)))
 
     private lateinit var viewModel: TableTemplateGroupViewModel
 
@@ -38,7 +43,11 @@ class TableTemplateGroupViewModelTests {
 
     @Before
     fun setup() {
-        viewModel = TableTemplateGroupViewModel(path, tableTemplateRepository, tableTemplateGroupVmRepoHelper, dispatcher)
+        viewModel = TableTemplateGroupViewModel(path,
+            tableItemFinalMapper,
+            tableTemplateRepository,
+            tableTemplateGroupVmRepoHelper,
+            dispatcher)
     }
 
     @Test
@@ -50,7 +59,7 @@ class TableTemplateGroupViewModelTests {
         assert(viewModel.status.value.success)
         assert(viewModel.status.value.message == "")
         assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 1)
+        assert(viewModel.status.value.items.size == 0)
         assert(viewModel.status.value.currentIndex == 0)
     }
 
@@ -187,7 +196,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `test add page when pages exist`() {
         viewModel.clearItems()
-        viewModel.addItem(TableTemplateItemMoshi(1, "test1"))
+        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+            value = "test", editable = true, dataType = ItemType.STRING))
         viewModel.addPage()
         assert(viewModel.status.value.success)
         assert(viewModel.status.value.message == "")
@@ -293,7 +303,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `set row name when name is not empty and no duplicates`() {
         viewModel.clearItems()
-        viewModel.addItem(TableTemplateItemMoshi(1, "test1"))
+        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+            value = "test", editable = true, dataType = ItemType.STRING))
         viewModel.setRowName("test2")
         assert(!viewModel.rowNameEmpty.value)
         assert(!viewModel.duplicateName.value)
@@ -302,7 +313,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `set row name when name is not empty and is duplicate`() {
         viewModel.clearItems()
-        viewModel.addItem(TableTemplateItemMoshi(1, "test1"))
+        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+            value = "test", editable = true, dataType = ItemType.STRING))
         viewModel.setRowName("test1")
         assert(!viewModel.rowNameEmpty.value)
         assert(viewModel.duplicateName.value)
@@ -311,7 +323,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `set row data type`() {
         viewModel.clearItems()
-        viewModel.addItem(TableTemplateItemMoshi(1, "test1", dataType = ItemType.BOOLEAN))
+        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+            value = "test", editable = true, dataType = ItemType.BOOLEAN))
         var item = viewModel.getCurrentPage()
         assert(item.dataType == ItemType.BOOLEAN)
         viewModel.setItemType(ItemType.STRING)
@@ -322,7 +335,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `set default value when row is editable`() {
         viewModel.clearItems()
-        viewModel.addItem(TableTemplateItemMoshi(1, "test1", editable = true))
+        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+            value = "test", editable = true, dataType = ItemType.STRING))
         viewModel.setDefaultValue("test")
         val item = viewModel.getCurrentPage()
         assert(item.value == "test")
@@ -332,7 +346,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `set default value when row is not editable`() {
         viewModel.clearItems()
-        viewModel.addItem(TableTemplateItemMoshi(1, "test1", editable = false))
+        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+            value = "test", editable = false, dataType = ItemType.STRING))
         viewModel.setDefaultValue("test")
         val item = viewModel.getCurrentPage()
         assert(item.value == "test")
@@ -342,7 +357,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `set no default value when row is editable`() {
         viewModel.clearItems()
-        viewModel.addItem(TableTemplateItemMoshi(1, "test1", editable = false))
+        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+            value = "test", editable = false, dataType = ItemType.STRING))
         viewModel.setDefaultValue("")
         val item = viewModel.getCurrentPage()
         assert(item.value == "")
@@ -352,7 +368,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `set is editable with no default value required`() {
         viewModel.clearItems()
-        viewModel.addItem(TableTemplateItemMoshi(1, "test1", editable = false))
+        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+            value = "test", editable = false, dataType = ItemType.STRING))
         viewModel.setIsEditable(true)
         val item = viewModel.getCurrentPage()
         assert(item.editable)
@@ -362,7 +379,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `set is editable with default value empty`() {
         viewModel.clearItems()
-        viewModel.addItem(TableTemplateItemMoshi(1, "test1", editable = false))
+        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+            value = "test", editable = false, dataType = ItemType.STRING))
         viewModel.setDefaultValue("")
         viewModel.setIsEditable(false)
         viewModel.setIndex(0)
@@ -374,7 +392,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `set is editable with default value required`() {
         viewModel.clearItems()
-        viewModel.addItem(TableTemplateItemMoshi(1, "test1", editable = true))
+        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+            value = "test", editable = true, dataType = ItemType.STRING))
         viewModel.setDefaultValue("")
         viewModel.setIsEditable(false)
         val item = viewModel.getCurrentPage()
@@ -385,7 +404,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `set is editable with default value present`() {
         viewModel.clearItems()
-        viewModel.addItem(TableTemplateItemMoshi(1, "test1", editable = false))
+        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+            value = "test", editable = false, dataType = ItemType.STRING))
         viewModel.setDefaultValue("test value")
         viewModel.setIsEditable(true)
         val item = viewModel.getCurrentPage()
@@ -396,7 +416,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `set is primary`() {
         viewModel.clearItems()
-        viewModel.addItem(TableTemplateItemMoshi(1, "test1", isPrimary = false))
+        viewModel.addItem(TableItemFinal("test1", isPrimary = false, isSortKey = true,
+            value = "test", editable = true, dataType = ItemType.STRING))
         viewModel.setPrimary(true)
         val item = viewModel.getCurrentPage()
         assert(item.isPrimary)
@@ -406,7 +427,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `set is not primary with no other rows set as primary`() {
         viewModel.clearItems()
-        viewModel.addItem(TableTemplateItemMoshi(1, "test1", isPrimary = false))
+        viewModel.addItem(TableItemFinal("test1", isPrimary = false, isSortKey = true,
+            value = "test", editable = true, dataType = ItemType.STRING))
         viewModel.setPrimary(false)
         val item = viewModel.getCurrentPage()
         assert(!item.isPrimary)
@@ -416,8 +438,10 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `set is not primary with other row set as primary`() {
         viewModel.clearItems()
-        viewModel.addItem(TableTemplateItemMoshi(1, "test1", isPrimary = true))
-        viewModel.addItem(TableTemplateItemMoshi(2, "test2", isPrimary = true))
+        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+            value = "test", editable = true, dataType = ItemType.STRING))
+        viewModel.addItem(TableItemFinal("test2", isPrimary = true, isSortKey = true,
+            value = "test", editable = true, dataType = ItemType.STRING))
         viewModel.setIndex(0)
         viewModel.setPrimary(false)
         assert(!viewModel.noPrimaryKeyFound.value)
@@ -426,7 +450,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `set is sort key`() {
         viewModel.clearItems()
-        viewModel.addItem(TableTemplateItemMoshi(1, "test1", isSortKey = false))
+        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
+            value = "test", editable = true, dataType = ItemType.STRING))
         viewModel.setSortKey(true)
         val item = viewModel.getCurrentPage()
         assert(item.isSortKey)
@@ -436,7 +461,8 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `set is not sort key with no other rows set as sort key`() {
         viewModel.clearItems()
-        viewModel.addItem(TableTemplateItemMoshi(1, "test1", isSortKey = false))
+        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+            value = "test", editable = true, dataType = ItemType.STRING))
         viewModel.setSortKey(false)
         val item = viewModel.getCurrentPage()
         assert(!item.isSortKey)
@@ -446,8 +472,10 @@ class TableTemplateGroupViewModelTests {
     @Test
     fun `set is not sort key with other row set as sort key`() {
         viewModel.clearItems()
-        viewModel.addItem(TableTemplateItemMoshi(1, "test1", isSortKey = true))
-        viewModel.addItem(TableTemplateItemMoshi(2, "test2", isSortKey = true))
+        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
+            value = "test", editable = true, dataType = ItemType.STRING))
+        viewModel.addItem(TableItemFinal("test2", isPrimary = false, isSortKey = true,
+            value = "test", editable = true, dataType = ItemType.STRING))
         viewModel.setIndex(0)
         viewModel.setSortKey(false)
         assert(!viewModel.noSortKeyFound.value)

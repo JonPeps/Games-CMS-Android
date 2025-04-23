@@ -4,8 +4,6 @@ import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.squareup.moshi.Json
 
 data class TableTemplateItemMoshi(
-    @Json(name = "id")
-    var id: Int = -1,
     @Json(name = "name")
     var name: String = "",
     @Json(name = "dataType")

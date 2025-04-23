@@ -1,5 +1,6 @@
 package com.jonpeps.gamescms.data.serialization
 
+import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.data.serialization.moshi.MoshiJsonAdapterCreator
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
@@ -29,7 +30,7 @@ class TableTemplateItemMoshiListTests {
 
     private lateinit var serializer: TableItemListMoshiSerialization
 
-    private val dummyData = TableTemplateItemListMoshi("test", listOf(TableTemplateItemMoshi(1, "test1")))
+    private val dummyData = TableTemplateItemListMoshi("test", listOf(TableTemplateItemMoshi("test", dataType = ItemType.STRING)))
 
     @Before
     fun setup() {
