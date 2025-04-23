@@ -5,28 +5,25 @@ import com.jonpeps.gamescms.data.dataclasses.createtemplate.CreateTablePairData
 import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition
 import software.amazon.awssdk.services.dynamodb.model.KeySchemaElement
 
-interface IDynamoDbCreateTableMapper {
-    fun mapToCreateTablePair(items: List<CreateTableItemData>): CreateTablePairData
-}
-
-class DynamoDbCreateTableMapper(private val coreItemsMapper: ICoreDynamoDbItemsMapper)
-        : IDynamoDbCreateTableMapper {
-    override fun mapToCreateTablePair(items: List<CreateTableItemData>): CreateTablePairData {
-        val attDefItems = arrayListOf<AttributeDefinition>()
-        val schemaItems = arrayListOf<KeySchemaElement>()
-        items.forEach {
-            val name = it.name
-            attDefItems.add(coreItemsMapper
-                .getAttributeDefinition(name, it.dataType))
-            if (it.isPrimary) {
-                schemaItems.add(coreItemsMapper
-                    .getKeySchemaElementPrimary(name))
+class DynamoDbCreateTableMapper {
+    companion object {
+        fun mapToCreateTablePair(items: List<CreateTableItemData>): CreateTablePairData {
+            val attDefItems = arrayListOf<AttributeDefinition>()
+            val schemaItems = arrayListOf<KeySchemaElement>()
+            items.forEach {
+                val name = it.name
+                attDefItems.add(CoreDynamoDbItemsMapper
+                    .getAttributeDefinition(name, it.dataType))
+                if (it.isPrimary) {
+                    schemaItems.add(CoreDynamoDbItemsMapper
+                        .getKeySchemaElementPrimary(name))
+                }
+                if (it.isSortKey) {
+                    schemaItems.add(CoreDynamoDbItemsMapper
+                        .getKeySchemaElementSort(name))
+                }
             }
-            if (it.isSortKey) {
-                schemaItems.add(coreItemsMapper
-                    .getKeySchemaElementSort(name))
-            }
+            return CreateTablePairData(attDefItems, schemaItems)
         }
-        return CreateTablePairData(attDefItems, schemaItems)
     }
 }

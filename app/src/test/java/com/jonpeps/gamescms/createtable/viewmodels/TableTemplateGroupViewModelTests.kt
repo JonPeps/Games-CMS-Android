@@ -2,7 +2,6 @@ package com.jonpeps.gamescms.createtable.viewmodels
 
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
-import com.jonpeps.gamescms.data.dataclasses.mappers.TableItemFinalMapper
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
 import com.jonpeps.gamescms.ui.createtable.helpers.ITableTemplateGroupVmRepoHelper
@@ -27,8 +26,6 @@ class TableTemplateGroupViewModelTests {
     @Mock
     private lateinit var tableTemplateRepository: ITableTemplateFileRepository
     @Mock
-    private lateinit var tableItemFinalMapper: TableItemFinalMapper
-    @Mock
     private lateinit var tableTemplateGroupVmRepoHelper: ITableTemplateGroupVmRepoHelper
     @Mock
     private lateinit var reader: BufferedReader
@@ -44,7 +41,6 @@ class TableTemplateGroupViewModelTests {
     @Before
     fun setup() {
         viewModel = TableTemplateGroupViewModel(path,
-            tableItemFinalMapper,
             tableTemplateRepository,
             tableTemplateGroupVmRepoHelper,
             dispatcher)

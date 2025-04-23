@@ -1,7 +1,5 @@
 package com.jonpeps.gamescms.hilt.di
 
-import com.jonpeps.gamescms.data.dataclasses.mappers.ITableItemFinalMapper
-import com.jonpeps.gamescms.data.dataclasses.mappers.TableItemFinalMapper
 import com.jonpeps.gamescms.data.serialization.moshi.IStringListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.moshi.ITableItemListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.moshi.MoshiJsonAdapterCreator
@@ -11,7 +9,6 @@ import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSeria
 import com.jonpeps.gamescms.data.serialization.string.IStringSerialization
 import com.jonpeps.gamescms.data.serialization.string.StringFileStorageStrSerialisation
 import com.jonpeps.gamescms.data.serialization.string.StringSerialization
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,11 +35,6 @@ class SerializationDiProvider {
                                                  dispatcher: CoroutineDispatcher)
     : IStringFileStorageStrSerialisation {
         return StringFileStorageStrSerialisation(stringSerialization, dispatcher)
-    }
-
-    @Provides
-    fun provideTableItemFinalMapper(): ITableItemFinalMapper {
-        return TableItemFinalMapper()
     }
 
     @Provides

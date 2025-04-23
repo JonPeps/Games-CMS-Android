@@ -7,29 +7,27 @@ import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class ItemTypeToAttTypeTests {
-    private val mapper = CoreDynamoDbItemsMapper()
-
     @Test
     fun `test string is S when item type arg is STRING`() {
-        val result = mapper.getStringType(ItemType.STRING)
+        val result = CoreDynamoDbItemsMapper.getStringType(ItemType.STRING)
         assert(result == "S")
     }
 
     @Test
     fun `test string is N when item type arg is INT`() {
-        val result = mapper.getStringType(ItemType.INT)
+        val result = CoreDynamoDbItemsMapper.getStringType(ItemType.INT)
         assert(result == "N")
     }
 
     @Test
     fun `test string is S when item type arg is UTC DATE`() {
-        val result = mapper.getStringType(ItemType.UTC_DATE)
+        val result = CoreDynamoDbItemsMapper.getStringType(ItemType.UTC_DATE)
         assert(result == "S")
     }
 
     @Test
     fun `test string is S when item type arg is BOOLEAN`() {
-        val result = mapper.getStringType(ItemType.BOOLEAN)
+        val result = CoreDynamoDbItemsMapper.getStringType(ItemType.BOOLEAN)
         assert(result == "S")
     }
 }

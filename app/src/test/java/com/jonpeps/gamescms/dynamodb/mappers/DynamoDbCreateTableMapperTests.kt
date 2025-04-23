@@ -10,7 +10,6 @@ import software.amazon.awssdk.services.dynamodb.model.KeyType
 
 @RunWith(JUnit4::class)
 class DynamoDbCreateTableMapperTests {
-    private val mapper = DynamoDbCreateTableMapper(CoreDynamoDbItemsMapper())
     private var testItems: List<CreateTableItemData>? = null
 
     @Before
@@ -46,7 +45,7 @@ class DynamoDbCreateTableMapperTests {
 
     @Test
     fun `test table items are parsed to attribute definitions as expected`() {
-        val mapperResult = mapper.mapToCreateTablePair(testItems!!)
+        val mapperResult = DynamoDbCreateTableMapper.mapToCreateTablePair(testItems!!)
         val attributeDefinitions = mapperResult.attDefinitions
         var item = attributeDefinitions[0]
         assert(item.attributeName() == "id")
@@ -64,7 +63,7 @@ class DynamoDbCreateTableMapperTests {
 
     @Test
     fun `test table items are parsed and key schemas are generated as expected`() {
-        val mapperResult = mapper.mapToCreateTablePair(testItems!!)
+        val mapperResult = DynamoDbCreateTableMapper.mapToCreateTablePair(testItems!!)
         val keySchemaElement = mapperResult.keySchema
         assert(keySchemaElement[0].attributeName() == "id")
         assert(keySchemaElement[0].keyType() == KeyType.HASH)

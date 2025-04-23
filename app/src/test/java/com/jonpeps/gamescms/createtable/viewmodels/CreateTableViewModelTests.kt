@@ -3,7 +3,7 @@ package com.jonpeps.gamescms.createtable.viewmodels
 import com.jonpeps.gamescms.data.dataclasses.createtemplate.CreateTableItemData
 import com.jonpeps.gamescms.data.dataclasses.createtemplate.CreateTablePairData
 import com.jonpeps.gamescms.data.dataclasses.ItemType
-import com.jonpeps.gamescms.dynamodb.mappers.IDynamoDbCreateTableMapper
+import com.jonpeps.gamescms.dynamodb.mappers.DynamoDbCreateTableMapper
 import com.jonpeps.gamescms.dynamodb.services.DynamoDbCreateTable
 import com.jonpeps.gamescms.ui.createtable.viewmodels.CreateTableViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,19 +14,17 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.Mockito.mock
 import org.mockito.exceptions.base.MockitoException
-import org.mockito.junit.MockitoJUnitRunner
+import org.powermock.modules.junit4.PowerMockRunner
 import software.amazon.awssdk.services.dynamodb.model.CreateTableResponse
 
-
-@RunWith(MockitoJUnitRunner::class)
+@RunWith(PowerMockRunner::class)
 class CreateTableViewModelTests {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val dispatcher = UnconfinedTestDispatcher()
     @Mock
     private lateinit var dynamoDbCreateTable: DynamoDbCreateTable
-    @Mock
-    private lateinit var dynamoDbCreateTableMapper: IDynamoDbCreateTableMapper
 
     private lateinit var viewModel: CreateTableViewModel
     private var testItems: List<CreateTableItemData>? = null
@@ -60,14 +58,18 @@ class CreateTableViewModelTests {
                 )
             )
 
-        viewModel = CreateTableViewModel(dynamoDbCreateTable, dynamoDbCreateTableMapper, dispatcher)
+        viewModel = CreateTableViewModel(dynamoDbCreateTable, dispatcher)
     }
 
     @Test
     fun `test create table success with valid API response`() = runTest(dispatcher) {
-        val mapperResponse = Mockito.mock(CreateTablePairData::class.java)
-        Mockito.`when`(dynamoDbCreateTableMapper.mapToCreateTablePair(testItems!!)).thenReturn(mapperResponse)
-        val createTableResponse = Mockito.mock(CreateTableResponse::class.java)
+        val mapperResponse = mock(CreateTablePairData::class.java)
+        val mockCompanionObj: DynamoDbCreateTableMapper.Companion = mock()
+
+        
+
+        Mockito.`when`(mockCompanionObj.mapToCreateTablePair(testItems!!)).thenReturn(mapperResponse)
+        val createTableResponse = mock(CreateTableResponse::class.java)
         Mockito.`when`(dynamoDbCreateTable.create("testTable", listOf(), listOf())).thenReturn(createTableResponse)
         viewModel.createTable("testTable", testItems!!)
         val response = viewModel.state.value
@@ -79,7 +81,7 @@ class CreateTableViewModelTests {
     @Test
     fun `test create table fails with API exception response`() = runTest(dispatcher) {
         val mapperResponse = Mockito.mock(CreateTablePairData::class.java)
-        Mockito.`when`(dynamoDbCreateTableMapper.mapToCreateTablePair(testItems!!)).thenReturn(mapperResponse)
+        //Mockito.`when`(dynamoDbCreateTableMapper.mapToCreateTablePair(testItems!!)).thenReturn(mapperResponse)
         Mockito.`when`(dynamoDbCreateTable.create("testTable", listOf(), listOf())).thenThrow(
             MockitoException::class.java)
         viewModel.createTable("testTable", testItems!!)

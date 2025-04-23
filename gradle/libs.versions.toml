@@ -57,7 +57,11 @@ moshiKotlinVersion = "1.14.0"
 navigationFragmentKtx = "2.8.9"
 navigationUiKtx = "2.8.9"
 powermockApiMockito = "1.6.2"
+powermockApiMockito2 = "1.7.3"
+powermockCore = "1.7.3"
+powermockMockitoReleaseFull = "1.6.0'"
 powermockModuleJunit4 = "1.6.2"
+powermockModuleJunit4Version = "1.7.3"
 roomKtx = "2.7.0"
 roomRuntime = "2.6.1"
 roomRuntimeVersion = "2.7.0"
@@ -136,7 +140,11 @@ mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 moshi-kotlin-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshiKotlinCodegen" }
 powermock-api-mockito = { module = "org.powermock:powermock-api-mockito", version.ref = "powermockApiMockito" }
+powermock-api-mockito2 = { module = "org.powermock:powermock-api-mockito2", version.ref = "powermockApiMockito2" }
+powermock-core = { module = "org.powermock:powermock-core", version.ref = "powermockCore" }
+powermock-mockito-release-full = { module = "org.powermock:powermock-mockito-release-full", version.ref = "powermockMockitoReleaseFull" }
 powermock-module-junit4 = { module = "org.powermock:powermock-module-junit4", version.ref = "powermockModuleJunit4" }
+powermock-module-junit4-v173 = { module = "org.powermock:powermock-module-junit4", version.ref = "powermockModuleJunit4Version" }
 runtime = { module = "androidx.compose.runtime:runtime", version.ref = "runtime" }
 squareup-moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshiKotlinVersion" }
 
