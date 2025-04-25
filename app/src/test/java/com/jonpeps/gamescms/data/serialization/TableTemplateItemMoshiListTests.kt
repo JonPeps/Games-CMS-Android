@@ -6,26 +6,29 @@ import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.serialization.moshi.TableItemListMoshiSerialization
 import com.squareup.moshi.JsonAdapter
+import io.mockk.MockKAnnotations
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
-import org.mockito.junit.MockitoJUnitRunner
 import java.io.IOException
 
-@Suppress("UNCHECKED_CAST")
-@RunWith(MockitoJUnitRunner::class)
+@RunWith(JUnit4::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class TableTemplateItemMoshiListTests {
-    @OptIn(ExperimentalCoroutinesApi::class)
     private val dispatcher = UnconfinedTestDispatcher()
-    @Mock
+    @MockK
     private lateinit var moshiJsonAdapterCreator: MoshiJsonAdapterCreator
-    @Mock
+    @MockK
     private lateinit var moshiJsonAdapter: JsonAdapter<TableTemplateItemListMoshi>
 
     private lateinit var serializer: TableItemListMoshiSerialization
@@ -34,7 +37,9 @@ class TableTemplateItemMoshiListTests {
 
     @Before
     fun setup() {
-        moshiJsonAdapter = mock(JsonAdapter::class.java) as JsonAdapter<TableTemplateItemListMoshi>
+        MockKAnnotations.init(this)
+
+        moshiJsonAdapter = mockk<JsonAdapter<TableTemplateItemListMoshi>>()
         serializer = TableItemListMoshiSerialization(moshiJsonAdapterCreator, dispatcher)
     }
 
@@ -42,8 +47,8 @@ class TableTemplateItemMoshiListTests {
     fun `test content converted from Json to table item template success`() = runTest(dispatcher) {
         assert(serializer.getItem() == null)
         assert(serializer.getErrorMsg() == "")
-        Mockito.`when`(serializer.getMoshiAdapter()).thenReturn(moshiJsonAdapter)
-        Mockito.`when`(moshiJsonAdapter.fromJson("Dummy Json")).thenReturn(dummyData)
+        every { serializer.getMoshiAdapter() } returns moshiJsonAdapter
+        every { moshiJsonAdapter.fromJson("Dummy Json") } returns dummyData
         val success = serializer.fromJson("Dummy Json")
         assert(success)
     }
@@ -52,8 +57,8 @@ class TableTemplateItemMoshiListTests {
     fun `test content converted from Json to table item template failure due to exception`() = runTest(dispatcher) {
         assert(serializer.getItem() == null)
         assert(serializer.getErrorMsg() == "")
-        Mockito.`when`(serializer.getMoshiAdapter()).thenReturn(moshiJsonAdapter)
-        Mockito.`when`(moshiJsonAdapter.fromJson("Dummy Json")).thenThrow(IOException())
+        every { serializer.getMoshiAdapter() } returns moshiJsonAdapter
+        every { moshiJsonAdapter.fromJson("Dummy Json") } throws IOException()
         val success = serializer.fromJson("Dummy Json")
         assert(!success)
         assert(serializer.getErrorMsg() != "")
@@ -62,8 +67,8 @@ class TableTemplateItemMoshiListTests {
     @Test
     fun `test convert to table item template to Json success`() = runTest(dispatcher) {
         assert(serializer.getErrorMsg() == "")
-        Mockito.`when`(serializer.getMoshiAdapter()).thenReturn(moshiJsonAdapter)
-        Mockito.`when`(moshiJsonAdapter.toJson(dummyData)).thenReturn("Dummy Json")
+        every { serializer.getMoshiAdapter() } returns moshiJsonAdapter
+        every { moshiJsonAdapter.toJson(dummyData) } returns "Dummy Json"
         val success = serializer.toJson(dummyData)
         assert(success)
         assert(serializer.getErrorMsg() == "")
@@ -71,8 +76,8 @@ class TableTemplateItemMoshiListTests {
 
     @Test
     fun `test convert to table item template to Json fails due to null string`()  = runTest(dispatcher) {
-        Mockito.`when`(serializer.getMoshiAdapter()).thenReturn(moshiJsonAdapter)
-        Mockito.`when`(moshiJsonAdapter.toJson(dummyData)).thenReturn(null)
+        every { serializer.getMoshiAdapter() } returns moshiJsonAdapter
+        every { moshiJsonAdapter.toJson(dummyData) } returns null
         val success = serializer.toJson(dummyData)
         assert(!success)
     }
@@ -80,8 +85,8 @@ class TableTemplateItemMoshiListTests {
     @Test
     fun `test convert to table item template to Json fails due to empty string`()  = runTest(dispatcher) {
         assert(serializer.getErrorMsg() == "")
-        Mockito.`when`(serializer.getMoshiAdapter()).thenReturn(moshiJsonAdapter)
-        Mockito.`when`(moshiJsonAdapter.toJson(dummyData)).thenReturn("")
+        every { serializer.getMoshiAdapter() } returns moshiJsonAdapter
+        every { moshiJsonAdapter.toJson(dummyData) } returns ""
         val success = serializer.toJson(dummyData)
         assert(!success)
     }
@@ -89,8 +94,8 @@ class TableTemplateItemMoshiListTests {
     @Test
     fun `test convert to table item template to Json fails due to assertion exception`()  = runTest(dispatcher) {
         assert(serializer.getErrorMsg() == "")
-        Mockito.`when`(serializer.getMoshiAdapter()).thenReturn(moshiJsonAdapter)
-        Mockito.`when`(moshiJsonAdapter.toJson(dummyData)).thenThrow(AssertionError())
+        every { serializer.getMoshiAdapter() } returns moshiJsonAdapter
+        every { moshiJsonAdapter.toJson(dummyData) } throws AssertionError()
         val success = serializer.toJson(dummyData)
         assert(!success)
         assert(serializer.getErrorMsg() != "")

@@ -52,6 +52,11 @@ mockitoJunitJupiter = "5.4.0"
 mockitoKotlin = "1"
 mockitoMockitoCore = "5.4.0"
 mockk = "{version}"
+mockkAndroid = "VERSION"
+mockkAndroidVersion = "1.13.5"
+mockkCommon = "1.11.0"
+mockkMockk = "1.11.0"
+mockkVersion = "1.0"
 moshiKotlinCodegen = "1.14.0"
 moshiKotlinVersion = "1.14.0"
 navigationFragmentKtx = "2.8.9"
@@ -138,6 +143,11 @@ mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito
 mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockitoJunitJupiter" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkAndroid" }
+mockk-android-v1135 = { module = "io.mockk:mockk-android", version.ref = "mockkAndroidVersion" }
+mockk-common = { module = "io.mockk:mockk-common", version.ref = "mockkCommon" }
+mockk-v10 = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
+mockk-v1110 = { module = "io.mockk:mockk", version.ref = "mockkMockk" }
 moshi-kotlin-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshiKotlinCodegen" }
 powermock-api-mockito = { module = "org.powermock:powermock-api-mockito", version.ref = "powermockApiMockito" }
 powermock-api-mockito2 = { module = "org.powermock:powermock-api-mockito2", version.ref = "powermockApiMockito2" }

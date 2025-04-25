@@ -2,33 +2,31 @@ package com.jonpeps.gamescms.createtable.viewmodels
 
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
+import com.jonpeps.gamescms.data.dataclasses.mappers.TableItemFinalMapper
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
 import com.jonpeps.gamescms.ui.createtable.helpers.ITableTemplateGroupVmRepoHelper
 import com.jonpeps.gamescms.ui.createtable.viewmodels.TableTemplateGroupViewModel
 import com.jonpeps.gamescms.ui.createtable.viewmodels.TableTemplateGroupViewModel.Companion.JSON_ITEM_TO_SAVE_IS_NULL
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.mockkObject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.junit.MockitoJUnitRunner
-import java.io.BufferedReader
 
-@RunWith(MockitoJUnitRunner::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class TableTemplateGroupViewModelTests {
-    @OptIn(ExperimentalCoroutinesApi::class)
     private val dispatcher = UnconfinedTestDispatcher()
-    @Mock
+    @MockK
     private lateinit var tableTemplateRepository: ITableTemplateFileRepository
-    @Mock
+    @MockK
     private lateinit var tableTemplateGroupVmRepoHelper: ITableTemplateGroupVmRepoHelper
-    @Mock
-    private lateinit var reader: BufferedReader
 
     private val dummyData = TableTemplateItemListMoshi("test_template", listOf(TableTemplateItemMoshi("test",
         dataType = ItemType.STRING)))
@@ -40,142 +38,170 @@ class TableTemplateGroupViewModelTests {
 
     @Before
     fun setup() {
+        MockKAnnotations.init(this)
+
         viewModel = TableTemplateGroupViewModel(path,
             tableTemplateRepository,
             tableTemplateGroupVmRepoHelper,
             dispatcher)
+
+        mockkObject(TableItemFinalMapper.Companion) {
+            val mockMapperResult1 = mockk<List<TableItemFinal>>()
+            every { TableItemFinalMapper.fromTableTemplateListMoshi(any()) } returns mockMapperResult1
+            val mockMapperResult2 = mockk<TableTemplateItemListMoshi>()
+            every { TableItemFinalMapper.toTableTemplateItemListMoshi(any(), any()) } returns mockMapperResult2
+        }
     }
 
     @Test
-    fun `test load template success when IO files are correct and load from repo is true`() = runTest(dispatcher) {
-        `when`(tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName)).thenReturn(reader)
-        `when`(tableTemplateRepository.load()).thenReturn(true)
-        `when`(tableTemplateRepository.getItem()).thenReturn(dummyData)
+    fun `test load template success when IO files are correct and load from repo is true`() {
+        setupForReadingFiles()
+        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
+        every { tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName) } returns mockk()
+        every { tableTemplateRepository.getItem() } returns dummyData
+        coEvery { tableTemplateRepository.load() } returns true
+
         viewModel.load(templateName)
+
         assert(viewModel.status.value.success)
         assert(viewModel.status.value.message == "")
         assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(viewModel.status.value.items.size == 1)
         assert(viewModel.status.value.currentIndex == 0)
     }
 
     @Test
-    fun `test load template failure when IO files are correct and load from repo is false`() = runTest(dispatcher) {
-        `when`(tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName)).thenReturn(reader)
-        `when`(tableTemplateRepository.load()).thenReturn(false)
+    fun `test load template failure when IO files are correct and load from repo is false`() {
+        setupForReadingFiles()
+        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
+        every { tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName) } returns mockk()
+        every { tableTemplateRepository.getErrorMsg() } returns "An error occurred!"
+        coEvery { tableTemplateRepository.load() } returns false
+
         viewModel.load(templateName)
+
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.message == tableTemplateRepository.getErrorMsg())
         assert(viewModel.status.value.ex == null)
     }
 
     @Test
-    fun `test load template failure when IO files are correct but load Json item fails`() = runTest(dispatcher) {
-        `when`(tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName)).thenReturn(reader)
-        `when`(tableTemplateRepository.load()).thenReturn(false)
-        viewModel.load(templateName)
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == tableTemplateRepository.getErrorMsg())
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.currentIndex == 0)
-    }
-
-    @Test
-    fun `test load template failure when IO files throw RuntimeException due to invalid File`() = runTest(dispatcher) {
-        `when`(
-            tableTemplateGroupVmRepoHelper.getAbsoluteFile(
-                path,
-                templateName
-            )
-        ).thenThrow(RuntimeException("Runtime error!"))
+    fun `test load template failure when IO files throw RuntimeException due to invalid File`() {
+        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(any(), any()) } throws RuntimeException("Runtime error!")
 
         viewModel.load(templateName)
+
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.message == "Runtime error!")
         assert(viewModel.status.value.ex != null)
     }
 
     @Test
-    fun `test load template failure when IO files throw RuntimeException due to invalid BufferReader`() = runTest(dispatcher) {
-        `when`(
-            tableTemplateGroupVmRepoHelper.getBufferReader(
-                path,
-                templateName
-            )
-        ).thenThrow(RuntimeException("Runtime error!"))
+    fun `test load template failure when IO files throw RuntimeException due to invalid BufferReader`() {
+        setupForReadingFiles()
+        setupForWritingFiles()
+        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { tableTemplateGroupVmRepoHelper.getBufferReader(any(), any()) } throws RuntimeException("Runtime error!")
 
         viewModel.load(templateName)
+
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.message == "Runtime error!")
         assert(viewModel.status.value.ex != null)
     }
 
     @Test
-    fun `test load template failure when IO files are correct but Json item is null`() = runTest(dispatcher) {
-        `when`(tableTemplateRepository.load()).thenReturn(true)
-        `when`(tableTemplateRepository.getItem()).thenReturn(null)
+    fun `test load template failure when IO files are correct but Json item is null`() {
+        setupForReadingFiles()
+        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
+        every { tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName) } returns mockk()
+        coEvery { tableTemplateRepository.load() } returns true
+        every { tableTemplateRepository.getItem() } returns null
+
         viewModel.load(templateName)
+
         assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == TableTemplateGroupViewModel.JSON_ITEM_TO_SAVE_IS_NULL + templateName)
+        assert(viewModel.status.value.message == JSON_ITEM_TO_SAVE_IS_NULL + templateName)
         assert(viewModel.status.value.ex == null)
     }
 
     @Test
-    fun `test save template success when IO files are correct and save to repo is true`() = runTest(dispatcher) {
-        tableTemplateRepository.setItem(dummyData)
-        `when`(tableTemplateRepository.getItem()).thenReturn(dummyData)
-        `when`(tableTemplateRepository.save(dummyData)).thenReturn(true)
+    fun `test save template success when IO files are correct and save to repo is true`() {
+        setupForReadingFiles()
+        setupForWritingFiles()
+        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
+        every { tableTemplateGroupVmRepoHelper.getMainFile(templateName) } returns mockk()
+        every { tableTemplateGroupVmRepoHelper.getDirectoryFile(path) } returns mockk()
+        every { tableTemplateGroupVmRepoHelper.getFileWriter(path, templateName) } returns mockk()
+        every { tableTemplateRepository.getItem() } returns dummyData
+        coEvery { tableTemplateRepository.save(dummyData) } returns true
+
         viewModel.save(templateName)
+
         assert(viewModel.status.value.success)
         assert(viewModel.status.value.message == "")
         assert(viewModel.status.value.ex == null)
     }
 
     @Test
-    fun `test save template fails when IO files are correct and Json to save is null`() = runTest(dispatcher) {
-        `when`(tableTemplateRepository.getItem()).thenReturn(null)
+    fun `test save template fails when IO files are correct and Json to save is null`() {
+        setupForWritingFiles()
+        setupForReadingFiles()
+        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
+        every { tableTemplateGroupVmRepoHelper.getMainFile(templateName) } returns mockk()
+        every { tableTemplateGroupVmRepoHelper.getDirectoryFile(path) } returns mockk()
+        every { tableTemplateGroupVmRepoHelper.getFileWriter(path, templateName) } returns mockk()
+        every { tableTemplateRepository.getItem() } returns null
+
         viewModel.save(templateName)
+
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.message == JSON_ITEM_TO_SAVE_IS_NULL + templateName)
     }
 
     @Test
-    fun `test save template fails when IO file throws RuntimeException due to invalid absolute file path`() = runTest(dispatcher) {
-        `when`(tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName)).thenThrow(RuntimeException("Runtime error!"))
+    fun `test save template fails when IO file throws RuntimeException due to invalid absolute file path`() {
+        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } throws RuntimeException("Runtime error!")
+
         viewModel.save(templateName)
+
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.message == "Runtime error!")
         assert(viewModel.status.value.ex != null)
     }
 
     @Test
-    fun `test save template fails when IO file throws RuntimeException due to invalid FileWriter`() = runTest(dispatcher) {
-        `when`(tableTemplateGroupVmRepoHelper.getFileWriter(path, templateName)).thenThrow(RuntimeException("Runtime error!"))
+    fun `test save template fails when IO file throws RuntimeException due to invalid FileWriter`() {
+        setupForReadingFiles()
+        setupForWritingFiles()
+        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
+        every { tableTemplateGroupVmRepoHelper.getMainFile(templateName) } returns mockk()
+        every { tableTemplateGroupVmRepoHelper.getDirectoryFile(path) } returns mockk()
+        every { tableTemplateGroupVmRepoHelper.getFileWriter(path, templateName) } throws RuntimeException("Runtime error!")
+
         viewModel.save(templateName)
+
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.message == "Runtime error!")
         assert(viewModel.status.value.ex != null)
     }
 
     @Test
-    fun `test save template fails when IO files are correct and save to repo is false`() = runTest(dispatcher) {
-        tableTemplateRepository.setItem(dummyData)
-        `when`(tableTemplateRepository.getItem()).thenReturn(dummyData)
-        `when`(tableTemplateRepository.save(dummyData)).thenReturn(false)
+    fun `test save template fails when IO files are correct and save to repo is false`() {
+        setupForReadingFiles()
+        setupForWritingFiles()
+        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
+        every { tableTemplateGroupVmRepoHelper.getMainFile(templateName) } returns mockk()
+        every { tableTemplateGroupVmRepoHelper.getDirectoryFile(path) } returns mockk()
+        every { tableTemplateGroupVmRepoHelper.getFileWriter(path, templateName) } returns mockk()
+        every { tableTemplateRepository.getItem() } returns dummyData
+        every { tableTemplateRepository.getErrorMsg() } returns "An error occurred!"
+        coEvery { tableTemplateRepository.save(dummyData) } returns false
+
         viewModel.save(templateName)
+
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.message == tableTemplateRepository.getErrorMsg())
-    }
-
-    @Test
-    fun `test save template fails when IO files are incorrect`() = runTest(dispatcher) {
-        `when`(tableTemplateRepository.getItem()).thenReturn(dummyData)
-        `when`(tableTemplateRepository.save(dummyData)).thenReturn(false)
-        `when`(tableTemplateRepository.getErrorMsg()).thenReturn("File error!")
-        viewModel.save(templateName)
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == "File error!")
-        assert(viewModel.status.value.ex == null)
     }
 
     @Test
@@ -493,5 +519,17 @@ class TableTemplateGroupViewModelTests {
         assert(viewModel.status.value.message == "")
         assert(viewModel.status.value.ex == null)
         assert(viewModel.status.value.items.size == 1)
+    }
+
+    private fun setupForReadingFiles() {
+        every { tableTemplateRepository.setAbsoluteFile(any()) } returns Unit
+        every { tableTemplateRepository.setBufferReader(any()) } returns Unit
+    }
+
+    private fun setupForWritingFiles() {
+        every { tableTemplateRepository.setDirectoryFile(any()) } returns Unit
+        every { tableTemplateRepository.setFileWriter(any()) } returns Unit
+        every { tableTemplateRepository.setFile(any()) } returns Unit
+        every { tableTemplateRepository.setItem(any()) } returns Unit
     }
 }

@@ -10,6 +10,7 @@ import javax.inject.Inject
 interface IStringFileStorageStrSerialisation {
     suspend fun write(directory: File,
                       mainFile: File,
+                      absoluteFile: File,
                       fileWriter: FileWriter,
                       contents: String): Boolean
 
@@ -29,6 +30,7 @@ class StringFileStorageStrSerialisation
 
     override suspend fun write(directory: File,
                                mainFile: File,
+                               absoluteFile: File,
                                fileWriter: FileWriter,
                                contents: String): Boolean {
         return withContext(dispatcher) {
@@ -42,7 +44,6 @@ class StringFileStorageStrSerialisation
                     }
                 }
                 if (success) {
-                    val absoluteFile = File(directory.name + mainFile.name)
                     if (!absoluteFile.exists()) {
                         if (!absoluteFile.createNewFile()) {
                             errorMsg = FAILED_TO_CREATE_FILE + mainFile.name

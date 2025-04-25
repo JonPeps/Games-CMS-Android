@@ -233,19 +233,19 @@ class TableTemplateGroupViewModel
 
     // For testing:
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun addItem(item: TableItemFinal) {
+    internal fun addItem(item: TableItemFinal) {
         items.add(item)
     }
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun clearItems() {
+    internal fun clearItems() {
         items.clear()
     }
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun setIndex(index: Int) {
+    internal fun setIndex(index: Int) {
         this.index = index
     }
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun getIndex() = index
+    internal fun getIndex() = index
     ///////////////////////////////
 
     private fun decrementPage(): Boolean {

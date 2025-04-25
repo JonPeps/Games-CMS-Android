@@ -107,9 +107,9 @@ class TableTemplateFileRepositoryTests {
         assert(tableTemplateRepository.getErrorMsg() == "")
         `when`(tableItemListMoshiSerialization.toJson(dummyData)).thenReturn(true)
         `when`(tableItemListMoshiSerialization.getToJsonItem()).thenReturn("test")
-        `when`(stringFileStorageStrSerialisation.write(directoryFile, file, fileWriter, "test")).thenReturn(true)
+        `when`(stringFileStorageStrSerialisation.write(directoryFile, file, absolutePath, fileWriter, "test")).thenReturn(true)
         val result = tableTemplateRepository.save(dummyData)
-        verify(stringFileStorageStrSerialisation, times(1)).write(directoryFile, file, fileWriter, "test")
+        verify(stringFileStorageStrSerialisation, times(1)).write(directoryFile, file, absolutePath, fileWriter, "test")
         assert(result)
         assert(tableTemplateRepository.getErrorMsg() == "")
     }

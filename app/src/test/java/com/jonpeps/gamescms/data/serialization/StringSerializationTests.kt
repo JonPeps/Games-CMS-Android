@@ -1,11 +1,12 @@
 package com.jonpeps.gamescms.data.serialization
 
 import com.jonpeps.gamescms.data.serialization.string.StringSerialization
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.mockito.Mockito
-import org.mockito.Mockito.mock
 import java.io.BufferedReader
 import java.io.FileWriter
 import java.io.IOException
@@ -17,10 +18,12 @@ class StringSerializationTests {
     @Test
     fun `success when string written to file`() {
         val serializeString = StringSerialization()
-        val mockFileWriter = mock(FileWriter::class.java)
+        val mockFileWriter = mockk<FileWriter>(relaxed = true)
+        every { mockFileWriter.write("123") } returns Unit
+        every { mockFileWriter.close() } returns Unit
         val success = serializeString.write(mockFileWriter, "123")
-        Mockito.verify(mockFileWriter).write("123")
-        Mockito.verify(mockFileWriter).close()
+        verify { mockFileWriter.write("123") }
+        verify { mockFileWriter.close() }
         assert(success)
         assert(serializeString.getErrorMsg() == "")
     }
@@ -28,11 +31,12 @@ class StringSerializationTests {
     @Test
     fun `failure when string written to file due to IO exception`() {
         val serializeString = StringSerialization()
-        val mockFileWriter = mock(FileWriter::class.java)
-        Mockito.`when`(mockFileWriter.write("123")).thenThrow(IOException("Write failed!"))
+        val mockFileWriter = mockk<FileWriter>(relaxed = true)
+        every { mockFileWriter.write("123") } throws IOException("Write failed!")
+        every { mockFileWriter.close() } returns Unit
         val success = serializeString.write(mockFileWriter, "123")
-        Mockito.verify(mockFileWriter).write("123")
-        Mockito.verify(mockFileWriter).close()
+        verify { mockFileWriter.write("123") }
+        verify { mockFileWriter.close() }
         assert(!success)
         assert(serializeString.getErrorMsg() == "java.io.IOException: Write failed!")
     }
@@ -40,10 +44,11 @@ class StringSerializationTests {
     @Test
     fun `success when reading string from file`() {
         val serializeString = StringSerialization()
-        val mockBufferedReader = mock(BufferedReader::class.java)
-        Mockito.`when`(mockBufferedReader.lines()).thenReturn(Stream.of("1", "2")).thenReturn(null)
+        val mockBufferedReader = mockk<BufferedReader>(relaxed = true)
+        every { mockBufferedReader.lines() } returns Stream.of("1", "2")
+        every { mockBufferedReader.close() } returns Unit
         val success = serializeString.read(mockBufferedReader)
-        Mockito.verify(mockBufferedReader).close()
+        verify { mockBufferedReader.close() }
         assert(success)
         assert(serializeString.getContents() == "12")
     }
@@ -51,11 +56,11 @@ class StringSerializationTests {
     @Test
     fun `failure when reading string from file throws exception`() {
         val serializeString = StringSerialization()
-        val mockBufferedReader = mock(BufferedReader::class.java)
-        val mockUncheckedIOException = mock(UncheckedIOException::class.java)
-        Mockito.`when`(mockBufferedReader.lines()).thenThrow(mockUncheckedIOException)
+        val mockBufferedReader = mockk<BufferedReader>(relaxed = true)
+        val mockUncheckedIOException = mockk<UncheckedIOException>()
+        every { mockBufferedReader.lines() } throws mockUncheckedIOException
         val success = serializeString.read(mockBufferedReader)
-        Mockito.verify(mockBufferedReader).close()
+        verify { mockBufferedReader.close() }
         assert(!success)
     }
 }

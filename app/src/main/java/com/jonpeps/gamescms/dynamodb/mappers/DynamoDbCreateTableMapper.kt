@@ -7,6 +7,7 @@ import software.amazon.awssdk.services.dynamodb.model.KeySchemaElement
 
 class DynamoDbCreateTableMapper {
     companion object {
+        @JvmStatic
         fun mapToCreateTablePair(items: List<CreateTableItemData>): CreateTablePairData {
             val attDefItems = arrayListOf<AttributeDefinition>()
             val schemaItems = arrayListOf<KeySchemaElement>()

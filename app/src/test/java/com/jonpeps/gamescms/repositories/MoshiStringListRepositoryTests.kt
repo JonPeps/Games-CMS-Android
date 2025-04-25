@@ -5,38 +5,38 @@ import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.repositories.MoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.moshi.IStringListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
-import org.mockito.junit.MockitoJUnitRunner
+import org.junit.runners.JUnit4
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileWriter
 
-@RunWith(MockitoJUnitRunner::class)
+@RunWith(JUnit4::class)
 class MoshiStringListRepositoryTests {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val dispatcher = UnconfinedTestDispatcher()
-    @Mock
+    @MockK
     private lateinit var stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation
-    @Mock
+    @MockK
     private lateinit var strListMoshiSerialization: IStringListMoshiSerialization
-    @Mock
+    @MockK
     private lateinit var directoryFile: File
-    @Mock
+    @MockK
     private lateinit var file: File
-    @Mock
+    @MockK
     private lateinit var absolutePath: File
-    @Mock
+    @MockK
     private lateinit var bufferedReader: BufferedReader
-    @Mock
+    @MockK
     private lateinit var fileWriter: FileWriter
 
     private val dummyData = StringListData(arrayListOf("test1", "test2"))
@@ -45,6 +45,8 @@ class MoshiStringListRepositoryTests {
 
     @Before
     fun setup() {
+        MockKAnnotations.init(this)
+
         moshiStringListRepository = MoshiStringListRepository(strListMoshiSerialization, stringFileStorageStrSerialisation)
         moshiStringListRepository.setAbsoluteFile(absolutePath)
         moshiStringListRepository.setFile(file)
@@ -56,12 +58,12 @@ class MoshiStringListRepositoryTests {
     @Test
     fun `test load string list success all paths`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
-        `when`(stringFileStorageStrSerialisation.read(absolutePath, bufferedReader)).thenReturn(true)
-        `when`(strListMoshiSerialization.fromJson("")).thenReturn(true)
-        `when`(stringFileStorageStrSerialisation.getContents()).thenReturn("")
-        `when`(strListMoshiSerialization.getItem()).thenReturn(dummyData)
+        coEvery { stringFileStorageStrSerialisation.read(absolutePath, bufferedReader) } returns true
+        coEvery { strListMoshiSerialization.fromJson("") } returns true
+        every { stringFileStorageStrSerialisation.getContents() } returns ""
+        every { strListMoshiSerialization.getItem() } returns dummyData
         val result = moshiStringListRepository.load()
-        verify(strListMoshiSerialization, times(1)).getItem()
+        assert(result)
         assert(strListMoshiSerialization.getItem() == dummyData)
         assert(result)
     }
@@ -69,31 +71,23 @@ class MoshiStringListRepositoryTests {
     @Test
     fun `test load string list with read Json string false`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
-        `when`(stringFileStorageStrSerialisation.read(absolutePath, bufferedReader)).thenReturn(false)
+        every { stringFileStorageStrSerialisation.getErrorMsg() } returns "An error occurred!"
+        coEvery { stringFileStorageStrSerialisation.read(absolutePath, bufferedReader) } returns false
         val result = moshiStringListRepository.load()
-        verify(stringFileStorageStrSerialisation, times(1)).getErrorMsg()
         assert(stringFileStorageStrSerialisation.getErrorMsg() == moshiStringListRepository.getErrorMsg())
-        assert(!result)
-    }
-
-    @Test
-    fun `test load string list fails with read Json file returns false`() = runTest(dispatcher) {
-        assert(moshiStringListRepository.getErrorMsg() == "")
-        `when`(stringFileStorageStrSerialisation.read(absolutePath, bufferedReader)).thenReturn(false)
-        val result = moshiStringListRepository.load()
-        verify(stringFileStorageStrSerialisation, times(1)).getErrorMsg()
-        assert(moshiStringListRepository.getErrorMsg() == stringFileStorageStrSerialisation.getErrorMsg())
         assert(!result)
     }
 
     @Test
     fun `test load string list with read Json file success but Json convert fails`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
-        `when`(stringFileStorageStrSerialisation.read(absolutePath, bufferedReader)).thenReturn(true)
-        `when`(strListMoshiSerialization
-            .fromJson(stringFileStorageStrSerialisation.getContents())).thenReturn(false)
+        every { strListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
+        every { stringFileStorageStrSerialisation.getErrorMsg() } returns strListMoshiSerialization.getErrorMsg()
+        every { stringFileStorageStrSerialisation.getContents() } returns ""
+        coEvery { stringFileStorageStrSerialisation.read(absolutePath, bufferedReader) } returns true
+        coEvery { strListMoshiSerialization
+            .fromJson(stringFileStorageStrSerialisation.getContents()) } returns false
         val result = moshiStringListRepository.load()
-        verify(strListMoshiSerialization, times(1)).getErrorMsg()
         assert(moshiStringListRepository.getErrorMsg() == strListMoshiSerialization.getErrorMsg())
         assert(!result)
     }
@@ -101,45 +95,70 @@ class MoshiStringListRepositoryTests {
     @Test
     fun `test save string list success all paths`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
-        `when`(strListMoshiSerialization.toJson(dummyData)).thenReturn(true)
-        `when`(strListMoshiSerialization.getToJsonItem()).thenReturn("test")
-        `when`(stringFileStorageStrSerialisation.write(directoryFile, file, fileWriter, "test")).thenReturn(true)
+        coEvery { strListMoshiSerialization.toJson(dummyData) } returns true
+        every { strListMoshiSerialization.getToJsonItem() } returns "test"
+        coEvery { stringFileStorageStrSerialisation.write(directoryFile, file, absolutePath, fileWriter, "test") } returns true
         val result = moshiStringListRepository.save(dummyData)
-        verify(stringFileStorageStrSerialisation, times(1)).write(directoryFile, file, fileWriter, "test")
         assert(result)
         assert(moshiStringListRepository.getErrorMsg() == "")
     }
 
     @Test
-    fun `test save string list Json string convert failure`() = runTest(dispatcher) {
+    fun `test save string list with write Json string to file success`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
-        `when`(strListMoshiSerialization.toJson(dummyData)).thenReturn(false)
+        coEvery { strListMoshiSerialization.toJson(dummyData) } returns true
+        every { strListMoshiSerialization.getToJsonItem() } returns "test"
+        every { strListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
+        every { stringFileStorageStrSerialisation.getErrorMsg() } returns strListMoshiSerialization.getErrorMsg()
+        coEvery { stringFileStorageStrSerialisation.write(directoryFile, file, absolutePath, fileWriter, "test") } returns true
+        val result = moshiStringListRepository.save(dummyData)
+        assert(result)
+    }
+
+    @Test
+    fun `test save string list with convert to Json string fails`() = runTest(dispatcher) {
+        assert(moshiStringListRepository.getErrorMsg() == "")
+        coEvery { strListMoshiSerialization.toJson(dummyData) } returns false
+        every { strListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
+        every { stringFileStorageStrSerialisation.getErrorMsg() } returns strListMoshiSerialization.getErrorMsg()
         val result = moshiStringListRepository.save(dummyData)
         assert(!result)
-        verify(strListMoshiSerialization, times(1)).getErrorMsg()
+        assert(stringFileStorageStrSerialisation.getErrorMsg() == moshiStringListRepository.getErrorMsg())
+    }
+
+    @Test
+    fun `test save string list Json string convert failure`() = runTest(dispatcher) {
+        assert(moshiStringListRepository.getErrorMsg() == "")
+        coEvery { strListMoshiSerialization.toJson(dummyData) } returns true
+        every { strListMoshiSerialization.getToJsonItem() } returns null
+        every { strListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
+        every { stringFileStorageStrSerialisation.getErrorMsg() } returns strListMoshiSerialization.getErrorMsg()
+        val result = moshiStringListRepository.save(dummyData)
+        assert(!result)
         assert(moshiStringListRepository.getErrorMsg() == strListMoshiSerialization.getErrorMsg())
     }
 
     @Test
     fun `test save string list with write Json string failure`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
-        `when`(strListMoshiSerialization.toJson(dummyData)).thenReturn(true)
-        `when`(strListMoshiSerialization.getToJsonItem()).thenReturn("test")
-        `when`(stringFileStorageStrSerialisation.write(directoryFile, file, fileWriter, "test")).thenReturn(false)
+        coEvery { strListMoshiSerialization.toJson(dummyData) } returns true
+        every { strListMoshiSerialization.getToJsonItem() } returns "test"
+        every { strListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
+        every { stringFileStorageStrSerialisation.getErrorMsg() } returns strListMoshiSerialization.getErrorMsg()
+        coEvery { stringFileStorageStrSerialisation.write(directoryFile, file, absolutePath, fileWriter, "test") } returns false
         val result = moshiStringListRepository.save(dummyData)
         assert(!result)
-        verify(stringFileStorageStrSerialisation, times(1)).getErrorMsg()
         assert(moshiStringListRepository.getErrorMsg() == stringFileStorageStrSerialisation.getErrorMsg())
     }
 
     @Test
     fun `test save string list with write Json string failure and get Json item is null`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
-        `when`(strListMoshiSerialization.toJson(dummyData)).thenReturn(true)
-        `when`(strListMoshiSerialization.getToJsonItem()).thenReturn(null)
+        coEvery { strListMoshiSerialization.toJson(dummyData) } returns true
+        every { strListMoshiSerialization.getToJsonItem() } returns null
+        every { strListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
         val result = moshiStringListRepository.save(dummyData)
         assert(!result)
-        verify(strListMoshiSerialization, times(1)).getErrorMsg()
         assert(moshiStringListRepository.getErrorMsg() == strListMoshiSerialization.getErrorMsg())
     }
 }

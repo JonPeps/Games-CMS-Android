@@ -112,7 +112,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     kapt(libs.androidx.hilt.compiler.v110)
     implementation(libs.hilt.android.gradle.plugin.v256)
-    implementation(libs.powermock.core)
-    implementation(libs.powermock.module.junit4.v173)
-    implementation(libs.powermock.api.mockito2)
+    implementation(libs.mockk.v1110)
+    implementation(libs.mockk.common)
+    testImplementation(libs.mockk.android.v1135)
 }

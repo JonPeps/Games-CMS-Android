@@ -63,7 +63,7 @@ abstract class BaseMoshiJsonRepository<T>(private val stringFileStorageStrSerial
             if (toJsonItem == null) {
                 errorMessage = moshiSerializer.getErrorMsg()
             } else {
-                if (stringFileStorageStrSerialisation.write(directoryFile, mainFile, mainFileWriter, toJsonItem)) {
+                if (stringFileStorageStrSerialisation.write(directoryFile, mainFile, mainAbsolutePath, mainFileWriter, toJsonItem)) {
                     success = true
                 } else {
                     errorMessage = stringFileStorageStrSerialisation.getErrorMsg()
