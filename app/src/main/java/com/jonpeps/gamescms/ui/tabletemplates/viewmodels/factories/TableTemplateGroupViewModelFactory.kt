@@ -1,8 +1,8 @@
-package com.jonpeps.gamescms.ui.createtable.viewmodels.factories
+package com.jonpeps.gamescms.ui.tabletemplates.viewmodels.factories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.jonpeps.gamescms.ui.createtable.viewmodels.TableTemplateGroupViewModel
+import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel
 import dagger.assisted.AssistedFactory
 
 @Suppress("UNCHECKED_CAST")

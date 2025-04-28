@@ -5,9 +5,9 @@ import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
 import com.jonpeps.gamescms.data.dataclasses.mappers.TableItemFinalMapper
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
-import com.jonpeps.gamescms.ui.createtable.helpers.ITableTemplateGroupVmRepoHelper
-import com.jonpeps.gamescms.ui.createtable.viewmodels.TableTemplateGroupViewModel
-import com.jonpeps.gamescms.ui.createtable.viewmodels.TableTemplateGroupViewModel.Companion.JSON_ITEM_TO_SAVE_IS_NULL
+import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmRepoHelper
+import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel
+import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel.Companion.JSON_ITEM_TO_SAVE_IS_NULL
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery

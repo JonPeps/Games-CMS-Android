@@ -1,9 +1,11 @@
 package com.jonpeps.gamescms.hilt.di
 
 import com.jonpeps.gamescms.dynamodb.services.IDynamoDbCreateTable
-import com.jonpeps.gamescms.ui.createtable.helpers.ITableTemplateGroupVmRepoHelper
-import com.jonpeps.gamescms.ui.createtable.helpers.TableTemplateGroupVmRepoHelper
+import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmRepoHelper
+import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupVmRepoHelper
 import com.jonpeps.gamescms.ui.createtable.viewmodels.CreateTableViewModel
+import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmChangesCache
+import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupVmChangesCache
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -36,4 +38,9 @@ abstract class ViewModelHelperDiBindings {
     abstract fun bindTableTemplateGroupVmRepoHelper(
         tableTemplateGroupVmRepoHelperImpl: TableTemplateGroupVmRepoHelper
     ): ITableTemplateGroupVmRepoHelper
+
+    @Binds
+    abstract fun bindTableTemplateGroupVmChangesCache(
+        tableTemplateGroupVmChangesCacheImpl: TableTemplateGroupVmChangesCache
+    ): ITableTemplateGroupVmChangesCache
 }

@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.dataclasses.createtemplate.CreateTableItemData
 import com.jonpeps.gamescms.dynamodb.mappers.DynamoDbCreateTableMapper
 import com.jonpeps.gamescms.dynamodb.services.IDynamoDbCreateTable
-import com.jonpeps.gamescms.ui.createtable.viewmodels.data.TableRequestViewModelResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +12,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import software.amazon.awssdk.services.dynamodb.model.CreateTableResponse
 import javax.inject.Inject
+
+class TableRequestViewModelResponse<T>(
+    val success: Boolean = false,
+    val response: T? = null,
+    val exception: Exception? = null)
 
 @HiltViewModel
 class CreateTableViewModel

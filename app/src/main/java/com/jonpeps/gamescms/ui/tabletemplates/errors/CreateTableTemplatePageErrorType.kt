@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.ui.createtable.errors
+package com.jonpeps.gamescms.ui.tabletemplates.errors
 
 enum class CreateTableTemplatePageErrorType {
     ROW_NAME_EMPTY,

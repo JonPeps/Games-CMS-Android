@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.ui.createtable.helpers
+package com.jonpeps.gamescms.ui.tabletemplates.viewmodels
 
 import java.io.BufferedReader
 import java.io.File

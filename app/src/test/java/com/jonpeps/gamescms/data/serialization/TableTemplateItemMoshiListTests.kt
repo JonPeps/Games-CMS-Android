@@ -17,9 +17,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.Mockito.mock
 import java.io.IOException
 
 @RunWith(JUnit4::class)

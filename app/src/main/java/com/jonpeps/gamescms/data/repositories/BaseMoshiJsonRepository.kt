@@ -60,16 +60,20 @@ abstract class BaseMoshiJsonRepository<T>(private val stringFileStorageStrSerial
         val moshiSerializer = getMoshiSerializer()
         if (moshiSerializer.toJson(item)) {
             val toJsonItem = moshiSerializer.getToJsonItem()
-            if (toJsonItem == null) {
-                errorMessage = moshiSerializer.getErrorMsg()
-            } else {
-                if (stringFileStorageStrSerialisation.write(directoryFile, mainFile, mainAbsolutePath, mainFileWriter, toJsonItem)) {
-                    success = true
-                } else {
+            if (toJsonItem != null) {
+                success = stringFileStorageStrSerialisation
+                    .write(directoryFile,
+                           mainFile,
+                           mainAbsolutePath,
+                           mainFileWriter,
+                           toJsonItem)
+                if (!success) {
                     errorMessage = stringFileStorageStrSerialisation.getErrorMsg()
+                    return false
                 }
             }
-        } else {
+        }
+        if (!success) {
             errorMessage = moshiSerializer.getErrorMsg()
         }
         return success

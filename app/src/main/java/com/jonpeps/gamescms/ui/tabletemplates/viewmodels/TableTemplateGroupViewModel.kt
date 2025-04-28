@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.ui.createtable.viewmodels
+package com.jonpeps.gamescms.ui.tabletemplates.viewmodels
 
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
@@ -6,8 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
 import com.jonpeps.gamescms.data.dataclasses.mappers.TableItemFinalMapper
-import com.jonpeps.gamescms.ui.createtable.helpers.ITableTemplateGroupVmRepoHelper
-import com.jonpeps.gamescms.ui.createtable.viewmodels.factories.TableTemplateGroupViewModelFactory
+import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.factories.TableTemplateGroupViewModelFactory
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -42,6 +41,9 @@ interface ITableTemplateGroupViewModel {
     fun previousPage()
     fun pageCount(): Int
     fun getCurrentPage(): TableItemFinal
+
+    fun hasChanges(): Boolean
+    fun reset()
 }
 
 @HiltViewModel(assistedFactory = TableTemplateGroupViewModelFactory.ITableTemplateGroupViewModelFactory::class)
@@ -50,6 +52,7 @@ class TableTemplateGroupViewModel
     @Assisted private val tableTemplateFilesPath: String,
     private val tableTemplateRepository: ITableTemplateFileRepository,
     private val tableTemplateGroupVmRepoHelper: ITableTemplateGroupVmRepoHelper,
+    private val tableTemplateGroupVmChangesCache: ITableTemplateGroupVmChangesCache,
     private val coroutineDispatcher: CoroutineDispatcher)
     : ViewModel(), ITableTemplateGroupViewModel {
 
@@ -103,6 +106,9 @@ class TableTemplateGroupViewModel
                 errorMessage = ex.message.toString()
                 success = false
             }
+            if (success) {
+                tableTemplateGroupVmChangesCache.set(templateName, items)
+            }
             _status.value = TableTemplateStatus(success, items, index, errorMessage, exception)
         }
     }
@@ -129,6 +135,9 @@ class TableTemplateGroupViewModel
                 exception = ex
                 errorMessage = ex.message.toString()
                 success = false
+            }
+            if (success) {
+                tableTemplateGroupVmChangesCache.updateCurrent(items)
             }
             _status.value = TableTemplateStatus(success, items, index, errorMessage, exception)
         }
@@ -230,6 +239,14 @@ class TableTemplateGroupViewModel
     override fun pageCount() = items.size
 
     override fun getCurrentPage(): TableItemFinal = items[index]
+
+    override fun hasChanges(): Boolean = tableTemplateGroupVmChangesCache.hasChanges()
+
+    override fun reset() {
+        tableTemplateGroupVmChangesCache.reset()
+        items = tableTemplateGroupVmChangesCache.get()?: arrayListOf()
+        _status.value = TableTemplateStatus(true, items, index, "", null)
+    }
 
     // For testing:
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
