@@ -33,7 +33,7 @@ abstract class GenericSerializationChangesCache<T> : IGenericSerializationCache<
         currentItem = deepCopy(initialItem)
     }
 
-    protected abstract fun deepCopy(item: T) : T
+    protected abstract fun deepCopy(item: T): T
 
-    protected abstract fun equalsOther(item: T) : Boolean
+    protected abstract fun equalsOther(item: T): Boolean
 }

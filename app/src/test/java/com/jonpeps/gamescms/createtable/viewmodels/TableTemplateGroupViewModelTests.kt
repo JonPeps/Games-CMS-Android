@@ -9,6 +9,7 @@ import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmRe
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel.Companion.JSON_ITEM_TO_SAVE_IS_NULL
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
+import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmChangesCache
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -27,6 +28,8 @@ class TableTemplateGroupViewModelTests {
     private lateinit var tableTemplateRepository: ITableTemplateFileRepository
     @MockK
     private lateinit var tableTemplateGroupVmRepoHelper: ITableTemplateGroupVmRepoHelper
+    @MockK
+    private lateinit var tableTemplateGroupVmChangesCache: ITableTemplateGroupVmChangesCache
 
     private val dummyData = TableTemplateItemListMoshi("test_template", listOf(TableTemplateItemMoshi("test",
         dataType = ItemType.STRING)))
@@ -43,6 +46,7 @@ class TableTemplateGroupViewModelTests {
         viewModel = TableTemplateGroupViewModel(path,
             tableTemplateRepository,
             tableTemplateGroupVmRepoHelper,
+            tableTemplateGroupVmChangesCache,
             dispatcher)
 
         mockkObject(TableItemFinalMapper.Companion) {

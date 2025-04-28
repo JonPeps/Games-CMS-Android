@@ -3,10 +3,11 @@ package com.jonpeps.gamescms.ui.tabletemplates.viewmodels
 import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
 import com.jonpeps.gamescms.data.helpers.GenericSerializationChangesCache
 import com.jonpeps.gamescms.data.helpers.IGenericSerializationCache
+import javax.inject.Inject
 
 interface ITableTemplateGroupVmChangesCache : IGenericSerializationCache<ArrayList<TableItemFinal>>
 
-class TableTemplateGroupVmChangesCache : GenericSerializationChangesCache<ArrayList<TableItemFinal>>(),
+class TableTemplateGroupVmChangesCache@Inject constructor() : GenericSerializationChangesCache<ArrayList<TableItemFinal>>(),
     ITableTemplateGroupVmChangesCache {
     override var initialItem: ArrayList<TableItemFinal> = arrayListOf()
     override var currentItem: ArrayList<TableItemFinal> = arrayListOf()
