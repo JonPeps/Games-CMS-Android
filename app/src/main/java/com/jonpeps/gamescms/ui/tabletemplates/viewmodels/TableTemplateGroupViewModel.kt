@@ -24,7 +24,7 @@ data class TableTemplateStatus(
     val ex: Exception?)
 
 interface ITableTemplateGroupViewModel {
-    fun load(name: String)
+    fun load(name: String, loadFromCacheIfExists: Boolean = true)
     fun save(name: String)
     fun new()
 
@@ -79,35 +79,40 @@ class TableTemplateGroupViewModel
     private var templateName = ""
     private var exception: Exception? = null
 
-    override fun load(name: String) {
+    override fun load(name: String, loadFromCacheIfExists: Boolean) {
         viewModelScope.launch(coroutineDispatcher) {
+            templateName = name
             exception = null
             var errorMessage = ""
             var success = true
-            try {
-                initReadFiles(name)
-                if (tableTemplateRepository.load()) {
-                    val tableListItem = tableTemplateRepository.getItem()
-                    tableListItem?.let {
-                        templateName = it.templateName
-                        items.clear()
-                        items.addAll(TableItemFinalMapper.fromTableTemplateListMoshi(it.items))
-                        index = 0
-                    }?:run {
+            if (loadFromCacheIfExists && tableTemplateGroupVmChangesCache.isPopulated()) {
+                items = tableTemplateGroupVmChangesCache.get(name)
+            } else {
+                try {
+                    initReadFiles(name)
+                    if (tableTemplateRepository.load()) {
+                        val tableListItem = tableTemplateRepository.getItem()
+                        tableListItem?.let {
+                            templateName = it.templateName
+                            items.clear()
+                            items.addAll(TableItemFinalMapper.fromTableTemplateListMoshi(it.items))
+                            index = 0
+                        }?:run {
+                            success = false
+                            errorMessage = JSON_ITEM_TO_SAVE_IS_NULL + name
+                        }
+                    } else {
                         success = false
-                        errorMessage = JSON_ITEM_TO_SAVE_IS_NULL + name
+                        errorMessage = tableTemplateRepository.getErrorMsg()
                     }
-                } else {
+                } catch (ex: Exception) {
+                    exception = ex
+                    errorMessage = ex.message.toString()
                     success = false
-                    errorMessage = tableTemplateRepository.getErrorMsg()
                 }
-            } catch (ex: Exception) {
-                exception = ex
-                errorMessage = ex.message.toString()
-                success = false
-            }
-            if (success) {
-                tableTemplateGroupVmChangesCache.set(templateName, items)
+                if (success) {
+                    tableTemplateGroupVmChangesCache.set(templateName, items)
+                }
             }
             _status.value = TableTemplateStatus(success, items, index, errorMessage, exception)
         }
@@ -137,7 +142,7 @@ class TableTemplateGroupViewModel
                 success = false
             }
             if (success) {
-                tableTemplateGroupVmChangesCache.updateCurrent(items)
+                tableTemplateGroupVmChangesCache.updateCurrent(templateName, items)
             }
             _status.value = TableTemplateStatus(success, items, index, errorMessage, exception)
         }
@@ -240,11 +245,11 @@ class TableTemplateGroupViewModel
 
     override fun getCurrentPage(): TableItemFinal = items[index]
 
-    override fun hasChanges(): Boolean = tableTemplateGroupVmChangesCache.hasChanges()
+    override fun hasChanges(): Boolean = tableTemplateGroupVmChangesCache.hasChanges(templateName)
 
     override fun reset() {
-        tableTemplateGroupVmChangesCache.reset()
-        items = tableTemplateGroupVmChangesCache.get()?: arrayListOf()
+        tableTemplateGroupVmChangesCache.reset(templateName)
+        items = tableTemplateGroupVmChangesCache.get(templateName)
         _status.value = TableTemplateStatus(true, items, index, "", null)
     }
 

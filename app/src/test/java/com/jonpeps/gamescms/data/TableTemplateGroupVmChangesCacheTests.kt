@@ -12,6 +12,7 @@ import org.junit.runners.JUnit4
 class TableTemplateGroupVmChangesCacheTests {
     private lateinit var dummyData: ArrayList<TableItemFinal>
     private lateinit var changesCache: TableTemplateGroupVmChangesCache
+    private val dummyName = "test"
 
     @Before
     fun setup() {
@@ -33,32 +34,32 @@ class TableTemplateGroupVmChangesCacheTests {
 
     @Test
     fun `test update current`() {
-        changesCache.set("test", dummyData)
-        val currentData = changesCache.get()
+        changesCache.set(dummyName, dummyData)
+        val currentData = changesCache.get(dummyName)
         currentData[0].name = "name3"
-        changesCache.updateCurrent(currentData)
-        assert(changesCache.get()[0].name == "name3")
+        changesCache.updateCurrent(dummyName, currentData)
+        assert(changesCache.get(dummyName)[0].name == "name3")
     }
 
     @Test
     fun `test reset`() {
-        changesCache.set("test", dummyData)
-        val currentData = changesCache.get()
+        changesCache.set(dummyName, dummyData)
+        val currentData = changesCache.get(dummyName)
         currentData[0].name = "name3"
-        changesCache.updateCurrent(currentData)
-        assert(changesCache.get()[0].name == "name3")
-        changesCache.reset()
-        assert(changesCache.get()[0].name == "name1")
+        changesCache.updateCurrent(dummyName, currentData)
+        assert(changesCache.get(dummyName)[0].name == "name3")
+        changesCache.reset(dummyName)
+        assert(changesCache.get(dummyName)[0].name == "name1")
     }
 
     @Test
     fun `test has changes`() {
-        changesCache.set("test", dummyData)
-        val currentData = changesCache.get()
+        changesCache.set(dummyName, dummyData)
+        val currentData = changesCache.get(dummyName)
         currentData[0].name = "name3"
-        changesCache.updateCurrent(currentData)
-        assert(changesCache.hasChanges())
-        changesCache.reset()
-        assert(!changesCache.hasChanges())
+        changesCache.updateCurrent(dummyName, currentData)
+        assert(changesCache.hasChanges(dummyName))
+        changesCache.reset(dummyName)
+        assert(!changesCache.hasChanges(dummyName))
     }
 }
