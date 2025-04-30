@@ -90,8 +90,8 @@ class TableTemplateGroupViewModel
             } else {
                 try {
                     initReadFiles(name)
-                    if (tableTemplateRepository.load()) {
-                        val tableListItem = tableTemplateRepository.getItem()
+                    if (tableTemplateRepository.load(templateName)) {
+                        val tableListItem = tableTemplateRepository.getItem(templateName)
                         tableListItem?.let {
                             templateName = it.templateName
                             items.clear()
@@ -120,14 +120,15 @@ class TableTemplateGroupViewModel
 
     override fun save(name: String) {
         viewModelScope.launch(coroutineDispatcher) {
+            templateName = name
             exception = null
             var success = false
             var errorMessage = ""
             try {
                 initWriteFiles(name)
-                val toSave = tableTemplateRepository.getItem()
+                val toSave = tableTemplateRepository.getItem(templateName)
                 toSave?.let {
-                    if (tableTemplateRepository.save(it)) {
+                    if (tableTemplateRepository.save(templateName, it)) {
                         success = true
                     } else {
                         errorMessage = tableTemplateRepository.getErrorMsg()
@@ -294,7 +295,7 @@ class TableTemplateGroupViewModel
         tableTemplateRepository.setFileWriter(
             tableTemplateGroupVmRepoHelper.getFileWriter(tableTemplateFilesPath, name))
         tableTemplateRepository
-            .setItem(TableItemFinalMapper.toTableTemplateItemListMoshi(name, items))
+            .setItem(templateName, TableItemFinalMapper.toTableTemplateItemListMoshi(name, items))
     }
 
     companion object {

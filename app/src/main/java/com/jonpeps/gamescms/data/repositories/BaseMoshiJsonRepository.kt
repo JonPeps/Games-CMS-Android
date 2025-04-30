@@ -1,5 +1,6 @@
 package com.jonpeps.gamescms.data.repositories
 
+import com.jonpeps.gamescms.data.helpers.IBasicStringGenericItemCache
 import com.jonpeps.gamescms.data.serialization.moshi.IBaseMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
 import java.io.BufferedReader
@@ -7,10 +8,10 @@ import java.io.File
 import java.io.FileWriter
 
 interface IBaseMoshiJsonRepository<T> {
-    suspend fun load(): Boolean
-    suspend fun save(item: T): Boolean
+    suspend fun load(cacheName: String): Boolean
+    suspend fun save(cacheName: String, item: T): Boolean
 
-    fun getItem(): T?
+    fun getItem(cacheName: String): T?
     fun getErrorMsg(): String
 
     fun setDirectoryFile(path: File)
@@ -19,21 +20,24 @@ interface IBaseMoshiJsonRepository<T> {
     fun setBufferReader(bufferedReader: BufferedReader)
     fun setFileWriter(fileWriter: FileWriter)
 
-    fun setItem(item: T?)
+    fun setItem(cacheName: String, item: T?)
 }
 
-abstract class BaseMoshiJsonRepository<T>(private val stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation
+abstract class BaseMoshiJsonRepository<T>(
+    private val stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation,
+    private val basicStringGenericItemCache: IBasicStringGenericItemCache<T>
 ): IBaseMoshiJsonRepository<T> {
-    private lateinit var directoryFile: File
-    private lateinit var mainFile: File
     protected lateinit var mainAbsolutePath: File
-    private lateinit var mainBufferedReader: BufferedReader
-    private lateinit var mainFileWriter: FileWriter
-    private var mainItem: T? = null
     protected var errorMessage = ""
 
-    override suspend fun load(): Boolean {
-        mainItem = null
+    private var cacheName: String = ""
+    private lateinit var directoryFile: File
+    private lateinit var mainFile: File
+    private lateinit var mainBufferedReader: BufferedReader
+    private lateinit var mainFileWriter: FileWriter
+    private val cacheMap = mutableMapOf<String, T>()
+
+    override suspend fun load(cacheName: String): Boolean {
         errorMessage = ""
         var success = true
         val moshiSerializer = getMoshiSerializer()
@@ -41,7 +45,7 @@ abstract class BaseMoshiJsonRepository<T>(private val stringFileStorageStrSerial
         if (result) {
             val contents = stringFileStorageStrSerialisation.getContents()
             if(moshiSerializer.fromJson(contents)) {
-                mainItem = moshiSerializer.getItem()
+                basicStringGenericItemCache.set(cacheName, moshiSerializer.getItem())
             } else {
                 errorMessage = moshiSerializer.getErrorMsg()
                 success = false
@@ -53,8 +57,7 @@ abstract class BaseMoshiJsonRepository<T>(private val stringFileStorageStrSerial
         return success
     }
 
-    override suspend fun save(item: T): Boolean {
-        mainItem = item
+    override suspend fun save(cacheName: String, item: T): Boolean {
         errorMessage = ""
         var success = false
         val moshiSerializer = getMoshiSerializer()
@@ -73,13 +76,22 @@ abstract class BaseMoshiJsonRepository<T>(private val stringFileStorageStrSerial
                 }
             }
         }
-        if (!success) {
+        if (success) {
+            basicStringGenericItemCache.set(cacheName, item)
+        } else {
             errorMessage = moshiSerializer.getErrorMsg()
         }
         return success
     }
 
-    override fun getItem(): T? = mainItem
+    override fun getItem(cacheName: String): T? {
+        return if (basicStringGenericItemCache.exists(cacheName)) {
+            basicStringGenericItemCache.get(cacheName)!!
+        } else {
+            null
+        }
+    }
+
     override fun getErrorMsg(): String = errorMessage
 
     override fun setDirectoryFile(path: File) {
@@ -101,8 +113,10 @@ abstract class BaseMoshiJsonRepository<T>(private val stringFileStorageStrSerial
         mainFileWriter = fileWriter
     }
 
-    override fun setItem(item: T?) {
-        this.mainItem = item
+    override fun setItem(cacheName: String, item: T?) {
+        if (item != null) {
+            cacheMap[cacheName] = item
+        }
     }
 
     abstract fun getMoshiSerializer(): IBaseMoshiSerialization<T>

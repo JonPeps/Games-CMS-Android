@@ -62,8 +62,8 @@ class TableTemplateGroupViewModelTests {
         setupForReadingFiles()
         every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
         every { tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName) } returns mockk()
-        every { tableTemplateRepository.getItem() } returns dummyData
-        coEvery { tableTemplateRepository.load() } returns true
+        every { tableTemplateRepository.getItem(templateName) } returns dummyData
+        coEvery { tableTemplateRepository.load(templateName) } returns true
 
         viewModel.load(templateName)
 
@@ -80,7 +80,7 @@ class TableTemplateGroupViewModelTests {
         every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
         every { tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName) } returns mockk()
         every { tableTemplateRepository.getErrorMsg() } returns "An error occurred!"
-        coEvery { tableTemplateRepository.load() } returns false
+        coEvery { tableTemplateRepository.load(templateName) } returns false
 
         viewModel.load(templateName)
 
@@ -119,8 +119,8 @@ class TableTemplateGroupViewModelTests {
         setupForReadingFiles()
         every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
         every { tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName) } returns mockk()
-        coEvery { tableTemplateRepository.load() } returns true
-        every { tableTemplateRepository.getItem() } returns null
+        coEvery { tableTemplateRepository.load(templateName) } returns true
+        every { tableTemplateRepository.getItem(templateName) } returns null
 
         viewModel.load(templateName)
 
