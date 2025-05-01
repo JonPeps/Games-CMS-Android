@@ -14,9 +14,9 @@ interface ITableTemplateFileRepository : IBaseMoshiJsonRepository<TableTemplateI
 
 class TableTemplateFileRepository
 @Inject constructor(private val tableTableItemListMoshiSerialization: ITableItemListMoshiSerialization,
-                    tableTemplateStringMoshiJsonCache: ITableTemplateStringListMoshiJsonCache,
+                    tableTemplateStringListMoshiJsonCache: ITableTemplateStringListMoshiJsonCache,
                     stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation)
-    :  BaseMoshiJsonRepository<TableTemplateItemListMoshi>(stringFileStorageStrSerialisation, tableTemplateStringMoshiJsonCache), ITableTemplateFileRepository {
+    :  BaseMoshiJsonRepository<TableTemplateItemListMoshi>(stringFileStorageStrSerialisation, tableTemplateStringListMoshiJsonCache), ITableTemplateFileRepository {
 
     override suspend fun deleteTemplate(): Boolean {
         errorMessage = ""

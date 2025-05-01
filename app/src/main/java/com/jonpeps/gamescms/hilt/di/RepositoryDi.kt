@@ -9,6 +9,7 @@ import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRep
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateStringListMoshiJsonCache
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateStringMoshiJsonCache
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.TableTemplateFileRepository
+import com.jonpeps.gamescms.ui.tabletemplates.repositories.TableTemplateStringListMoshiJsonCache
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.TableTemplateStringMoshiJsonCache
 import dagger.Binds
 import dagger.Module
@@ -30,10 +31,10 @@ class RepositoryDiProvider {
     @Provides
     fun provideTableTemplateFileRepository(tableTableItemListMoshiSerialization: ITableItemListMoshiSerialization,
                                            stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation,
-                                           tableTemplateStringMoshiJsonCache: ITableTemplateStringMoshiJsonCache
+                                           tableTemplateStringListListMoshiCache: TableTemplateStringListMoshiJsonCache
     )
     : ITableTemplateFileRepository {
-        return TableTemplateFileRepository(tableTableItemListMoshiSerialization, tableTemplateStringMoshiJsonCache, stringFileStorageStrSerialisation)
+        return TableTemplateFileRepository(tableTableItemListMoshiSerialization, tableTemplateStringListListMoshiCache, stringFileStorageStrSerialisation)
     }
 }
 

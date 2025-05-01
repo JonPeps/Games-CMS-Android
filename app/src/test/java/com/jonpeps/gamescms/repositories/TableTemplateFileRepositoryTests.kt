@@ -6,6 +6,7 @@ import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.serialization.moshi.ITableItemListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
+import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateStringListMoshiJsonCache
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.TableTemplateFileRepository
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -31,6 +32,8 @@ class TableTemplateFileRepositoryTests {
     @MockK
     private lateinit var tableItemListMoshiSerialization: ITableItemListMoshiSerialization
     @MockK
+    private lateinit var tableTemplateStringListMoshiJsonCache: ITableTemplateStringListMoshiJsonCache
+    @MockK
     private lateinit var directoryFile: File
     @MockK
     private lateinit var file: File
@@ -43,13 +46,18 @@ class TableTemplateFileRepositoryTests {
 
     private lateinit var tableTemplateRepository: ITableTemplateFileRepository
 
+    private val templateName = "test"
     private val dummyData = TableTemplateItemListMoshi("test", listOf(TableTemplateItemMoshi("test", dataType = ItemType.STRING)))
 
     @Before
     fun setup() {
         MockKAnnotations.init(this)
 
-        tableTemplateRepository = TableTemplateFileRepository(tableItemListMoshiSerialization, stringFileStorageStrSerialisation)
+        tableTemplateRepository = TableTemplateFileRepository(
+            tableItemListMoshiSerialization,
+            tableTemplateStringListMoshiJsonCache,
+            stringFileStorageStrSerialisation)
+
         tableTemplateRepository.setAbsoluteFile(absolutePath)
         tableTemplateRepository.setFile(file)
         tableTemplateRepository.setDirectoryFile(directoryFile)
@@ -59,13 +67,13 @@ class TableTemplateFileRepositoryTests {
 
     @Test
     fun `test load template success all paths`() = runTest(dispatcher) {
-        assert(tableTemplateRepository.getItem() == null)
+        assert(tableTemplateRepository.getItem(templateName) == null)
         assert(tableTemplateRepository.getErrorMsg() == "")
         every { stringFileStorageStrSerialisation.getContents() } returns "test"
         coEvery { tableItemListMoshiSerialization.fromJson("test") } returns true
         every { tableItemListMoshiSerialization.getItem() } returns dummyData
         coEvery { stringFileStorageStrSerialisation.read(absolutePath, bufferedReader) } returns true
-        val result = tableTemplateRepository.load()
+        val result = tableTemplateRepository.load(templateName)
         assert(result)
     }
 
@@ -78,10 +86,10 @@ class TableTemplateFileRepositoryTests {
         coEvery { tableItemListMoshiSerialization.fromJson("test") } returns false
         every { tableItemListMoshiSerialization.getItem() } returns dummyData
         coEvery { stringFileStorageStrSerialisation.read(absolutePath, bufferedReader) } returns true
-        val result = tableTemplateRepository.load()
+        val result = tableTemplateRepository.load(templateName)
         assert(tableTemplateRepository.getErrorMsg() == stringFileStorageStrSerialisation.getErrorMsg())
         assert(!result)
-        assert(tableTemplateRepository.getItem() == null)
+        assert(tableTemplateRepository.getItem(templateName) == null)
     }
 
     @Test
@@ -89,7 +97,7 @@ class TableTemplateFileRepositoryTests {
         assert(tableTemplateRepository.getErrorMsg() == "")
         coEvery { stringFileStorageStrSerialisation.read(absolutePath, bufferedReader) } returns false
         every { stringFileStorageStrSerialisation.getErrorMsg() } returns "An error occurred!"
-        val result = tableTemplateRepository.load()
+        val result = tableTemplateRepository.load(templateName)
         assert(tableTemplateRepository.getErrorMsg() == stringFileStorageStrSerialisation.getErrorMsg())
         assert(!result)
     }
@@ -101,7 +109,7 @@ class TableTemplateFileRepositoryTests {
         every { stringFileStorageStrSerialisation.getContents() } returns "test"
         coEvery { tableItemListMoshiSerialization.fromJson("test") } returns false
         every { tableItemListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
-        val result = tableTemplateRepository.load()
+        val result = tableTemplateRepository.load(templateName)
         assert(tableTemplateRepository.getErrorMsg() == tableItemListMoshiSerialization.getErrorMsg())
         assert(!result)
     }
@@ -112,7 +120,7 @@ class TableTemplateFileRepositoryTests {
         coEvery { tableItemListMoshiSerialization.toJson(dummyData) } returns true
         every { tableItemListMoshiSerialization.getToJsonItem() } returns "test"
         coEvery { stringFileStorageStrSerialisation.write(directoryFile, file, absolutePath, fileWriter, "test") } returns true
-        val result = tableTemplateRepository.save(dummyData)
+        val result = tableTemplateRepository.save(templateName, dummyData)
         assert(result)
         assert(tableTemplateRepository.getErrorMsg() == "")
     }
@@ -132,7 +140,7 @@ class TableTemplateFileRepositoryTests {
             )
         } returns false
         every { stringFileStorageStrSerialisation.getErrorMsg() } returns "An error occurred!"
-        val result = tableTemplateRepository.save(dummyData)
+        val result = tableTemplateRepository.save(templateName, dummyData)
         assert(!result)
     }
 
@@ -143,7 +151,7 @@ class TableTemplateFileRepositoryTests {
         every { tableItemListMoshiSerialization.getToJsonItem() } returns "test"
         coEvery { stringFileStorageStrSerialisation.write(directoryFile, file, absolutePath, fileWriter, "test") } returns false
         every { stringFileStorageStrSerialisation.getErrorMsg() } returns "An error occurred!"
-        val result = tableTemplateRepository.save(dummyData)
+        val result = tableTemplateRepository.save(templateName, dummyData)
         assert(!result)
         assert(tableTemplateRepository.getErrorMsg() == stringFileStorageStrSerialisation.getErrorMsg())
     }
@@ -153,7 +161,7 @@ class TableTemplateFileRepositoryTests {
         assert(tableTemplateRepository.getErrorMsg() == "")
         coEvery { tableItemListMoshiSerialization.toJson(dummyData) } returns false
         every { tableItemListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
-        val result = tableTemplateRepository.save(dummyData)
+        val result = tableTemplateRepository.save(templateName, dummyData)
         assert(!result)
         assert(tableTemplateRepository.getErrorMsg() == tableItemListMoshiSerialization.getErrorMsg())
     }
@@ -164,7 +172,7 @@ class TableTemplateFileRepositoryTests {
         coEvery { tableItemListMoshiSerialization.toJson(dummyData) } returns true
         every { tableItemListMoshiSerialization.getToJsonItem() } returns null
         every { tableItemListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
-        val result = tableTemplateRepository.save(dummyData)
+        val result = tableTemplateRepository.save(templateName, dummyData)
         assert(!result)
         assert(tableTemplateRepository.getErrorMsg() == tableItemListMoshiSerialization.getErrorMsg())
     }

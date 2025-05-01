@@ -1,10 +1,12 @@
 package com.jonpeps.gamescms.repositories
 
-import com.jonpeps.gamescms.data.dataclasses.StringListData
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
 import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.repositories.MoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.moshi.IStringListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
+import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateStringListMoshiJsonCache
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -29,6 +31,8 @@ class MoshiStringListRepositoryTests {
     @MockK
     private lateinit var strListMoshiSerialization: IStringListMoshiSerialization
     @MockK
+    private lateinit var tableTemplateStringListMoshiJsonCache: ITableTemplateStringListMoshiJsonCache
+    @MockK
     private lateinit var directoryFile: File
     @MockK
     private lateinit var file: File
@@ -39,7 +43,11 @@ class MoshiStringListRepositoryTests {
     @MockK
     private lateinit var fileWriter: FileWriter
 
-    private val dummyData = StringListData(arrayListOf("test1", "test2"))
+    private val templateName = "test"
+    private val dummyData = TableTemplateItemListMoshi(
+        templateName,
+        listOf(TableTemplateItemMoshi("test"))
+    )
 
     private lateinit var moshiStringListRepository: IMoshiStringListRepository
 
@@ -47,7 +55,11 @@ class MoshiStringListRepositoryTests {
     fun setup() {
         MockKAnnotations.init(this)
 
-        moshiStringListRepository = MoshiStringListRepository(strListMoshiSerialization, stringFileStorageStrSerialisation)
+        moshiStringListRepository = MoshiStringListRepository(
+            strListMoshiSerialization,
+            tableTemplateStringListMoshiJsonCache,
+            stringFileStorageStrSerialisation)
+
         moshiStringListRepository.setAbsoluteFile(absolutePath)
         moshiStringListRepository.setFile(file)
         moshiStringListRepository.setDirectoryFile(directoryFile)
@@ -62,7 +74,7 @@ class MoshiStringListRepositoryTests {
         coEvery { strListMoshiSerialization.fromJson("") } returns true
         every { stringFileStorageStrSerialisation.getContents() } returns ""
         every { strListMoshiSerialization.getItem() } returns dummyData
-        val result = moshiStringListRepository.load()
+        val result = moshiStringListRepository.load(templateName)
         assert(result)
         assert(strListMoshiSerialization.getItem() == dummyData)
         assert(result)
@@ -73,7 +85,7 @@ class MoshiStringListRepositoryTests {
         assert(moshiStringListRepository.getErrorMsg() == "")
         every { stringFileStorageStrSerialisation.getErrorMsg() } returns "An error occurred!"
         coEvery { stringFileStorageStrSerialisation.read(absolutePath, bufferedReader) } returns false
-        val result = moshiStringListRepository.load()
+        val result = moshiStringListRepository.load(templateName)
         assert(stringFileStorageStrSerialisation.getErrorMsg() == moshiStringListRepository.getErrorMsg())
         assert(!result)
     }
@@ -87,7 +99,7 @@ class MoshiStringListRepositoryTests {
         coEvery { stringFileStorageStrSerialisation.read(absolutePath, bufferedReader) } returns true
         coEvery { strListMoshiSerialization
             .fromJson(stringFileStorageStrSerialisation.getContents()) } returns false
-        val result = moshiStringListRepository.load()
+        val result = moshiStringListRepository.load(templateName)
         assert(moshiStringListRepository.getErrorMsg() == strListMoshiSerialization.getErrorMsg())
         assert(!result)
     }
@@ -98,7 +110,7 @@ class MoshiStringListRepositoryTests {
         coEvery { strListMoshiSerialization.toJson(dummyData) } returns true
         every { strListMoshiSerialization.getToJsonItem() } returns "test"
         coEvery { stringFileStorageStrSerialisation.write(directoryFile, file, absolutePath, fileWriter, "test") } returns true
-        val result = moshiStringListRepository.save(dummyData)
+        val result = moshiStringListRepository.save(templateName, dummyData)
         assert(result)
         assert(moshiStringListRepository.getErrorMsg() == "")
     }
@@ -111,7 +123,7 @@ class MoshiStringListRepositoryTests {
         every { strListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
         every { stringFileStorageStrSerialisation.getErrorMsg() } returns strListMoshiSerialization.getErrorMsg()
         coEvery { stringFileStorageStrSerialisation.write(directoryFile, file, absolutePath, fileWriter, "test") } returns true
-        val result = moshiStringListRepository.save(dummyData)
+        val result = moshiStringListRepository.save(templateName, dummyData)
         assert(result)
     }
 
@@ -121,7 +133,7 @@ class MoshiStringListRepositoryTests {
         coEvery { strListMoshiSerialization.toJson(dummyData) } returns false
         every { strListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
         every { stringFileStorageStrSerialisation.getErrorMsg() } returns strListMoshiSerialization.getErrorMsg()
-        val result = moshiStringListRepository.save(dummyData)
+        val result = moshiStringListRepository.save(templateName, dummyData)
         assert(!result)
         assert(stringFileStorageStrSerialisation.getErrorMsg() == moshiStringListRepository.getErrorMsg())
     }
@@ -133,7 +145,7 @@ class MoshiStringListRepositoryTests {
         every { strListMoshiSerialization.getToJsonItem() } returns null
         every { strListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
         every { stringFileStorageStrSerialisation.getErrorMsg() } returns strListMoshiSerialization.getErrorMsg()
-        val result = moshiStringListRepository.save(dummyData)
+        val result = moshiStringListRepository.save(templateName, dummyData)
         assert(!result)
         assert(moshiStringListRepository.getErrorMsg() == strListMoshiSerialization.getErrorMsg())
     }
@@ -146,7 +158,7 @@ class MoshiStringListRepositoryTests {
         every { strListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
         every { stringFileStorageStrSerialisation.getErrorMsg() } returns strListMoshiSerialization.getErrorMsg()
         coEvery { stringFileStorageStrSerialisation.write(directoryFile, file, absolutePath, fileWriter, "test") } returns false
-        val result = moshiStringListRepository.save(dummyData)
+        val result = moshiStringListRepository.save(templateName, dummyData)
         assert(!result)
         assert(moshiStringListRepository.getErrorMsg() == stringFileStorageStrSerialisation.getErrorMsg())
     }
@@ -157,7 +169,7 @@ class MoshiStringListRepositoryTests {
         coEvery { strListMoshiSerialization.toJson(dummyData) } returns true
         every { strListMoshiSerialization.getToJsonItem() } returns null
         every { strListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
-        val result = moshiStringListRepository.save(dummyData)
+        val result = moshiStringListRepository.save(templateName, dummyData)
         assert(!result)
         assert(moshiStringListRepository.getErrorMsg() == strListMoshiSerialization.getErrorMsg())
     }

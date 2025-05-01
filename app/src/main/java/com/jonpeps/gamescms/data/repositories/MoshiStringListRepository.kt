@@ -1,6 +1,5 @@
 package com.jonpeps.gamescms.data.repositories
 
-import com.jonpeps.gamescms.data.dataclasses.StringListData
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.serialization.moshi.IBaseMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.moshi.IStringListMoshiSerialization
