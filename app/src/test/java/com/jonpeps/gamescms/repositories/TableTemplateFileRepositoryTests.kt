@@ -68,7 +68,7 @@ class TableTemplateFileRepositoryTests {
     }
 
     @Test
-    fun `test load template fails with read Json file returns false`() = runTest(dispatcher) {
+    fun `LOAD table template FAILS WHEN READ Json file RETURNS FALSE`() = runTest(dispatcher) {
         assert(tableTemplateRepository.getErrorMsg() == "")
         coEvery { stringFileStorageStrSerialisation.read(absolutePath, bufferedReader) } returns false
         every { stringFileStorageStrSerialisation.getErrorMsg() } returns "An error occurred!"
@@ -78,7 +78,7 @@ class TableTemplateFileRepositoryTests {
     }
 
     @Test
-    fun `test load template with read Json file success but Json convert fails`() = runTest(dispatcher) {
+    fun `LOAD table template AND read JSON file SUCCESS BUT JSON convert RETURNS FALSE`() = runTest(dispatcher) {
         assert(tableTemplateRepository.getErrorMsg() == "")
         coEvery { (stringFileStorageStrSerialisation.read(absolutePath, bufferedReader)) } returns true
         every { stringFileStorageStrSerialisation.getContents() } returns "test"
@@ -90,7 +90,7 @@ class TableTemplateFileRepositoryTests {
     }
 
     @Test
-    fun `test save template success all paths`() = runTest(dispatcher) {
+    fun `SAVE table template SUCCESS`() = runTest(dispatcher) {
         assert(tableTemplateRepository.getErrorMsg() == "")
         coEvery { tableItemListMoshiSerialization.toJson(dummyData) } returns true
         every { tableItemListMoshiSerialization.getToJsonItem() } returns "test"
@@ -101,7 +101,7 @@ class TableTemplateFileRepositoryTests {
     }
 
     @Test
-    fun `test save template with read Json string failure`() = runTest(dispatcher) {
+    fun `SAVE table template FAILS WHEN WRITE JSON string RETURNS FALSE`() = runTest(dispatcher) {
         assert(tableTemplateRepository.getErrorMsg() == "")
         coEvery { tableItemListMoshiSerialization.toJson(dummyData) } returns true
         every { tableItemListMoshiSerialization.getToJsonItem() } returns "test"
@@ -120,7 +120,7 @@ class TableTemplateFileRepositoryTests {
     }
 
     @Test
-    fun `test save template with write Json string failure`() = runTest(dispatcher) {
+    fun `SAVE table template FAILS WHEN CONVERT to JSON string RETURNS FALSE`() = runTest(dispatcher) {
         assert(tableTemplateRepository.getErrorMsg() == "")
         coEvery { tableItemListMoshiSerialization.toJson(dummyData) } returns true
         every { tableItemListMoshiSerialization.getToJsonItem() } returns "test"
@@ -132,7 +132,7 @@ class TableTemplateFileRepositoryTests {
     }
 
     @Test
-    fun `test save template Json string convert failure`() = runTest(dispatcher) {
+    fun `SAVE table template JSON string CONVERT to JSON item RETURNS FALSE`() = runTest(dispatcher) {
         assert(tableTemplateRepository.getErrorMsg() == "")
         coEvery { tableItemListMoshiSerialization.toJson(dummyData) } returns false
         every { tableItemListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
@@ -142,7 +142,7 @@ class TableTemplateFileRepositoryTests {
     }
 
     @Test
-    fun `test save template with write Json string failure and get Json item is null`() = runTest(dispatcher) {
+    fun `SAVE table template FAILS WHEN CONVERT to JSON item RETURNS NULL`() = runTest(dispatcher) {
         assert(tableTemplateRepository.getErrorMsg() == "")
         coEvery { tableItemListMoshiSerialization.toJson(dummyData) } returns true
         every { tableItemListMoshiSerialization.getToJsonItem() } returns null
@@ -153,7 +153,7 @@ class TableTemplateFileRepositoryTests {
     }
 
     @Test
-    fun `test delete template success`() = runTest(dispatcher) {
+    fun `DELETE table template SUCCESS`() = runTest(dispatcher) {
         assert(tableTemplateRepository.getErrorMsg() == "")
         every { absolutePath.delete() } returns true
         val result = tableTemplateRepository.deleteTemplate()
@@ -161,7 +161,7 @@ class TableTemplateFileRepositoryTests {
     }
 
     @Test
-    fun `test delete template failure`() = runTest(dispatcher) {
+    fun `DELETE table template FAILURE`() = runTest(dispatcher) {
         assert(tableTemplateRepository.getErrorMsg() == "")
         every { absolutePath.delete() } returns false
         val result = tableTemplateRepository.deleteTemplate()

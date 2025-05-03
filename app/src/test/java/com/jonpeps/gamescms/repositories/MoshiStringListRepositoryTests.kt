@@ -69,7 +69,7 @@ class MoshiStringListRepositoryTests {
         every { tableTemplateStringListMoshiJsonCache.set(templateName, dummyData) } returns Unit    }
 
     @Test
-    fun `test load string list success all paths`() = runTest(dispatcher) {
+    fun `LOAD string list SUCCESS`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
         coEvery { stringFileStorageStrSerialisation.read(absolutePath, bufferedReader) } returns true
         coEvery { strListMoshiSerialization.fromJson("") } returns true
@@ -82,7 +82,7 @@ class MoshiStringListRepositoryTests {
     }
 
     @Test
-    fun `test load string list with read Json string false`() = runTest(dispatcher) {
+    fun `LOAD string list AND READ JSON string RETURNS FALSE`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
         every { stringFileStorageStrSerialisation.getErrorMsg() } returns "An error occurred!"
         coEvery { stringFileStorageStrSerialisation.read(absolutePath, bufferedReader) } returns false
@@ -92,7 +92,7 @@ class MoshiStringListRepositoryTests {
     }
 
     @Test
-    fun `test load string list with read Json file success but Json convert fails`() = runTest(dispatcher) {
+    fun `LOAD string list WITH READ JSON file SUCCESS BUT JSON parsing RETURNS FALSE`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
         every { strListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
         every { stringFileStorageStrSerialisation.getErrorMsg() } returns strListMoshiSerialization.getErrorMsg()
@@ -106,7 +106,7 @@ class MoshiStringListRepositoryTests {
     }
 
     @Test
-    fun `test save string list success all paths`() = runTest(dispatcher) {
+    fun `SAVE string list SUCCESS`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
         coEvery { strListMoshiSerialization.toJson(dummyData) } returns true
         every { strListMoshiSerialization.getToJsonItem() } returns "test"
@@ -117,7 +117,7 @@ class MoshiStringListRepositoryTests {
     }
 
     @Test
-    fun `test save string list with write Json string to file success`() = runTest(dispatcher) {
+    fun `SAVE string list WITH WRITE JSON string to file SUCCESS`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
         coEvery { strListMoshiSerialization.toJson(dummyData) } returns true
         every { strListMoshiSerialization.getToJsonItem() } returns "test"
@@ -129,7 +129,7 @@ class MoshiStringListRepositoryTests {
     }
 
     @Test
-    fun `test save string list with convert to Json string fails`() = runTest(dispatcher) {
+    fun `SAVE string list WITH CONVERT to JSON string RETURNS FALSE`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
         coEvery { strListMoshiSerialization.toJson(dummyData) } returns false
         every { strListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
@@ -140,7 +140,7 @@ class MoshiStringListRepositoryTests {
     }
 
     @Test
-    fun `test save string list Json string convert failure`() = runTest(dispatcher) {
+    fun `SAVE JSON string BUT CONVERT TO JSON item RETURNS NULL`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
         coEvery { strListMoshiSerialization.toJson(dummyData) } returns true
         every { strListMoshiSerialization.getToJsonItem() } returns null
@@ -152,7 +152,7 @@ class MoshiStringListRepositoryTests {
     }
 
     @Test
-    fun `test save string list with write Json string failure`() = runTest(dispatcher) {
+    fun `SAVE to JSON item FAILS WHEN WRITING to file`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
         coEvery { strListMoshiSerialization.toJson(dummyData) } returns true
         every { strListMoshiSerialization.getToJsonItem() } returns "test"
@@ -165,7 +165,7 @@ class MoshiStringListRepositoryTests {
     }
 
     @Test
-    fun `test save string list with write Json string failure and get Json item is null`() = runTest(dispatcher) {
+    fun `SAVE to JSON item FAILS WHEN CONVERTING to JSON string`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
         coEvery { strListMoshiSerialization.toJson(dummyData) } returns true
         every { strListMoshiSerialization.getToJsonItem() } returns null
