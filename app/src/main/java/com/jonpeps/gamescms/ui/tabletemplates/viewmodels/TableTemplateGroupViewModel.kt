@@ -86,7 +86,7 @@ class TableTemplateGroupViewModel
             var errorMessage = ""
             var success = true
             if (loadFromCacheIfExists && tableTemplateGroupVmChangesCache.isPopulated()) {
-                items = tableTemplateGroupVmChangesCache.get(name)
+                items = ArrayList(tableTemplateGroupVmChangesCache.get(templateName))
             } else {
                 try {
                     initReadFiles(name)
@@ -250,7 +250,7 @@ class TableTemplateGroupViewModel
 
     override fun reset() {
         tableTemplateGroupVmChangesCache.reset(templateName)
-        items = tableTemplateGroupVmChangesCache.get(templateName)
+        items = ArrayList(tableTemplateGroupVmChangesCache.get(templateName))
         _status.value = TableTemplateStatus(true, items, index, "", null)
     }
 

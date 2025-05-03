@@ -6,13 +6,13 @@ import com.jonpeps.gamescms.data.helpers.GenericSerializationChangesCache
 import com.jonpeps.gamescms.data.helpers.IGenericSerializationCache
 import javax.inject.Inject
 
-interface ITableTemplateGroupVmChangesCache : IGenericSerializationCache<ArrayList<TableItemFinal>>
+interface ITableTemplateGroupVmChangesCache : IGenericSerializationCache<List<TableItemFinal>>
 
 class TableTemplateGroupVmChangesCache@Inject constructor()
-    : GenericSerializationChangesCache<ArrayList<TableItemFinal>>(), ITableTemplateGroupVmChangesCache {
-    override val cache: MutableMap<String, ChangesCachePair<ArrayList<TableItemFinal>>> = mutableMapOf()
+    : GenericSerializationChangesCache<List<TableItemFinal>>(), ITableTemplateGroupVmChangesCache {
+    override val cache: MutableMap<String, ChangesCachePair<List<TableItemFinal>>> = mutableMapOf()
 
-    override fun deepCopy(item: ArrayList<TableItemFinal>): ArrayList<TableItemFinal> {
+    override fun deepCopy(item: List<TableItemFinal>): List<TableItemFinal> {
         val arrayList = arrayListOf<TableItemFinal>()
         item.forEach {
             arrayList.add(
@@ -40,5 +40,5 @@ class TableTemplateGroupVmChangesCache@Inject constructor()
         return true
     }
 
-    override fun getDefault(): ArrayList<TableItemFinal> = arrayListOf()
+    override fun getDefault(): List<TableItemFinal> = arrayListOf()
 }

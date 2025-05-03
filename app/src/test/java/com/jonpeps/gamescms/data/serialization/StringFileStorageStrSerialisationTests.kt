@@ -38,7 +38,7 @@ class StringFileStorageStrSerialisationTests {
     }
 
     @Test
-    fun `test write to file failure when directory doesn't exist`() = runTest(dispatcher) {
+    fun `WRITE to file FAILS WHEN directory DOES NOT EXIST`() = runTest(dispatcher) {
         val strFileStorageStrSerialisation
                 = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
         assert(strFileStorageStrSerialisation.getErrorMsg() == "")
@@ -56,7 +56,7 @@ class StringFileStorageStrSerialisationTests {
     }
 
     @Test
-    fun `test write to file failure when directory creation fails`() = runTest(dispatcher) {
+    fun `WRITE to file FAILS WHEN directory CREATION FAILS`() = runTest(dispatcher) {
         val strFileStorageStrSerialisation
                 = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
         assert(strFileStorageStrSerialisation.getErrorMsg() == "")
@@ -74,7 +74,7 @@ class StringFileStorageStrSerialisationTests {
     }
 
     @Test
-    fun `test write to file failure when main file make directory fails`() = runTest(dispatcher) {
+    fun `WRITE to file FAILS WHEN main file MAKE directory FAILS`() = runTest(dispatcher) {
         val strFileStorageStrSerialisation
                 = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
         assert(strFileStorageStrSerialisation.getErrorMsg() == "")
@@ -92,7 +92,7 @@ class StringFileStorageStrSerialisationTests {
     }
 
     @Test
-    fun `test write to file success when create new file is achieved`() = runTest(dispatcher) {
+    fun `WRITE to file SUCCESS WHEN CREATE new file is SUCCESS`() = runTest(dispatcher) {
         val strFileStorageStrSerialisation
                 = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
 
@@ -107,7 +107,7 @@ class StringFileStorageStrSerialisationTests {
     }
 
     @Test
-    fun `test write to file success when file doesn't exist`() = runTest(dispatcher) {
+    fun `WRITE to file SUCCESS WHEN file DOES NOT EXIST`() = runTest(dispatcher) {
         val strFileStorageStrSerialisation
                 = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
         assert(strFileStorageStrSerialisation.getErrorMsg() == "")
@@ -124,7 +124,39 @@ class StringFileStorageStrSerialisationTests {
     }
 
     @Test
-    fun `test write to file failure when directory creation fails due to an exception thrown`() = runTest(dispatcher) {
+    fun `WRITE to file FAILS WHEN file CREATION FAILS`() = runTest(dispatcher) {
+        val strFileStorageStrSerialisation
+                = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
+        assert(strFileStorageStrSerialisation.getErrorMsg() == "")
+
+        commonFileReturnScenariosForWriteStr(
+            directoryReturn = true,
+            absFileExists = false,
+            createFileReturn = false,
+            makeDirectoryReturn = true)
+
+        val result = strFileStorageStrSerialisation.write(directory, file, absoluteFile, fileWriter, "test")
+
+        assert(strFileStorageStrSerialisation.getErrorMsg() == StringFileStorageStrSerialisation.FAILED_TO_CREATE_FILE + file.name)
+        assert(!result)
+    }
+
+    @Test
+    fun `WRITE to file SUCCESS WHEN file CREATION SUCCESS AS WELL AS it DOES NOT EXIST`() = runTest(dispatcher) {
+        val strFileStorageStrSerialisation
+                = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
+        assert(strFileStorageStrSerialisation.getErrorMsg() == "")
+        commonFileReturnScenariosForWriteStr(
+            directoryReturn = true,
+            absFileExists = true,
+            createFileReturn = true,
+            makeDirectoryReturn = true)
+        val result = strFileStorageStrSerialisation.write(directory, file, absoluteFile, fileWriter, "test")
+        assert(result)
+    }
+
+    @Test
+    fun `WRITE to file FAILS WHEN directory CREATION FAILS due to an EXCEPTION thrown`() = runTest(dispatcher) {
         every { directory.name } returns ""
         every { directory.exists() } returns false
         every { securityException.message } returns ""
@@ -137,7 +169,7 @@ class StringFileStorageStrSerialisationTests {
     }
 
     @Test
-    fun `read from file success when file exists`() = runTest(dispatcher) {
+    fun `READ from file SUCCESS WHEN file EXISTS`() = runTest(dispatcher) {
         val strFileStorageStrSerialisation
                 = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
         assert(strFileStorageStrSerialisation.getErrorMsg() == "")
@@ -152,7 +184,7 @@ class StringFileStorageStrSerialisationTests {
     }
 
     @Test
-    fun `read from file failure when absolute file does not exist`() = runTest(dispatcher) {
+    fun `READ from file FAILS WHEN absolute file DOES NOT EXIST`() = runTest(dispatcher) {
         val strFileStorageStrSerialisation
                 = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
         assert(strFileStorageStrSerialisation.getErrorMsg() == "")
@@ -164,7 +196,7 @@ class StringFileStorageStrSerialisationTests {
     }
 
     @Test
-    fun `read from file failure when file doesn't exist`() = runTest(dispatcher) {
+    fun `READ from file FAILS WHEN file DOES NOT EXIST`() = runTest(dispatcher) {
         val strFileStorageStrSerialisation
                 = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
         assert(strFileStorageStrSerialisation.getErrorMsg() == "")
@@ -177,7 +209,7 @@ class StringFileStorageStrSerialisationTests {
     }
 
     @Test
-    fun `read from file failure when file exist check throws an exception`() = runTest(dispatcher) {
+    fun `READ from file FAILS WHEN file EXISTS check THROWS an exception`() = runTest(dispatcher) {
         val strFileStorageStrSerialisation
                 = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
         every { absoluteFile.name } returns ""
@@ -189,7 +221,7 @@ class StringFileStorageStrSerialisationTests {
     }
 
     @Test
-    fun `read from file success when string serialisation read returns true`() = runTest(dispatcher) {
+    fun `READ from file SUCCESS WHEN string serialisation READ RETURNS TRUE`() = runTest(dispatcher) {
         val strFileStorageStrSerialisation
                 = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
         every { absoluteFile.name } returns ""
@@ -202,7 +234,7 @@ class StringFileStorageStrSerialisationTests {
     }
 
     @Test
-    fun `read from file failure when string serialisation read returns false`() = runTest(dispatcher) {
+    fun `READ from file FAILS WHEN string serialisation READ RETURNS FALSE`() = runTest(dispatcher) {
         val strFileStorageStrSerialisation
                 = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
         every { absoluteFile.name } returns ""
@@ -215,7 +247,7 @@ class StringFileStorageStrSerialisationTests {
     }
 
     @Test
-    fun `read from file failure when read file contents returns false`() = runTest(dispatcher) {
+    fun `READ from file FAILS WHEN read file contents RETURNS FALSE`() = runTest(dispatcher) {
         val strFileStorageStrSerialisation
                 = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
         assert(strFileStorageStrSerialisation.getErrorMsg() == "")

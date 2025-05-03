@@ -86,7 +86,7 @@ abstract class BaseMoshiJsonRepository<T>(
 
     override fun getItem(cacheName: String): T? {
         return if (basicStringGenericItemCache.exists(cacheName)) {
-            basicStringGenericItemCache.get(cacheName)!!
+            basicStringGenericItemCache.get(cacheName)
         } else {
             null
         }

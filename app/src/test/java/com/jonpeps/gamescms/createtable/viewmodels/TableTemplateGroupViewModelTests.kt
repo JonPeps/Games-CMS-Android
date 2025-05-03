@@ -56,17 +56,20 @@ class TableTemplateGroupViewModelTests {
             val mockMapperResult2 = mockk<TableTemplateItemListMoshi>()
             every { TableItemFinalMapper.toTableTemplateItemListMoshi(any(), any()) } returns mockMapperResult2
         }
+
+        every { tableTemplateGroupVmChangesCache.set(any(), any()) } returns Unit
     }
 
     @Test
-    fun `test load template success when IO files are correct and load from repo is true`() {
+    fun `load template SUCCESS WHEN IO files are VALID and load from repository RETURNS TRUE`() {
         setupForReadingFiles()
         every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
         every { tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName) } returns mockk()
+        every { tableTemplateGroupVmChangesCache.isPopulated() } returns false
         every { tableTemplateRepository.getItem(templateName) } returns dummyData
         coEvery { tableTemplateRepository.load(templateName) } returns true
 
-        viewModel.load(templateName)
+        viewModel.load(templateName, false)
 
         assert(viewModel.status.value.success)
         assert(viewModel.status.value.message == "")
@@ -76,10 +79,11 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test load template failure when IO files are correct and load from repo is false`() {
+    fun `load template FAILURE WHEN IO files are VALID AND load from repository RETURNS false`() {
         setupForReadingFiles()
         every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
         every { tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName) } returns mockk()
+        every { tableTemplateGroupVmChangesCache.isPopulated() } returns false
         every { tableTemplateRepository.getErrorMsg() } returns "An error occurred!"
         coEvery { tableTemplateRepository.load(templateName) } returns false
 
@@ -91,8 +95,9 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test load template failure when IO files throw RuntimeException due to invalid File`() {
+    fun `load template FAILURE WHEN IO files THROW RuntimeException due to INVALID File`() {
         every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(any(), any()) } throws RuntimeException("Runtime error!")
+        every { tableTemplateGroupVmChangesCache.isPopulated() } returns false
 
         viewModel.load(templateName)
 
@@ -102,11 +107,12 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test load template failure when IO files throw RuntimeException due to invalid BufferReader`() {
+    fun `load template FAILURE WHEN IO files THROW RuntimeException due to INVALID BufferReader`() {
         setupForReadingFiles()
         setupForWritingFiles()
         every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
         every { tableTemplateGroupVmRepoHelper.getBufferReader(any(), any()) } throws RuntimeException("Runtime error!")
+        every { tableTemplateGroupVmChangesCache.isPopulated() } returns false
 
         viewModel.load(templateName)
 
@@ -116,14 +122,14 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test load template failure when IO files are correct but Json item is null`() {
+    fun `load template FAILURE WHEN IO files are correct BUT Json item is NULL`() {
         setupForReadingFiles()
         every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
         every { tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName) } returns mockk()
         coEvery { tableTemplateRepository.load(templateName) } returns true
         every { tableTemplateRepository.getItem(templateName) } returns null
 
-        viewModel.load(templateName)
+        viewModel.load(templateName, false)
 
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.message == JSON_ITEM_TO_SAVE_IS_NULL + templateName)
@@ -131,7 +137,23 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test save template success when IO files are correct and save to repo is true`() {
+    fun `load template from cache SUCCESS`() {
+        every { tableTemplateGroupVmChangesCache.isPopulated() } returns true
+        every { tableTemplateGroupVmChangesCache.get(templateName) } returns listOf(
+            TableItemFinal("test", isPrimary = true, isSortKey = true,
+                value = "test", editable = true, dataType = ItemType.STRING))
+
+        viewModel.load(templateName, true)
+
+        assert(viewModel.status.value.success)
+        assert(viewModel.status.value.message == "")
+        assert(viewModel.status.value.ex == null)
+        assert(viewModel.status.value.items.size == 1)
+        assert(viewModel.status.value.currentIndex == 0)
+    }
+
+    @Test
+    fun `save template SUCCESS WHEN IO files are VALID and save to repository RETURNS TRUE`() {
         setupForReadingFiles()
         setupForWritingFiles()
         every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
@@ -149,7 +171,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test save template fails when IO files are correct and Json to save is null`() {
+    fun `save template FAILURE WHEN IO files are VALID and Json to save is NULL`() {
         setupForWritingFiles()
         setupForReadingFiles()
         every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
@@ -165,7 +187,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test save template fails when IO file throws RuntimeException due to invalid absolute file path`() {
+    fun `save template FAILURE WHEN IO file THROWS RuntimeException due to INVALID absolute file path`() {
         every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } throws RuntimeException("Runtime error!")
 
         viewModel.save(templateName)
@@ -192,7 +214,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test save template fails when IO files are correct and save to repo is false`() {
+    fun `save template FAILURE WHEN IO files are VALID BUT save to repository RETURNS FALSE`() {
         setupForReadingFiles()
         setupForWritingFiles()
         every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
@@ -210,7 +232,27 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test add page when no pages exist`() {
+    fun `new template SUCCESS`() {
+        viewModel.new()
+        assert(viewModel.status.value.success)
+        assert(viewModel.status.value.message == "")
+        assert(viewModel.status.value.ex == null)
+    }
+
+    @Test
+    fun `reset all items in view model SUCCESS`() {
+        every { tableTemplateGroupVmChangesCache.reset(any()) } returns Unit
+        every { tableTemplateGroupVmChangesCache.get(any()) } returns listOf()
+
+        viewModel.reset()
+
+        assert(viewModel.status.value.success)
+        assert(viewModel.status.value.message == "")
+        assert(viewModel.status.value.ex == null)
+    }
+
+    @Test
+    fun `ADD page WHEN no pages EXIST`() {
         viewModel.clearItems()
         viewModel.addPage()
         assert(viewModel.status.value.success)
@@ -221,7 +263,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test add page when pages exist`() {
+    fun `ADD page WHEN pages EXIST`() {
         viewModel.clearItems()
         viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
@@ -234,7 +276,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test remove page when no pages exist`() {
+    fun `REMOVE page WHEN no pages EXIST`() {
         viewModel.clearItems()
         viewModel.removePage()
         assert(viewModel.status.value.success)
@@ -244,7 +286,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test remove page when pages exist`() {
+    fun `REMOVE page WHEN pages EXIST`() {
         viewModel.clearItems()
         viewModel.addPage()
         viewModel.addPage()
@@ -257,7 +299,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test next page when no pages exist`() {
+    fun `NEXT page WHEN no pages EXIST`() {
         viewModel.clearItems()
         viewModel.nextPage()
         assert(viewModel.status.value.success)
@@ -268,7 +310,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test next page when only one page exist`() {
+    fun `NEXT page WHEN only one page EXISTS`() {
         viewModel.clearItems()
         viewModel.setIndex(0)
         viewModel.nextPage()
@@ -281,7 +323,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test next page when pages exist`() {
+    fun `NEXT page WHEN pages EXIST`() {
         viewModel.clearItems()
         viewModel.addPage()
         viewModel.addPage()
@@ -296,7 +338,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test previous page when no pages exist`() {
+    fun `PREVIOUS page WHEN no pages EXIST`() {
         viewModel.clearItems()
         viewModel.previousPage()
         assert(viewModel.status.value.success)
@@ -307,7 +349,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test previous page when pages exist`() {
+    fun `PREVIOUS page WHEN pages EXIST`() {
         viewModel.clearItems()
         viewModel.addPage()
         viewModel.addPage()
@@ -320,7 +362,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `set row name when name is empty`() {
+    fun `set row name WHEN name is EMPTY`() {
         viewModel.clearItems()
         viewModel.setRowName("")
         assert(viewModel.rowNameEmpty.value)
@@ -328,7 +370,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `set row name when name is not empty and no duplicates`() {
+    fun `set row name WHEN name IS NOT EMPTY AND no duplicates`() {
         viewModel.clearItems()
         viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
@@ -338,7 +380,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `set row name when name is not empty and is duplicate`() {
+    fun `set row name WHEN name IS NOT EMPTY AND is duplicate`() {
         viewModel.clearItems()
         viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
@@ -360,7 +402,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `set default value when row is editable`() {
+    fun `set default value WHEN row IS EDITABLE`() {
         viewModel.clearItems()
         viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
@@ -371,7 +413,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `set default value when row is not editable`() {
+    fun `set DEFAULT value WHEN row IS NOT EDITABLE`() {
         viewModel.clearItems()
         viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = false, dataType = ItemType.STRING))
@@ -382,7 +424,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `set no default value when row is editable`() {
+    fun `set NO DEFAULT value WHEN row IS EDITABLE`() {
         viewModel.clearItems()
         viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = false, dataType = ItemType.STRING))
@@ -393,7 +435,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `set is editable with no default value required`() {
+    fun `set IS EDITABLE WITH NO DEFAULT value REQUIRED`() {
         viewModel.clearItems()
         viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = false, dataType = ItemType.STRING))
@@ -404,7 +446,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `set is editable with default value empty`() {
+    fun `set IS EDITABLE WITH DEFAULT value EMPTY`() {
         viewModel.clearItems()
         viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = false, dataType = ItemType.STRING))
@@ -417,7 +459,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `set is editable with default value required`() {
+    fun `set IS EDITABLE WITH DEFAULT value REQUIRED`() {
         viewModel.clearItems()
         viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
@@ -429,7 +471,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `set is editable with default value present`() {
+    fun `set IS EDITABLE WITH DEFAULT value PRESENT`() {
         viewModel.clearItems()
         viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = false, dataType = ItemType.STRING))
@@ -441,7 +483,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `set is primary`() {
+    fun `set IS PRIMARY`() {
         viewModel.clearItems()
         viewModel.addItem(TableItemFinal("test1", isPrimary = false, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
@@ -452,7 +494,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `set is not primary with no other rows set as primary`() {
+    fun `set IS NOT PRIMARY AND no other rows set AS PRIMARY`() {
         viewModel.clearItems()
         viewModel.addItem(TableItemFinal("test1", isPrimary = false, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
@@ -463,7 +505,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `set is not primary with other row set as primary`() {
+    fun `set IS NOT PRIMARY with OTHER row set AS PRIMARY`() {
         viewModel.clearItems()
         viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
@@ -475,7 +517,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `set is sort key`() {
+    fun `set IS SORT KEY`() {
         viewModel.clearItems()
         viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
             value = "test", editable = true, dataType = ItemType.STRING))
@@ -486,7 +528,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `set is not sort key with no other rows set as sort key`() {
+    fun `set IS NOT SORT KEY WITH no other rows set as SORT KEY`() {
         viewModel.clearItems()
         viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
@@ -497,7 +539,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `set is not sort key with other row set as sort key`() {
+    fun `set IS NOT SORT KEY WITH other row set as SORT KEY`() {
         viewModel.clearItems()
         viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
             value = "test", editable = true, dataType = ItemType.STRING))
@@ -509,7 +551,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test page count`() {
+    fun `PAGE COUNT WHEN pages added`() {
         viewModel.clearItems()
         viewModel.addPage()
         viewModel.addPage()
@@ -517,7 +559,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `test new table template`() {
+    fun `NEW table template SUCCESS`() {
         viewModel.addPage()
         viewModel.new()
         assert(viewModel.status.value.success)

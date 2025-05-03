@@ -16,7 +16,7 @@ import java.util.stream.Stream
 @RunWith(JUnit4::class)
 class StringSerializationTests {
     @Test
-    fun `success when string written to file`() {
+    fun `SUCCESS WHEN string WRITTEN to file`() {
         val serializeString = StringSerialization()
         val mockFileWriter = mockk<FileWriter>(relaxed = true)
         every { mockFileWriter.write("123") } returns Unit
@@ -29,7 +29,7 @@ class StringSerializationTests {
     }
 
     @Test
-    fun `failure when string written to file due to IO exception`() {
+    fun `string WRITTEN to file FAILS due to IO exception`() {
         val serializeString = StringSerialization()
         val mockFileWriter = mockk<FileWriter>(relaxed = true)
         every { mockFileWriter.write("123") } throws IOException("Write failed!")
@@ -42,7 +42,7 @@ class StringSerializationTests {
     }
 
     @Test
-    fun `success when reading string from file`() {
+    fun `SUCCESS WHEN READING string from file`() {
         val serializeString = StringSerialization()
         val mockBufferedReader = mockk<BufferedReader>(relaxed = true)
         every { mockBufferedReader.lines() } returns Stream.of("1", "2")
@@ -54,7 +54,7 @@ class StringSerializationTests {
     }
 
     @Test
-    fun `failure when reading string from file throws exception`() {
+    fun `FAILURE WHEN READING string from file THROWS exception`() {
         val serializeString = StringSerialization()
         val mockBufferedReader = mockk<BufferedReader>(relaxed = true)
         val mockUncheckedIOException = mockk<UncheckedIOException>()

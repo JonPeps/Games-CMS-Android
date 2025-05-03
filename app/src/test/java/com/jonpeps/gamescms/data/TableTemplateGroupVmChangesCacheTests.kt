@@ -33,7 +33,7 @@ class TableTemplateGroupVmChangesCacheTests {
     }
 
     @Test
-    fun `test update current`() {
+    fun `test UPDATE current`() {
         changesCache.set(dummyName, dummyData)
         val currentData = changesCache.get(dummyName)
         currentData[0].name = "name3"
@@ -42,7 +42,7 @@ class TableTemplateGroupVmChangesCacheTests {
     }
 
     @Test
-    fun `test reset`() {
+    fun `test RESET`() {
         changesCache.set(dummyName, dummyData)
         val currentData = changesCache.get(dummyName)
         currentData[0].name = "name3"
@@ -53,7 +53,7 @@ class TableTemplateGroupVmChangesCacheTests {
     }
 
     @Test
-    fun `test has changes`() {
+    fun `test HAS CHANGES`() {
         changesCache.set(dummyName, dummyData)
         val currentData = changesCache.get(dummyName)
         currentData[0].name = "name3"

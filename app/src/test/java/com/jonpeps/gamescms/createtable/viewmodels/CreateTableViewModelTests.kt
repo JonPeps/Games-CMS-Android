@@ -57,7 +57,7 @@ class CreateTableViewModelTests {
     }
 
     @Test
-    fun `test create table success with valid API response`() {
+    fun `test create table SUCCESS WHEN DynamoDbCreateTable returns valid API response`() {
         coEvery { dynamoDbCreateTable.create(any(), any(), any()) } returns mockk<CreateTableResponse>()
         viewModel.createTable("test", testItems)
         assert(viewModel.state.value.success)
@@ -66,7 +66,7 @@ class CreateTableViewModelTests {
     }
 
     @Test
-    fun `test create table fails with API exception response`() {
+    fun `test create table FAILURE WHEN DynamoDbCreateTable THROWS IOException`() {
         coEvery { dynamoDbCreateTable.create(any(), any(), any()) } throws mockk<IOException>()
         viewModel.createTable("test", testItems)
         assert(!viewModel.state.value.success)

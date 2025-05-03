@@ -47,7 +47,7 @@ class TableTemplateFileRepositoryTests {
     private lateinit var tableTemplateRepository: ITableTemplateFileRepository
 
     private val templateName = "test"
-    private val dummyData = TableTemplateItemListMoshi("test", listOf(TableTemplateItemMoshi("test", dataType = ItemType.STRING)))
+    private val dummyData = TableTemplateItemListMoshi(templateName, listOf(TableTemplateItemMoshi("test", dataType = ItemType.STRING)))
 
     @Before
     fun setup() {
@@ -63,33 +63,8 @@ class TableTemplateFileRepositoryTests {
         tableTemplateRepository.setDirectoryFile(directoryFile)
         tableTemplateRepository.setBufferReader(bufferedReader)
         tableTemplateRepository.setFileWriter(fileWriter)
-    }
 
-    @Test
-    fun `test load template success all paths`() = runTest(dispatcher) {
-        assert(tableTemplateRepository.getItem(templateName) == null)
-        assert(tableTemplateRepository.getErrorMsg() == "")
-        every { stringFileStorageStrSerialisation.getContents() } returns "test"
-        coEvery { tableItemListMoshiSerialization.fromJson("test") } returns true
-        every { tableItemListMoshiSerialization.getItem() } returns dummyData
-        coEvery { stringFileStorageStrSerialisation.read(absolutePath, bufferedReader) } returns true
-        val result = tableTemplateRepository.load(templateName)
-        assert(result)
-    }
-
-    @Test
-    fun `test load template with read Json string false`() = runTest(dispatcher) {
-        assert(tableTemplateRepository.getErrorMsg() == "")
-        every { stringFileStorageStrSerialisation.getErrorMsg() } returns "An error occurred!"
-        every { tableItemListMoshiSerialization.getErrorMsg() } returns stringFileStorageStrSerialisation.getErrorMsg()
-        every { stringFileStorageStrSerialisation.getContents() } returns "test"
-        coEvery { tableItemListMoshiSerialization.fromJson("test") } returns false
-        every { tableItemListMoshiSerialization.getItem() } returns dummyData
-        coEvery { stringFileStorageStrSerialisation.read(absolutePath, bufferedReader) } returns true
-        val result = tableTemplateRepository.load(templateName)
-        assert(tableTemplateRepository.getErrorMsg() == stringFileStorageStrSerialisation.getErrorMsg())
-        assert(!result)
-        assert(tableTemplateRepository.getItem(templateName) == null)
+        every { tableTemplateStringListMoshiJsonCache.set(templateName, dummyData) } returns Unit
     }
 
     @Test

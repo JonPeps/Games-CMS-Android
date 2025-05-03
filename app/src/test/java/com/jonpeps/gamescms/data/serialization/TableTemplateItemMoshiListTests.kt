@@ -41,7 +41,7 @@ class TableTemplateItemMoshiListTests {
     }
 
     @Test
-    fun `test content converted from Json to table item template success`() = runTest(dispatcher) {
+    fun `content converted FROM JSON to table item template SUCCESS`() = runTest(dispatcher) {
         assert(serializer.getItem() == null)
         assert(serializer.getErrorMsg() == "")
         every { serializer.getMoshiAdapter() } returns moshiJsonAdapter
@@ -51,7 +51,7 @@ class TableTemplateItemMoshiListTests {
     }
 
     @Test
-    fun `test content converted from Json to table item template failure due to exception`() = runTest(dispatcher) {
+    fun `content converted FROM JSON to table item template FAILS due to exception THROWN`() = runTest(dispatcher) {
         assert(serializer.getItem() == null)
         assert(serializer.getErrorMsg() == "")
         every { serializer.getMoshiAdapter() } returns moshiJsonAdapter
@@ -62,7 +62,7 @@ class TableTemplateItemMoshiListTests {
     }
 
     @Test
-    fun `test convert to table item template to Json success`() = runTest(dispatcher) {
+    fun `convert to table item template to JSON SUCCESS`() = runTest(dispatcher) {
         assert(serializer.getErrorMsg() == "")
         every { serializer.getMoshiAdapter() } returns moshiJsonAdapter
         every { moshiJsonAdapter.toJson(dummyData) } returns "Dummy Json"
@@ -72,7 +72,7 @@ class TableTemplateItemMoshiListTests {
     }
 
     @Test
-    fun `test convert to table item template to Json fails due to null string`()  = runTest(dispatcher) {
+    fun `convert FROM table item template TO JSON FAILS because of NULL string`()  = runTest(dispatcher) {
         every { serializer.getMoshiAdapter() } returns moshiJsonAdapter
         every { moshiJsonAdapter.toJson(dummyData) } returns null
         val success = serializer.toJson(dummyData)
@@ -80,7 +80,7 @@ class TableTemplateItemMoshiListTests {
     }
 
     @Test
-    fun `test convert to table item template to Json fails due to empty string`()  = runTest(dispatcher) {
+    fun `convert FROM table item template TO JSON FAILS due to EMPTY string`()  = runTest(dispatcher) {
         assert(serializer.getErrorMsg() == "")
         every { serializer.getMoshiAdapter() } returns moshiJsonAdapter
         every { moshiJsonAdapter.toJson(dummyData) } returns ""
@@ -89,7 +89,7 @@ class TableTemplateItemMoshiListTests {
     }
 
     @Test
-    fun `test convert to table item template to Json fails due to assertion exception`()  = runTest(dispatcher) {
+    fun `convert from table item template TO JSON FAILS due to assertion exception`()  = runTest(dispatcher) {
         assert(serializer.getErrorMsg() == "")
         every { serializer.getMoshiAdapter() } returns moshiJsonAdapter
         every { moshiJsonAdapter.toJson(dummyData) } throws AssertionError()

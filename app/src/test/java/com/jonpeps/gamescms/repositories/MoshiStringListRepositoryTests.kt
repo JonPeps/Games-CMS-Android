@@ -65,7 +65,8 @@ class MoshiStringListRepositoryTests {
         moshiStringListRepository.setDirectoryFile(directoryFile)
         moshiStringListRepository.setBufferReader(bufferedReader)
         moshiStringListRepository.setFileWriter(fileWriter)
-    }
+
+        every { tableTemplateStringListMoshiJsonCache.set(templateName, dummyData) } returns Unit    }
 
     @Test
     fun `test load string list success all paths`() = runTest(dispatcher) {
