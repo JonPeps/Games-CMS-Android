@@ -1,6 +1,5 @@
 package com.jonpeps.gamescms.data.serialization.moshi
 
-import com.jonpeps.gamescms.data.dataclasses.StringListData
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.squareup.moshi.JsonAdapter
 import kotlinx.coroutines.CoroutineDispatcher

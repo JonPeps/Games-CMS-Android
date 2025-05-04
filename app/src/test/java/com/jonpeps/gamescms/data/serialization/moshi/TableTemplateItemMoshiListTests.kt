@@ -1,10 +1,8 @@
-package com.jonpeps.gamescms.data.serialization
+package com.jonpeps.gamescms.data.serialization.moshi
 
 import com.jonpeps.gamescms.data.dataclasses.ItemType
-import com.jonpeps.gamescms.data.serialization.moshi.MoshiJsonAdapterCreator
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
-import com.jonpeps.gamescms.data.serialization.moshi.TableItemListMoshiSerialization
 import com.squareup.moshi.JsonAdapter
 import io.mockk.MockKAnnotations
 import io.mockk.every

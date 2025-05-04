@@ -5,7 +5,6 @@ import com.squareup.moshi.JsonAdapter
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
-
 interface ITableItemListMoshiSerialization : IBaseMoshiSerialization<TableTemplateItemListMoshi>
 
 class TableItemListMoshiSerialization
