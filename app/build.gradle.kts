@@ -72,7 +72,6 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
@@ -84,7 +83,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     kotlin("kapt")
-    implementation(libs.runtime)
     testImplementation(libs.junit.v412)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
@@ -100,7 +98,6 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.material3)
     testImplementation(libs.junit)
     implementation(libs.squareup.moshi.kotlin)
     implementation(libs.moshi.kotlin.codegen)
@@ -115,4 +112,5 @@ dependencies {
     implementation(libs.mockk.v1110)
     implementation(libs.mockk.common)
     testImplementation(libs.mockk.android.v1135)
+    implementation(libs.androidx.material3.v140alpha13)
 }
