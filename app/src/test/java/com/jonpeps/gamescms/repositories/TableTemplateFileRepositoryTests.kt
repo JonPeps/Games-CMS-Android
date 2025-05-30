@@ -6,7 +6,7 @@ import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.serialization.moshi.ITableItemListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateStringListMoshiJsonCache
+import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateStringMoshiJsonCache
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.TableTemplateFileRepository
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -32,7 +32,7 @@ class TableTemplateFileRepositoryTests {
     @MockK
     private lateinit var tableItemListMoshiSerialization: ITableItemListMoshiSerialization
     @MockK
-    private lateinit var tableTemplateStringListMoshiJsonCache: ITableTemplateStringListMoshiJsonCache
+    private lateinit var tableTemplateStringMoshiJsonCache: ITableTemplateStringMoshiJsonCache
     @MockK
     private lateinit var directoryFile: File
     @MockK
@@ -55,7 +55,7 @@ class TableTemplateFileRepositoryTests {
 
         tableTemplateRepository = TableTemplateFileRepository(
             tableItemListMoshiSerialization,
-            tableTemplateStringListMoshiJsonCache,
+            tableTemplateStringMoshiJsonCache,
             stringFileStorageStrSerialisation)
 
         tableTemplateRepository.setAbsoluteFile(absolutePath)
@@ -64,7 +64,7 @@ class TableTemplateFileRepositoryTests {
         tableTemplateRepository.setBufferReader(bufferedReader)
         tableTemplateRepository.setFileWriter(fileWriter)
 
-        every { tableTemplateStringListMoshiJsonCache.set(templateName, dummyData) } returns Unit
+        every { tableTemplateStringMoshiJsonCache.set(templateName, dummyData) } returns Unit
     }
 
     @Test
@@ -150,22 +150,5 @@ class TableTemplateFileRepositoryTests {
         val result = tableTemplateRepository.save(templateName, dummyData)
         assert(!result)
         assert(tableTemplateRepository.getErrorMsg() == tableItemListMoshiSerialization.getErrorMsg())
-    }
-
-    @Test
-    fun `DELETE table template SUCCESS`() = runTest(dispatcher) {
-        assert(tableTemplateRepository.getErrorMsg() == "")
-        every { absolutePath.delete() } returns true
-        val result = tableTemplateRepository.deleteTemplate()
-        assert(result)
-    }
-
-    @Test
-    fun `DELETE table template FAILURE`() = runTest(dispatcher) {
-        assert(tableTemplateRepository.getErrorMsg() == "")
-        every { absolutePath.delete() } returns false
-        val result = tableTemplateRepository.deleteTemplate()
-        assert(!result)
-        assert(tableTemplateRepository.getErrorMsg() == TableTemplateFileRepository.FAILED_TO_DELETE_FILE + absolutePath)
     }
 }

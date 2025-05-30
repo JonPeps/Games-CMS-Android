@@ -1,19 +1,18 @@
 package com.jonpeps.gamescms.data.repositories
 
-import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
-import com.jonpeps.gamescms.data.serialization.moshi.IBaseMoshiSerialization
+import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.serialization.moshi.IStringListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateStringListMoshiJsonCache
+import com.jonpeps.gamescms.ui.tabletemplates.repositories.IStringListMoshiJsonCache
 import javax.inject.Inject
 
-interface IMoshiStringListRepository : IBaseMoshiJsonRepository<TableTemplateItemListMoshi>
+interface IMoshiStringListRepository : IBaseMoshiJsonRepository<StringListMoshi>
 
 class MoshiStringListRepository
 @Inject constructor(private val strListMoshiSerialization: IStringListMoshiSerialization,
-                    tableTemplateStringMoshiJsonCache: ITableTemplateStringListMoshiJsonCache,
+                    tableTemplateStringMoshiJsonCache: IStringListMoshiJsonCache,
                     stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation
-) : BaseMoshiJsonRepository<TableTemplateItemListMoshi>(stringFileStorageStrSerialisation, tableTemplateStringMoshiJsonCache), IMoshiStringListRepository {
+) : BaseMoshiJsonRepository<StringListMoshi>(stringFileStorageStrSerialisation, tableTemplateStringMoshiJsonCache), IMoshiStringListRepository {
 
-    override fun getMoshiSerializer(): IBaseMoshiSerialization<TableTemplateItemListMoshi> = strListMoshiSerialization
+    override fun getMoshiSerializer() = strListMoshiSerialization
 }

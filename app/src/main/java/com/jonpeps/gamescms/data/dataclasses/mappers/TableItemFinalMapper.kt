@@ -37,9 +37,5 @@ class TableItemFinalMapper {
         ): TableTemplateItemListMoshi {
             return TableTemplateItemListMoshi(templateName, tableItemFinal.map { toTableTemplateItemMoshi(it) })
         }
-
-        fun getDefaultTableItemFinal(): TableItemFinal {
-            return TableItemFinal("", ItemType.STRING, false, "", true)
-        }
     }
 }

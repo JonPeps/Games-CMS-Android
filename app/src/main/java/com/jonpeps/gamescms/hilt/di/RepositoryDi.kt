@@ -6,10 +6,10 @@ import com.jonpeps.gamescms.data.serialization.moshi.IStringListMoshiSerializati
 import com.jonpeps.gamescms.data.serialization.moshi.ITableItemListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateStringListMoshiJsonCache
+import com.jonpeps.gamescms.ui.tabletemplates.repositories.IStringListMoshiJsonCache
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateStringMoshiJsonCache
+import com.jonpeps.gamescms.ui.tabletemplates.repositories.StringListMoshiJsonCache
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.TableTemplateFileRepository
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.TableTemplateStringListMoshiJsonCache
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.TableTemplateStringMoshiJsonCache
 import dagger.Binds
 import dagger.Module
@@ -23,18 +23,18 @@ class RepositoryDiProvider {
     @Provides
     fun provideMoshiStringListRepository(strListMoshiSerialization: IStringListMoshiSerialization,
                                          stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation,
-                                         tableTemplateStringMoshiJsonCache: ITableTemplateStringListMoshiJsonCache)
+                                         stringMoshiJsonCache: IStringListMoshiJsonCache)
     : IMoshiStringListRepository {
-        return MoshiStringListRepository(strListMoshiSerialization, tableTemplateStringMoshiJsonCache, stringFileStorageStrSerialisation)
+        return MoshiStringListRepository(strListMoshiSerialization, stringMoshiJsonCache, stringFileStorageStrSerialisation)
     }
 
     @Provides
     fun provideTableTemplateFileRepository(tableTableItemListMoshiSerialization: ITableItemListMoshiSerialization,
                                            stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation,
-                                           tableTemplateStringListListMoshiCache: TableTemplateStringListMoshiJsonCache
+                                           tableTemplateStringMoshiCache: TableTemplateStringMoshiJsonCache
     )
     : ITableTemplateFileRepository {
-        return TableTemplateFileRepository(tableTableItemListMoshiSerialization, tableTemplateStringListListMoshiCache, stringFileStorageStrSerialisation)
+        return TableTemplateFileRepository(tableTableItemListMoshiSerialization, tableTemplateStringMoshiCache, stringFileStorageStrSerialisation)
     }
 }
 
@@ -47,9 +47,9 @@ abstract class RepositoryDiBindings {
     ): ITableTemplateStringMoshiJsonCache
 
     @Binds
-    abstract fun bindTableTemplateStringListMoshiJsonCache(
-        tableTemplateStringMoshiJsonCacheImpl: TableTemplateStringMoshiJsonCache
-    ): ITableTemplateStringMoshiJsonCache
+    abstract fun bindStringListMoshiJsonCache(
+        stringListMoshiCache: StringListMoshiJsonCache
+    ): IStringListMoshiJsonCache
 }
 
 

@@ -12,7 +12,7 @@ class TableTemplateGroupVmChangesCache@Inject constructor()
     : GenericSerializationChangesCache<List<TableItemFinal>>(), ITableTemplateGroupVmChangesCache {
     override val cache: MutableMap<String, ChangesCachePair<List<TableItemFinal>>> = mutableMapOf()
 
-    override fun deepCopy(item: List<TableItemFinal>): List<TableItemFinal> {
+    override fun copy(item: List<TableItemFinal>): List<TableItemFinal> {
         val arrayList = arrayListOf<TableItemFinal>()
         item.forEach {
             arrayList.add(

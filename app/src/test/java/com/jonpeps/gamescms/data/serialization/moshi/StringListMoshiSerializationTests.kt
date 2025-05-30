@@ -1,5 +1,6 @@
 package com.jonpeps.gamescms.data.serialization.moshi
 
+import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.squareup.moshi.JsonAdapter
 import io.mockk.MockKAnnotations
@@ -18,7 +19,7 @@ import org.junit.runners.JUnit4
 class StringListMoshiSerializationTests {
     private val dispatcher = UnconfinedTestDispatcher()
     @MockK
-    private lateinit var stringListJsonAdapter: JsonAdapter<TableTemplateItemListMoshi>
+    private lateinit var stringListJsonAdapter: JsonAdapter<StringListMoshi>
     @MockK
     private lateinit var moshiJsonAdapterCreator: MoshiJsonAdapterCreator
 

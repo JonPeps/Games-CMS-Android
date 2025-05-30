@@ -20,8 +20,8 @@ abstract class GenericSerializationChangesCache<T> : IGenericSerializationCache<
 
     override fun set(name: String, item: T) {
         val changesCachePair = object : ChangesCachePair<T>() {
-            override var initialItem: T = deepCopy(item)
-            override var currentItem: T = deepCopy(item)
+            override var initialItem: T = copy(item)
+            override var currentItem: T = copy(item)
         }
         cache[name] = changesCachePair
         isPopulated = true
@@ -29,7 +29,7 @@ abstract class GenericSerializationChangesCache<T> : IGenericSerializationCache<
 
     override fun updateCurrent(name: String, item: T) {
         if (cache.containsKey(name)) {
-            cache[name]?.currentItem = deepCopy(item)
+            cache[name]?.currentItem = copy(item)
         }
     }
 
@@ -50,12 +50,12 @@ abstract class GenericSerializationChangesCache<T> : IGenericSerializationCache<
         if (cache.containsKey(name)) {
             val initialItem = cache[name]?.initialItem
             if (initialItem != null) {
-                cache[name]?.currentItem = deepCopy(initialItem)
+                cache[name]?.currentItem = copy(initialItem)
             }
         }
     }
 
-    protected abstract fun deepCopy(item: T): T
+    protected abstract fun copy(item: T): T
 
     protected abstract fun areEqual(name: String): Boolean
 

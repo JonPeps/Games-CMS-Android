@@ -151,7 +151,9 @@ class TableTemplateGroupViewModel
 
     override fun new() {
         items.clear()
-        items.add(TableItemFinalMapper.getDefaultTableItemFinal())
+        items.add(TableItemFinal(name = "", dataType = ItemType.STRING,
+            isPrimary = false, value = "", editable = true, isSortKey = false)
+        )
         _status.value = TableTemplateStatus(true, items, index, "", null)
     }
 
@@ -218,7 +220,8 @@ class TableTemplateGroupViewModel
         if (items.size >= 1) {
             index++
         }
-        items.add(index, TableItemFinalMapper.getDefaultTableItemFinal())
+        items.add(index, TableItemFinal(name = "", dataType = ItemType.STRING,
+            isPrimary = false, value = "", editable = true, isSortKey = false))
         _status.value = TableTemplateStatus(true, items, index, "", null)
     }
 

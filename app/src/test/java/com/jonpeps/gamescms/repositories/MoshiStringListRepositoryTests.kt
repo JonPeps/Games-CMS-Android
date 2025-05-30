@@ -1,12 +1,11 @@
 package com.jonpeps.gamescms.repositories
 
-import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
-import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.repositories.MoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.moshi.IStringListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateStringListMoshiJsonCache
+import com.jonpeps.gamescms.ui.tabletemplates.repositories.IStringListMoshiJsonCache
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -31,7 +30,7 @@ class MoshiStringListRepositoryTests {
     @MockK
     private lateinit var strListMoshiSerialization: IStringListMoshiSerialization
     @MockK
-    private lateinit var tableTemplateStringListMoshiJsonCache: ITableTemplateStringListMoshiJsonCache
+    private lateinit var tableTemplateStringListMoshiJsonCache: IStringListMoshiJsonCache
     @MockK
     private lateinit var directoryFile: File
     @MockK
@@ -44,10 +43,7 @@ class MoshiStringListRepositoryTests {
     private lateinit var fileWriter: FileWriter
 
     private val templateName = "test"
-    private val dummyData = TableTemplateItemListMoshi(
-        templateName,
-        listOf(TableTemplateItemMoshi("test"))
-    )
+    private val dummyData = StringListMoshi(listOf("test"))
 
     private lateinit var moshiStringListRepository: IMoshiStringListRepository
 
