@@ -9,6 +9,8 @@ import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSeria
 import com.jonpeps.gamescms.data.serialization.string.IStringSerialization
 import com.jonpeps.gamescms.data.serialization.string.StringFileStorageStrSerialisation
 import com.jonpeps.gamescms.data.serialization.string.StringSerialization
+import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.IStringListItemsVmChangesCache
+import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.StringListItemsVmChangesCache
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,5 +42,10 @@ class SerializationDiProvider {
     @Provides
     fun provideStringSerialization(): IStringSerialization {
         return StringSerialization()
+    }
+
+    @Provides
+    fun providesStringListItemsVmChangesCache(): IStringListItemsVmChangesCache {
+        return StringListItemsVmChangesCache()
     }
 }

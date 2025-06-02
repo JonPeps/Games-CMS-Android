@@ -2,6 +2,7 @@ package com.jonpeps.gamescms.data
 
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
+import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmChangesCache
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupVmChangesCache
 import org.junit.Before
 import org.junit.Test
@@ -11,7 +12,7 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class TableTemplateGroupVmChangesCacheTests {
     private lateinit var dummyData: ArrayList<TableItemFinal>
-    private lateinit var changesCache: TableTemplateGroupVmChangesCache
+    private lateinit var changesCache: ITableTemplateGroupVmChangesCache
     private val dummyName = "test"
 
     @Before

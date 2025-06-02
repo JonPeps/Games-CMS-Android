@@ -1,20 +1,20 @@
-package com.jonpeps.gamescms.ui.tabletemplates.viewmodels.factories
+package com.jonpeps.gamescms.data.viewmodels.factories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateListViewModel
+import com.jonpeps.gamescms.data.viewmodels.CommonStringListViewModel
 import dagger.assisted.AssistedFactory
 
 @Suppress("UNCHECKED_CAST")
 class ListViewModelFactory {
     @AssistedFactory
-    interface IListViewModelFactory {
-        fun create(listPath: String): TableTemplateListViewModel
+    interface ICommonStringListViewModelFactory {
+        fun create(listPath: String): CommonStringListViewModel
     }
 
     companion object {
         fun provideFactory(
-            assistedFactory: IListViewModelFactory,
+            assistedFactory: ICommonStringListViewModelFactory,
             listPath: String
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {

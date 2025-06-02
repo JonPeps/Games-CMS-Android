@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
 import com.jonpeps.gamescms.data.dataclasses.mappers.TableItemFinalMapper
+import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.factories.TableTemplateGroupViewModelFactory
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
 import dagger.assisted.Assisted
@@ -51,7 +52,7 @@ class TableTemplateGroupViewModel
 @AssistedInject constructor(
     @Assisted private val tableTemplateFilesPath: String,
     private val tableTemplateRepository: ITableTemplateFileRepository,
-    private val tableTemplateGroupVmRepoHelper: ITableTemplateGroupVmRepoHelper,
+    private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val tableTemplateGroupVmChangesCache: ITableTemplateGroupVmChangesCache,
     private val coroutineDispatcher: CoroutineDispatcher)
     : ViewModel(), ITableTemplateGroupViewModel {
@@ -99,7 +100,7 @@ class TableTemplateGroupViewModel
                             index = 0
                         }?:run {
                             success = false
-                            errorMessage = JSON_ITEM_TO_SAVE_IS_NULL + name
+                            errorMessage = JSON_ITEM_TO_LOAD_IS_NULL + name
                         }
                     } else {
                         success = false
@@ -284,24 +285,25 @@ class TableTemplateGroupViewModel
 
     private fun initReadFiles(name: String) {
         tableTemplateRepository.setAbsoluteFile(
-            tableTemplateGroupVmRepoHelper.getAbsoluteFile(tableTemplateFilesPath, name))
+            commonSerializationRepoHelper.getAbsoluteFile(tableTemplateFilesPath, name))
         tableTemplateRepository.setBufferReader(
-            tableTemplateGroupVmRepoHelper.getBufferReader(tableTemplateFilesPath, name))
+            commonSerializationRepoHelper.getBufferReader(tableTemplateFilesPath, name))
     }
 
     private fun initWriteFiles(name: String) {
         tableTemplateRepository.setAbsoluteFile(
-            tableTemplateGroupVmRepoHelper.getAbsoluteFile(tableTemplateFilesPath, name))
-        tableTemplateRepository.setFile(tableTemplateGroupVmRepoHelper.getMainFile(name))
+            commonSerializationRepoHelper.getAbsoluteFile(tableTemplateFilesPath, name))
+        tableTemplateRepository.setFile(commonSerializationRepoHelper.getMainFile(name))
         tableTemplateRepository.setDirectoryFile(
-            tableTemplateGroupVmRepoHelper.getDirectoryFile(tableTemplateFilesPath))
+            commonSerializationRepoHelper.getDirectoryFile(tableTemplateFilesPath))
         tableTemplateRepository.setFileWriter(
-            tableTemplateGroupVmRepoHelper.getFileWriter(tableTemplateFilesPath, name))
+            commonSerializationRepoHelper.getFileWriter(tableTemplateFilesPath, name))
         tableTemplateRepository
             .setItem(templateName, TableItemFinalMapper.toTableTemplateItemListMoshi(name, items))
     }
 
     companion object {
         const val JSON_ITEM_TO_SAVE_IS_NULL = "Json item to save is null for table template: "
+        const val JSON_ITEM_TO_LOAD_IS_NULL = "Json item to load is null for table template: "
     }
 }

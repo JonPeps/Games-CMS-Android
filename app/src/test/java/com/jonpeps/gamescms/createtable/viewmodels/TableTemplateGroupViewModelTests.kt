@@ -5,11 +5,12 @@ import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
 import com.jonpeps.gamescms.data.dataclasses.mappers.TableItemFinalMapper
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
-import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmRepoHelper
+import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel.Companion.JSON_ITEM_TO_SAVE_IS_NULL
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmChangesCache
+import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel.Companion.JSON_ITEM_TO_LOAD_IS_NULL
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -27,7 +28,7 @@ class TableTemplateGroupViewModelTests {
     @MockK
     private lateinit var tableTemplateRepository: ITableTemplateFileRepository
     @MockK
-    private lateinit var tableTemplateGroupVmRepoHelper: ITableTemplateGroupVmRepoHelper
+    private lateinit var tableTemplateGroupVmRepoHelper: ICommonSerializationRepoHelper
     @MockK
     private lateinit var tableTemplateGroupVmChangesCache: ITableTemplateGroupVmChangesCache
 
@@ -132,7 +133,7 @@ class TableTemplateGroupViewModelTests {
         viewModel.load(templateName, false)
 
         assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == JSON_ITEM_TO_SAVE_IS_NULL + templateName)
+        assert(viewModel.status.value.message == JSON_ITEM_TO_LOAD_IS_NULL + templateName)
         assert(viewModel.status.value.ex == null)
     }
 
