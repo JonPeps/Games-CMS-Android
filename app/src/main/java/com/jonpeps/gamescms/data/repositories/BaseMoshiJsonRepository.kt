@@ -10,6 +10,7 @@ import java.io.FileWriter
 interface IBaseMoshiJsonRepository<T> {
     suspend fun load(cacheName: String): Boolean
     suspend fun save(cacheName: String, item: T): Boolean
+    suspend fun delete(path: String, name: String): Boolean
 
     fun getItem(cacheName: String): T?
     fun getErrorMsg(): String
@@ -82,6 +83,10 @@ abstract class BaseMoshiJsonRepository<T>(
             errorMessage = moshiSerializer.getErrorMsg()
         }
         return success
+    }
+
+    override suspend fun delete(path: String, name: String): Boolean {
+        return File(path + name).delete()
     }
 
     override fun getItem(cacheName: String): T? {

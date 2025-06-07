@@ -75,6 +75,9 @@ class TableTemplateGroupViewModel
     private var _rowNameEmpty = MutableStateFlow(true)
     val rowNameEmpty: StateFlow<Boolean> = _rowNameEmpty
 
+    private var _isProcessing = MutableStateFlow(false)
+    val isProcessing: StateFlow<Boolean> = _isProcessing
+
     private var items = arrayListOf<TableItemFinal>()
     private var index = 0
     private var templateName = ""
@@ -82,6 +85,7 @@ class TableTemplateGroupViewModel
 
     override fun load(name: String, loadFromCacheIfExists: Boolean) {
         viewModelScope.launch(coroutineDispatcher) {
+            _isProcessing.value = true
             templateName = name
             exception = null
             var errorMessage = ""
@@ -115,12 +119,14 @@ class TableTemplateGroupViewModel
                     tableTemplateGroupVmChangesCache.set(templateName, items)
                 }
             }
+            _isProcessing.value = false
             _status.value = TableTemplateStatus(success, items, index, errorMessage, exception)
         }
     }
 
     override fun save(name: String) {
         viewModelScope.launch(coroutineDispatcher) {
+            _isProcessing.value = true
             templateName = name
             exception = null
             var success = false
@@ -146,15 +152,18 @@ class TableTemplateGroupViewModel
             if (success) {
                 tableTemplateGroupVmChangesCache.updateCurrent(templateName, items)
             }
+            _isProcessing.value = false
             _status.value = TableTemplateStatus(success, items, index, errorMessage, exception)
         }
     }
 
     override fun new() {
+        _isProcessing.value = true
         items.clear()
         items.add(TableItemFinal(name = "", dataType = ItemType.STRING,
             isPrimary = false, value = "", editable = true, isSortKey = false)
         )
+        _isProcessing.value = false
         _status.value = TableTemplateStatus(true, items, index, "", null)
     }
 

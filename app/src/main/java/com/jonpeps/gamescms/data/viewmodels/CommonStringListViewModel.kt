@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
+import com.jonpeps.gamescms.data.serialization.ICommonDeleteFileHelper
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.viewmodels.factories.ListViewModelFactory
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.IStringListItemsVmChangesCache
-import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel.Companion.JSON_ITEM_TO_LOAD_IS_NULL
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,18 +23,20 @@ data class StringListStatus(
     val ex: Exception?)
 
 interface ICommonStringListViewModel {
-    fun load(cacheName: String, pathToList: String, loadFromCacheIfExists: Boolean = true)
+    fun load(cacheName: String, loadFromCacheIfExists: Boolean = true)
     fun add(name: String)
-    fun delete(pathToFile: String, name: String)
+    fun delete(name: String)
 }
 
 @HiltViewModel(assistedFactory = ListViewModelFactory.ICommonStringListViewModelFactory::class)
 class CommonStringListViewModel
 @AssistedInject constructor(
-    @Assisted private val stringListPath: String,
+    @Assisted("param1") private val tableTemplateFilesPath: String,
+    @Assisted("param2") private val stringListPath: String,
     private val moshiStringListRepository: IMoshiStringListRepository,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val listItemsVmChangesCache: IStringListItemsVmChangesCache,
+    private val commonDeleteFileHelper: ICommonDeleteFileHelper,
     private val coroutineDispatcher: CoroutineDispatcher
 ): ViewModel(), ICommonStringListViewModel {
     private val _status = MutableStateFlow(StringListStatus(true, arrayListOf(), "", null))
@@ -44,15 +46,15 @@ class CommonStringListViewModel
     val isProcessing: StateFlow<Boolean> = _isProcessing
 
     private var items = arrayListOf<String>()
-    private var index = 0
     private var cacheName = ""
     private var exception: Exception? = null
 
 
-    override fun load(cacheName: String, pathToList: String, loadFromCacheIfExists: Boolean) {
+    override fun load(cacheName: String, loadFromCacheIfExists: Boolean) {
         this.cacheName = cacheName
         viewModelScope.launch(coroutineDispatcher) {
             _isProcessing.value = true
+            items.clear()
             exception = null
             var errorMessage = ""
             var success = true
@@ -60,18 +62,18 @@ class CommonStringListViewModel
                 items = ArrayList(listItemsVmChangesCache.get(cacheName))
             } else {
                 try {
-                    initReadFiles(pathToList)
-                    if (moshiStringListRepository.load(pathToList)) {
-                        val stringList = moshiStringListRepository.getItem(pathToList)
+                    initReadFiles()
+                    if (moshiStringListRepository.load(cacheName)) {
+                        val stringList = moshiStringListRepository.getItem(cacheName)
                         if (stringList != null) {
                             items = ArrayList(stringList.list)
                         } else {
                             success = false
-                            errorMessage = JSON_ITEM_TO_LOAD_IS_NULL + pathToList
+                            errorMessage = FAILED_TO_LOAD_FILE + stringListPath
                         }
                     } else {
                         success = false
-                        errorMessage = JSON_ITEM_TO_LOAD_IS_NULL + pathToList
+                        errorMessage = FAILED_TO_LOAD_FILE + stringListPath
                     }
                 } catch (ex: Exception) {
                     exception = ex
@@ -81,24 +83,61 @@ class CommonStringListViewModel
                 if (success) {
                     listItemsVmChangesCache.set(cacheName, items)
                 }
-                _status.value = StringListStatus(success, items, errorMessage, exception)
             }
+            _isProcessing.value = false
+            _status.value = StringListStatus(success, items, errorMessage, exception)
         }
     }
 
     override fun add(name: String) {
-        TODO("Not yet implemented")
+        viewModelScope.launch(coroutineDispatcher) {
+            _isProcessing.value = true
+            initWriteFiles(name)
+            items.add(name)
+            var success = true
+            if (moshiStringListRepository.save(cacheName, StringListMoshi(items))) {
+                listItemsVmChangesCache.set(cacheName, items)
+            } else {
+                success = false
+            }
+            _isProcessing.value = false
+            _status.value = StringListStatus(success, items, if (success) "" else FAILED_TO_SAVE_FILE + name, null)
+        }
     }
 
-    override fun delete(pathToFile: String, name: String) {
-        TODO("Not yet implemented")
+    override fun delete(name: String) {
+        viewModelScope.launch(coroutineDispatcher) {
+            _isProcessing.value = true
+            initWriteFiles(name)
+            items.remove(name)
+            var success = true
+            var message = ""
+            if (moshiStringListRepository.save(cacheName, StringListMoshi(items))) {
+                listItemsVmChangesCache.set(cacheName, items)
+                val deleted = moshiStringListRepository.delete(stringListPath, name)
+                if (!deleted) {
+                    success = false
+                    message = FAILED_TO_DELETE_FILE + name
+                } else {
+                    if (!commonDeleteFileHelper.deleteFile(tableTemplateFilesPath, name)) {
+                        success = false
+                        message = FAILED_TO_DELETE_FILE + name
+                    }
+                }
+            } else {
+                success = false
+                message = FAILED_TO_SAVE_FILE + name
+            }
+            _isProcessing.value = false
+            _status.value = StringListStatus(success, items, message, null)
+        }
     }
 
-    private fun initReadFiles(name: String) {
+    private fun initReadFiles() {
         moshiStringListRepository.setAbsoluteFile(
-            commonSerializationRepoHelper.getAbsoluteFile(stringListPath, name))
+            commonSerializationRepoHelper.getAbsoluteFile(stringListPath, ""))
         moshiStringListRepository.setBufferReader(
-            commonSerializationRepoHelper.getBufferReader(stringListPath, name))
+            commonSerializationRepoHelper.getBufferReader(stringListPath, ""))
     }
 
     private fun initWriteFiles(name: String) {
@@ -111,5 +150,11 @@ class CommonStringListViewModel
             commonSerializationRepoHelper.getFileWriter(stringListPath, name))
         moshiStringListRepository
             .setItem(cacheName, StringListMoshi(items))
+    }
+
+    companion object {
+        const val FAILED_TO_LOAD_FILE = "Failed to load file: "
+        const val FAILED_TO_DELETE_FILE = "Failed to delete file: "
+        const val FAILED_TO_SAVE_FILE = "Failed to save file: "
     }
 }

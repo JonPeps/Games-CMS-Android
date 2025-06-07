@@ -1,5 +1,7 @@
 package com.jonpeps.gamescms.hilt.di
 
+import com.jonpeps.gamescms.data.serialization.CommonDeleteFileHelper
+import com.jonpeps.gamescms.data.serialization.ICommonDeleteFileHelper
 import com.jonpeps.gamescms.data.serialization.moshi.IStringListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.moshi.ITableItemListMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.moshi.MoshiJsonAdapterCreator
@@ -47,5 +49,10 @@ class SerializationDiProvider {
     @Provides
     fun providesStringListItemsVmChangesCache(): IStringListItemsVmChangesCache {
         return StringListItemsVmChangesCache()
+    }
+
+    @Provides
+    fun providesCommonDeleteFileHelper(): ICommonDeleteFileHelper {
+        return CommonDeleteFileHelper()
     }
 }
