@@ -5,6 +5,7 @@ import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.ICommonDeleteFileHelper
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.viewmodels.CommonStringListViewModel
+import com.jonpeps.gamescms.data.viewmodels.CommonStringListViewModel.Companion.FAILED_TO_DELETE_FILE
 import com.jonpeps.gamescms.data.viewmodels.CommonStringListViewModel.Companion.FAILED_TO_LOAD_FILE
 import com.jonpeps.gamescms.data.viewmodels.CommonStringListViewModel.Companion.FAILED_TO_SAVE_FILE
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.IStringListItemsVmChangesCache
@@ -165,7 +166,143 @@ class CommonStringListViewModelTests {
         assert(viewModel.status.value.items.size == 0)
     }
 
+    @Test
+    fun `add string list SUCCESS WHEN IO files are VALID and save to repository RETURNS TRUE`() {
+        setupForWritingFiles()
+        every { commonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { commonSerializationRepoHelper.getFileWriter(any(), any()) } returns mockk()
+        every { commonSerializationRepoHelper.getDirectoryFile(any()) } returns mockk()
+        every { commonSerializationRepoHelper.getMainFile(any()) } returns mockk()
 
+        coEvery { moshiStringListRepository.save(any(), any()) } returns true
+
+        viewModel.add("test")
+
+        verify { listItemsVmChangesCache.set(any(), any()) }
+
+        assert(viewModel.status.value.success)
+        assert(viewModel.status.value.message == "")
+        assert(viewModel.status.value.ex == null)
+        assert(viewModel.status.value.items.size == 1)
+    }
+
+    @Test
+    fun `add string list FAILURE WHEN IO files are VALID and save to repository RETURNS FALSE`() {
+        setupForWritingFiles()
+        every { commonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { commonSerializationRepoHelper.getFileWriter(any(), any()) } returns mockk()
+        every { commonSerializationRepoHelper.getDirectoryFile(any()) } returns mockk()
+        every { commonSerializationRepoHelper.getMainFile(any()) } returns mockk()
+
+        coEvery { moshiStringListRepository.save(any(), any()) } returns false
+
+        viewModel.add("test")
+
+        assert(!viewModel.status.value.success)
+        assert(viewModel.status.value.message == FAILED_TO_SAVE_FILE + "test")
+        assert(viewModel.status.value.ex == null)
+        assert(viewModel.status.value.items.size == 0)
+    }
+
+    @Test
+    fun `delete string SUCCESS WHEN IO files are VALID AND DELETE file RETURNS TRUE as well as SAVE files RETURNS TRUE`() {
+        setupForWritingFiles()
+        every { commonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { commonSerializationRepoHelper.getFileWriter(any(), any()) } returns mockk()
+        every { commonSerializationRepoHelper.getDirectoryFile(any()) } returns mockk()
+        every { commonSerializationRepoHelper.getMainFile(any()) } returns mockk()
+        coEvery { moshiStringListRepository.delete(any(), any()) } returns true
+        every { commonDeleteFileHelper.deleteFile(any(), any()) } returns true
+        coEvery { moshiStringListRepository.delete(any(), any()) } returns true
+        every { commonDeleteFileHelper.deleteFile(any(), any()) } returns true
+        coEvery { moshiStringListRepository.delete(any(), any()) } returns true
+
+        viewModel.delete("test")
+
+        assert(viewModel.status.value.success)
+        assert(viewModel.status.value.message == "")
+        assert(viewModel.status.value.ex == null)
+        assert(viewModel.status.value.items.size == 0)
+    }
+
+    @Test
+    fun `delete string SUCCESS WHEN IO files are VALID AND DELETE file returns TRUE AND SAVE REPO returns TRUE AND DELETE file SUCCESS`() {
+        setupForWritingFiles()
+        every { commonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { commonSerializationRepoHelper.getFileWriter(any(), any()) } returns mockk()
+        every { commonSerializationRepoHelper.getDirectoryFile(any()) } returns mockk()
+        every { commonSerializationRepoHelper.getMainFile(any()) } returns mockk()
+        coEvery { moshiStringListRepository.delete(any(), any()) } returns true
+        coEvery { moshiStringListRepository.save(any(), any()) } returns true
+        every { commonDeleteFileHelper.deleteFile(any(), any()) } returns true
+
+        viewModel.delete("test")
+
+        verify { listItemsVmChangesCache.set(any(), any()) }
+
+        assert(viewModel.status.value.success)
+        assert(viewModel.status.value.message == "")
+        assert(viewModel.status.value.ex == null)
+        assert(viewModel.status.value.items.size == 0)
+    }
+
+    @Test
+    fun `delete string FAILURE WHEN IO files are VALID AND DELETE file returns TRUE BUT SAVE to repo FAILS`() {
+        setupForWritingFiles()
+        every { commonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { commonSerializationRepoHelper.getFileWriter(any(), any()) } returns mockk()
+        every { commonSerializationRepoHelper.getDirectoryFile(any()) } returns mockk()
+        every { commonSerializationRepoHelper.getMainFile(any()) } returns mockk()
+        coEvery { moshiStringListRepository.delete(any(), any()) } returns true
+        every { commonDeleteFileHelper.deleteFile(any(), any()) } returns true
+        coEvery { moshiStringListRepository.delete(any(), any()) } returns true
+        every { commonDeleteFileHelper.deleteFile(any(), any()) } returns true
+        coEvery { moshiStringListRepository.delete(any(), any()) } returns true
+        coEvery { moshiStringListRepository.save(any(), any()) } returns false
+
+        viewModel.delete("test")
+
+        assert(!viewModel.status.value.success)
+        assert(viewModel.status.value.message == FAILED_TO_SAVE_FILE + "test")
+        assert(viewModel.status.value.ex == null)
+        assert(viewModel.status.value.items.size == 0)
+    }
+
+    @Test
+    fun `delete string FAILURE WHEN IO files are VALID AND DELETE file returns FALSE`() {
+        setupForWritingFiles()
+        every { commonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { commonSerializationRepoHelper.getFileWriter(any(), any()) } returns mockk()
+        every { commonSerializationRepoHelper.getDirectoryFile(any()) } returns mockk()
+        every { commonSerializationRepoHelper.getMainFile(any()) } returns mockk()
+        coEvery { moshiStringListRepository.delete(any(), any()) } returns false
+
+        viewModel.delete("test")
+
+        assert(!viewModel.status.value.success)
+        assert(viewModel.status.value.message == FAILED_TO_DELETE_FILE + "test")
+        assert(viewModel.status.value.ex == null)
+        assert(viewModel.status.value.items.size == 0)
+    }
+
+    @Test
+    fun `delete string FAILURE WHEN IO files are VALID AND DELETE file returns TRUE AND SAVE REPO returns TRUE BUT DELETE file FAILS`() {
+        setupForWritingFiles()
+        every { commonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { commonSerializationRepoHelper.getFileWriter(any(), any()) } returns mockk()
+        every { commonSerializationRepoHelper.getDirectoryFile(any()) } returns mockk()
+        every { commonSerializationRepoHelper.getMainFile(any()) } returns mockk()
+        coEvery { moshiStringListRepository.delete(any(), any()) } returns true
+        coEvery { moshiStringListRepository.save(any(), any()) } returns true
+        every { commonDeleteFileHelper.deleteFile(any(), any()) } returns false
+
+        viewModel.delete("test")
+
+        assert(!viewModel.status.value.success)
+        assert(viewModel.status.value.message == FAILED_TO_DELETE_FILE + "test")
+        assert(viewModel.status.value.ex == null)
+        assert(viewModel.status.value.items.size == 0)
+    }
 
     private fun setupForReadingFiles() {
         every { moshiStringListRepository.setAbsoluteFile(any()) } returns Unit
@@ -173,9 +310,10 @@ class CommonStringListViewModelTests {
     }
 
     private fun setupForWritingFiles() {
+        every { moshiStringListRepository.setAbsoluteFile(any()) } returns Unit
         every { moshiStringListRepository.setDirectoryFile(any()) } returns Unit
-        every { moshiStringListRepository.setFileWriter(any()) } returns Unit
         every { moshiStringListRepository.setFile(any()) } returns Unit
-        every { moshiStringListRepository.setItem(cachedListName, any()) } returns Unit
+        every { moshiStringListRepository.setFileWriter(any()) } returns Unit
+        every { moshiStringListRepository.setItem(any(), any()) } returns Unit
     }
 }

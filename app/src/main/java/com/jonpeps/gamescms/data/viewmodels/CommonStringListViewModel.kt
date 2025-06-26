@@ -99,6 +99,7 @@ class CommonStringListViewModel
                 listItemsVmChangesCache.set(cacheName, items)
             } else {
                 success = false
+                items.remove(name)
             }
             _isProcessing.value = false
             _status.value = StringListStatus(success, items, if (success) "" else FAILED_TO_SAVE_FILE + name, null)
@@ -112,21 +113,21 @@ class CommonStringListViewModel
             items.remove(name)
             var success = true
             var message = ""
-            if (moshiStringListRepository.save(cacheName, StringListMoshi(items))) {
-                listItemsVmChangesCache.set(cacheName, items)
-                val deleted = moshiStringListRepository.delete(stringListPath, name)
-                if (!deleted) {
+            if (moshiStringListRepository.delete(stringListPath, name)) {
+                if (!moshiStringListRepository.save(cacheName, StringListMoshi(items))) {
                     success = false
-                    message = FAILED_TO_DELETE_FILE + name
+                    message = FAILED_TO_SAVE_FILE + name
                 } else {
                     if (!commonDeleteFileHelper.deleteFile(tableTemplateFilesPath, name)) {
                         success = false
                         message = FAILED_TO_DELETE_FILE + name
+                    } else {
+                        listItemsVmChangesCache.set(cacheName, items)
                     }
                 }
             } else {
                 success = false
-                message = FAILED_TO_SAVE_FILE + name
+                message = FAILED_TO_DELETE_FILE + name
             }
             _isProcessing.value = false
             _status.value = StringListStatus(success, items, message, null)
