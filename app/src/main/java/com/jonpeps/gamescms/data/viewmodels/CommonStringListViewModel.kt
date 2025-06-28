@@ -6,6 +6,7 @@ import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.ICommonDeleteFileHelper
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
+import com.jonpeps.gamescms.data.serialization.SubDeleteFlag
 import com.jonpeps.gamescms.data.viewmodels.factories.ListViewModelFactory
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.IStringListItemsVmChangesCache
 import dagger.assisted.Assisted
@@ -22,16 +23,18 @@ data class StringListStatus(
     val message: String?,
     val ex: Exception?)
 
+
+
 interface ICommonStringListViewModel {
     fun load(cacheName: String, loadFromCacheIfExists: Boolean = true)
     fun add(name: String)
-    fun delete(name: String)
+    fun delete(name: String, subDeleteFlag: SubDeleteFlag = SubDeleteFlag.NONE)
 }
 
 @HiltViewModel(assistedFactory = ListViewModelFactory.ICommonStringListViewModelFactory::class)
 class CommonStringListViewModel
 @AssistedInject constructor(
-    @Assisted("param1") private val tableTemplateFilesPath: String,
+    @Assisted("param1") private val directoryOrFilesPath: String,
     @Assisted("param2") private val stringListPath: String,
     private val moshiStringListRepository: IMoshiStringListRepository,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
@@ -48,7 +51,6 @@ class CommonStringListViewModel
     private var items = arrayListOf<String>()
     private var cacheName = ""
     private var exception: Exception? = null
-
 
     override fun load(cacheName: String, loadFromCacheIfExists: Boolean) {
         this.cacheName = cacheName
@@ -106,7 +108,7 @@ class CommonStringListViewModel
         }
     }
 
-    override fun delete(name: String) {
+    override fun delete(name: String, subDeleteFlag: SubDeleteFlag) {
         viewModelScope.launch(coroutineDispatcher) {
             _isProcessing.value = true
             initWriteFiles(name)
@@ -114,16 +116,16 @@ class CommonStringListViewModel
             var success = true
             var message = ""
             if (moshiStringListRepository.delete(stringListPath, name)) {
-                if (!moshiStringListRepository.save(cacheName, StringListMoshi(items))) {
+                if (moshiStringListRepository.save(cacheName, StringListMoshi(items))) {
+                    if (commonDeleteFileHelper.onSubDelete(directoryOrFilesPath, name, subDeleteFlag)) {
+                        listItemsVmChangesCache.set(cacheName, items)
+                    } else {
+                        success = false
+                        message = FAILED_TO_DELETE_FILE_OR_DIRECTORY + name
+                    }
+                } else {
                     success = false
                     message = FAILED_TO_SAVE_FILE + name
-                } else {
-                    if (!commonDeleteFileHelper.deleteFile(tableTemplateFilesPath, name)) {
-                        success = false
-                        message = FAILED_TO_DELETE_FILE + name
-                    } else {
-                        listItemsVmChangesCache.set(cacheName, items)
-                    }
                 }
             } else {
                 success = false
@@ -156,6 +158,7 @@ class CommonStringListViewModel
     companion object {
         const val FAILED_TO_LOAD_FILE = "Failed to load file: "
         const val FAILED_TO_DELETE_FILE = "Failed to delete file: "
+        const val FAILED_TO_DELETE_FILE_OR_DIRECTORY = "Failed to delete file/directory: "
         const val FAILED_TO_SAVE_FILE = "Failed to save file: "
     }
 }

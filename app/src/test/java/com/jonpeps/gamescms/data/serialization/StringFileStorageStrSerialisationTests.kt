@@ -169,89 +169,22 @@ class StringFileStorageStrSerialisationTests {
     }
 
     @Test
-    fun `READ from file SUCCESS WHEN file EXISTS`() = runTest(dispatcher) {
-        val strFileStorageStrSerialisation
-                = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
-        assert(strFileStorageStrSerialisation.getErrorMsg() == "")
-        every { directory.name } returns ""
-        every { directory.exists() } returns true
-        every { absoluteFile.exists() } returns true
+    fun `READ SUCCESS WHEN buffer is populated`() = runTest(dispatcher) {
         every { stringSerialization.read(bufferReader) } returns true
         every { stringSerialization.getContents() } returns "test"
-        val result = strFileStorageStrSerialisation.read(absoluteFile, bufferReader)
-        assert(strFileStorageStrSerialisation.getContents() == "test")
+        val strFileStorageStrSerialisation
+                = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
+        val result = strFileStorageStrSerialisation.read(bufferReader)
         assert(result)
     }
 
     @Test
-    fun `READ from file FAILS WHEN absolute file DOES NOT EXIST`() = runTest(dispatcher) {
-        val strFileStorageStrSerialisation
-                = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
-        assert(strFileStorageStrSerialisation.getErrorMsg() == "")
-        every { absoluteFile.name } returns ""
-        every { absoluteFile.exists() } returns false
-        val result = strFileStorageStrSerialisation.read(absoluteFile, bufferReader)
-        assert(strFileStorageStrSerialisation.getErrorMsg() == StringFileStorageStrSerialisation.FILE_DOES_NOT_EXIST + absoluteFile.name)
-        assert(!result)
-    }
-
-    @Test
-    fun `READ from file FAILS WHEN file DOES NOT EXIST`() = runTest(dispatcher) {
-        val strFileStorageStrSerialisation
-                = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
-        assert(strFileStorageStrSerialisation.getErrorMsg() == "")
-        every { file.name } returns ""
-        every { absoluteFile.name } returns ""
-        every { absoluteFile.exists() } returns false
-        val result = strFileStorageStrSerialisation.read(absoluteFile, bufferReader)
-        assert(strFileStorageStrSerialisation.getErrorMsg() == StringFileStorageStrSerialisation.FILE_DOES_NOT_EXIST + file.name)
-        assert(!result)
-    }
-
-    @Test
-    fun `READ from file FAILS WHEN file EXISTS check THROWS an exception`() = runTest(dispatcher) {
-        val strFileStorageStrSerialisation
-                = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
-        every { absoluteFile.name } returns ""
-        every { securityException.message } returns ""
-        every { absoluteFile.exists() } throws securityException
-        val result = strFileStorageStrSerialisation.read(absoluteFile, bufferReader)
-        assert(strFileStorageStrSerialisation.getErrorMsg() == securityException.message.toString())
-        assert(!result)
-    }
-
-    @Test
-    fun `READ from file SUCCESS WHEN string serialisation READ RETURNS TRUE`() = runTest(dispatcher) {
-        val strFileStorageStrSerialisation
-                = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
-        every { absoluteFile.name } returns ""
-        every { absoluteFile.exists() } returns true
-        every { stringSerialization.read(bufferReader) } returns true
-        every { stringSerialization.getContents() } returns "test"
-        val result = strFileStorageStrSerialisation.read(absoluteFile, bufferReader)
-        assert(result)
-        assert(strFileStorageStrSerialisation.getContents() == "test")
-    }
-
-    @Test
-    fun `READ from file FAILS WHEN string serialisation READ RETURNS FALSE`() = runTest(dispatcher) {
-        val strFileStorageStrSerialisation
-                = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
-        every { absoluteFile.name } returns ""
-        every { absoluteFile.exists() } returns true
-        every { stringSerialization.getErrorMsg() } returns ""
+    fun `READ FAILS WHEN buffer is NOT populated`() = runTest(dispatcher) {
         every { stringSerialization.read(bufferReader) } returns false
-        val result = strFileStorageStrSerialisation.read(absoluteFile, bufferReader)
-        assert(!result)
-        assert(strFileStorageStrSerialisation.getErrorMsg() == stringSerialization.getErrorMsg())
-    }
-
-    @Test
-    fun `READ from file FAILS WHEN read file contents RETURNS FALSE`() = runTest(dispatcher) {
+        every { stringSerialization.getErrorMsg() } returns "An error occurred!"
         val strFileStorageStrSerialisation
                 = StringFileStorageStrSerialisation(stringSerialization, dispatcher)
-        assert(strFileStorageStrSerialisation.getErrorMsg() == "")
-        val result = strFileStorageStrSerialisation.read(absoluteFile, bufferReader)
+        val result = strFileStorageStrSerialisation.read(bufferReader)
         assert(!result)
     }
 

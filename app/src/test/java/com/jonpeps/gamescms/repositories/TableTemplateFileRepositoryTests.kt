@@ -70,7 +70,7 @@ class TableTemplateFileRepositoryTests {
     @Test
     fun `LOAD table template FAILS WHEN READ Json file RETURNS FALSE`() = runTest(dispatcher) {
         assert(tableTemplateRepository.getErrorMsg() == "")
-        coEvery { stringFileStorageStrSerialisation.read(absolutePath, bufferedReader) } returns false
+        coEvery { stringFileStorageStrSerialisation.read(bufferedReader) } returns false
         every { stringFileStorageStrSerialisation.getErrorMsg() } returns "An error occurred!"
         val result = tableTemplateRepository.load(templateName)
         assert(tableTemplateRepository.getErrorMsg() == stringFileStorageStrSerialisation.getErrorMsg())
@@ -80,7 +80,7 @@ class TableTemplateFileRepositoryTests {
     @Test
     fun `LOAD table template AND read JSON file SUCCESS BUT JSON convert RETURNS FALSE`() = runTest(dispatcher) {
         assert(tableTemplateRepository.getErrorMsg() == "")
-        coEvery { (stringFileStorageStrSerialisation.read(absolutePath, bufferedReader)) } returns true
+        coEvery { (stringFileStorageStrSerialisation.read(bufferedReader)) } returns true
         every { stringFileStorageStrSerialisation.getContents() } returns "test"
         coEvery { tableItemListMoshiSerialization.fromJson("test") } returns false
         every { tableItemListMoshiSerialization.getErrorMsg() } returns "An error occurred!"

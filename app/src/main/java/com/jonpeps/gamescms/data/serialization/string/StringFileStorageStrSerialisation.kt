@@ -14,7 +14,7 @@ interface IStringFileStorageStrSerialisation {
                       fileWriter: FileWriter,
                       contents: String): Boolean
 
-    suspend fun read(absoluteFile: File, bufferedReader: BufferedReader): Boolean
+    suspend fun read(bufferedReader: BufferedReader): Boolean
 
     fun getContents(): String
     fun getErrorMsg(): String
@@ -60,21 +60,11 @@ class StringFileStorageStrSerialisation
         }
     }
 
-    override suspend fun read(absoluteFile: File, bufferedReader: BufferedReader): Boolean {
+    override suspend fun read(bufferedReader: BufferedReader): Boolean {
         return withContext(dispatcher) {
             errorMsg = ""
             contents = ""
             var success = true
-            try {
-                if (!absoluteFile.exists()) {
-                    errorMsg = FILE_DOES_NOT_EXIST + absoluteFile.name
-                    success = false
-                }
-            } catch (ex: Exception) {
-                errorMsg = ex.message.toString()
-                success = false
-            }
-            if (!success) return@withContext false
             if (stringSerialization.read(bufferedReader)) {
                 contents = stringSerialization.getContents()
             } else {

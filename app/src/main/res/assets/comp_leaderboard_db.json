@@ -1,0 +1,37 @@
+{
+    "template_name": "comp_leaderboard_db",
+    "items": [
+        {
+            "name": "GUID",
+            "dataType": "String",
+            "isPrimary": true,
+            "editable": false
+        },
+        {
+            "name": "Name",
+            "dataType": "String",
+            "editable": false
+        },
+        {
+            "name": "Email",
+            "dataType": "String",
+            "editable": false
+        },
+        {
+            "name": "Score",
+            "dataType": "Int",
+            "isSortKey": true,
+            "editable": false
+        },
+        {
+            "name": "Position",
+            "dataType": "Int",
+            "editable": false
+        },
+        {
+            "name": "Date",
+            "dataType": "String",
+            "editable": false
+        }
+    ]
+}

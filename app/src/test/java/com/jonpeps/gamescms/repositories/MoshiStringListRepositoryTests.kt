@@ -67,7 +67,7 @@ class MoshiStringListRepositoryTests {
     @Test
     fun `LOAD string list SUCCESS`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
-        coEvery { stringFileStorageStrSerialisation.read(absolutePath, bufferedReader) } returns true
+        coEvery { stringFileStorageStrSerialisation.read(bufferedReader) } returns true
         coEvery { strListMoshiSerialization.fromJson("") } returns true
         every { stringFileStorageStrSerialisation.getContents() } returns ""
         every { strListMoshiSerialization.getItem() } returns dummyData
@@ -81,7 +81,7 @@ class MoshiStringListRepositoryTests {
     fun `LOAD string list AND READ JSON string RETURNS FALSE`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
         every { stringFileStorageStrSerialisation.getErrorMsg() } returns "An error occurred!"
-        coEvery { stringFileStorageStrSerialisation.read(absolutePath, bufferedReader) } returns false
+        coEvery { stringFileStorageStrSerialisation.read(bufferedReader) } returns false
         val result = moshiStringListRepository.load(templateName)
         assert(stringFileStorageStrSerialisation.getErrorMsg() == moshiStringListRepository.getErrorMsg())
         assert(!result)
@@ -93,7 +93,7 @@ class MoshiStringListRepositoryTests {
         every { strListMoshiSerialization.getErrorMsg() } returns "An error occurred!"
         every { stringFileStorageStrSerialisation.getErrorMsg() } returns strListMoshiSerialization.getErrorMsg()
         every { stringFileStorageStrSerialisation.getContents() } returns ""
-        coEvery { stringFileStorageStrSerialisation.read(absolutePath, bufferedReader) } returns true
+        coEvery { stringFileStorageStrSerialisation.read(bufferedReader) } returns true
         coEvery { strListMoshiSerialization
             .fromJson(stringFileStorageStrSerialisation.getContents()) } returns false
         val result = moshiStringListRepository.load(templateName)

@@ -1,0 +1,49 @@
+{
+    "template_name": "comp_info_db",
+    "items": [
+        {
+            "name": "CompNo",
+            "dataType": "Int",
+            "isPrimary": true,
+            "defaultValue": "1",
+            "editable": false
+        },
+        {
+            "name": "StartDate",
+            "dataType": "UtcDate",
+            "isSortKey": true,
+            "editable": true
+        },
+        {
+            "name": "EndDate",
+            "dataType": "UtcDate",
+            "editable": true
+        },
+        {
+            "name": "CompStartDateTextual",
+            "dataType": "String",
+            "editable": true
+        },
+        {
+            "name": "CompEndDateTextual",
+            "dataType": "String",
+            "editable": true
+        },
+        {
+            "name": "MainCompDatabaseName",
+            "dataType": "String",
+            "defaultValue": "{p}_Comp_{#}",
+            "editable": false
+        },
+        {
+            "name": "PreText",
+            "dataType": "String",
+            "editable": true
+        },
+        {
+            "name": "PrizeText",
+            "dataType": "String",
+            "editable": true
+        }
+    ]
+}

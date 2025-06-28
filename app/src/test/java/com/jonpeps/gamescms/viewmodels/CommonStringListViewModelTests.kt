@@ -6,6 +6,7 @@ import com.jonpeps.gamescms.data.serialization.ICommonDeleteFileHelper
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.viewmodels.CommonStringListViewModel
 import com.jonpeps.gamescms.data.viewmodels.CommonStringListViewModel.Companion.FAILED_TO_DELETE_FILE
+import com.jonpeps.gamescms.data.viewmodels.CommonStringListViewModel.Companion.FAILED_TO_DELETE_FILE_OR_DIRECTORY
 import com.jonpeps.gamescms.data.viewmodels.CommonStringListViewModel.Companion.FAILED_TO_LOAD_FILE
 import com.jonpeps.gamescms.data.viewmodels.CommonStringListViewModel.Companion.FAILED_TO_SAVE_FILE
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.IStringListItemsVmChangesCache
@@ -234,7 +235,7 @@ class CommonStringListViewModelTests {
         every { commonSerializationRepoHelper.getMainFile(any()) } returns mockk()
         coEvery { moshiStringListRepository.delete(any(), any()) } returns true
         coEvery { moshiStringListRepository.save(any(), any()) } returns true
-        every { commonDeleteFileHelper.deleteFile(any(), any()) } returns true
+        every { commonDeleteFileHelper.onSubDelete(any(), any(), any()) } returns true
 
         viewModel.delete("test")
 
@@ -294,12 +295,12 @@ class CommonStringListViewModelTests {
         every { commonSerializationRepoHelper.getMainFile(any()) } returns mockk()
         coEvery { moshiStringListRepository.delete(any(), any()) } returns true
         coEvery { moshiStringListRepository.save(any(), any()) } returns true
-        every { commonDeleteFileHelper.deleteFile(any(), any()) } returns false
+        every { commonDeleteFileHelper.onSubDelete(any(), any(), any()) } returns false
 
         viewModel.delete("test")
 
         assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == FAILED_TO_DELETE_FILE + "test")
+        assert(viewModel.status.value.message == FAILED_TO_DELETE_FILE_OR_DIRECTORY + "test")
         assert(viewModel.status.value.ex == null)
         assert(viewModel.status.value.items.size == 0)
     }

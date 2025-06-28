@@ -42,7 +42,7 @@ abstract class BaseMoshiJsonRepository<T>(
         errorMessage = ""
         var success = true
         val moshiSerializer = getMoshiSerializer()
-        val result = stringFileStorageStrSerialisation.read(mainAbsolutePath, mainBufferedReader)
+        val result = stringFileStorageStrSerialisation.read(mainBufferedReader)
         if (result) {
             val contents = stringFileStorageStrSerialisation.getContents()
             if(moshiSerializer.fromJson(contents)) {

@@ -1,0 +1,59 @@
+{
+    "template_name": "app_start_db",
+    "items": [
+        {
+            "name": "Id",
+            "dataType": "Int",
+            "isPrimary": true,
+            "defaultValue": "1",
+            "editable": false
+        },
+        {
+            "name": "BuildNo",
+            "dataType": "Int",
+            "defaultValue": "1",
+            "editable": true
+        },
+        {
+            "name": "GooglePlayLink",
+            "dataType": "String",
+            "editable": true
+        },
+        {
+            "name": "BlockAppStart",
+            "dataType": "Boolean",
+            "defaultValue": "false",
+            "editable": true
+        },
+        {
+            "name": "ByPassRequiredPlayersCheck",
+            "dataType": "Boolean",
+            "defaultValue": "false",
+            "editable": true
+        },
+        {
+            "name": "RequiredPlayersToStartComps",
+            "dataType": "Int",
+            "defaultValue": "1000",
+            "editable": true
+        },
+        {
+            "name": "CompsDatabaseName",
+            "dataType": "String",
+            "defaultValue": "{p}_Comps",
+            "editable": false
+        },
+        {
+            "name": "MaxLeaderboardPositions",
+            "dataType": "Int",
+            "defaultValue": "1000000",
+            "editable": true
+        },
+        {
+            "name": "CheckCompsStartingDatabaseName",
+            "dataType": "String",
+            "defaultValue": "{p}_InitialRegister",
+            "editable": false
+        }
+    ]
+}
