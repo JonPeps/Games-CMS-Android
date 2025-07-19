@@ -23,8 +23,6 @@ data class StringListStatus(
     val message: String?,
     val ex: Exception?)
 
-
-
 interface ICommonStringListViewModel {
     fun load(cacheName: String, loadFromCacheIfExists: Boolean = true)
     fun add(name: String)

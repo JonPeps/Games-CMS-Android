@@ -12,6 +12,8 @@ comGoogleDaggerHiltAndroidCompiler = "2.44"
 compiler = "1.5.15"
 composeBom = "2025.03.00"
 coreKtxVersion = "1.12.0"
+dagger = "2.56"
+daggerCompiler = "2.56"
 googleHiltAndroid = "2.48"
 googleHiltAndroidCompiler = "2.28-alpha"
 googleHiltAndroidCompilerVersion = "2.40"
@@ -39,6 +41,7 @@ appcompat = "1.7.0"
 kotlinxCoroutinesAndroid = "1.7.3"
 kotlinxCoroutinesCore = "1.7.1"
 kotlinxCoroutinesTest = "1.7.1"
+kotlinxMetadataJvm = "LATEST_KOTLINX_METADATA_VERSION"
 lifecycleRuntimeKtx = "2.8.7"
 material = "1.12.0"
 constraintlayout = "2.2.1"
@@ -59,7 +62,10 @@ mockkAndroidVersion = "1.13.5"
 mockkCommon = "1.11.0"
 mockkMockk = "1.11.0"
 mockkVersion = "1.0"
+moshi = "1.14.0"
+moshiKotlin = "LATEST_VERSION"
 moshiKotlinCodegen = "1.14.0"
+moshiKotlinCodegenVersion = "1.9.2"
 moshiKotlinVersion = "1.14.0"
 navigationFragmentKtx = "2.8.9"
 navigationUiKtx = "2.8.9"
@@ -93,6 +99,9 @@ androidx-material = { module = "androidx.compose.material:material", version.ref
 androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 androidx-material3-v132 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
 androidx-material3-v140alpha13 = { module = "androidx.compose.material3:material3", version.ref = "androidxMaterial3" }
+dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
+dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "daggerCompiler" }
+kotlinx-metadata-jvm = { module = "org.jetbrains.kotlinx:kotlinx-metadata-jvm", version.ref = "kotlinxMetadataJvm" }
 material3-window-size = { module = "androidx.compose.material3:material3-window-size-class", version.ref = "material3Version" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
@@ -153,7 +162,10 @@ mockk-android-v1135 = { module = "io.mockk:mockk-android", version.ref = "mockkA
 mockk-common = { module = "io.mockk:mockk-common", version.ref = "mockkCommon" }
 mockk-v10 = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
 mockk-v1110 = { module = "io.mockk:mockk", version.ref = "mockkMockk" }
+moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshiKotlinCodegen" }
+moshi-kotlin-codegen-v192 = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshiKotlinCodegenVersion" }
+moshi-kotlin-vlatestversion = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshiKotlin" }
 powermock-api-mockito = { module = "org.powermock:powermock-api-mockito", version.ref = "powermockApiMockito" }
 powermock-api-mockito2 = { module = "org.powermock:powermock-api-mockito2", version.ref = "powermockApiMockito2" }
 powermock-core = { module = "org.powermock:powermock-core", version.ref = "powermockCore" }

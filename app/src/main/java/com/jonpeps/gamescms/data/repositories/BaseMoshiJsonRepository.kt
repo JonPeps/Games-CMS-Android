@@ -1,11 +1,15 @@
 package com.jonpeps.gamescms.data.repositories
 
 import com.jonpeps.gamescms.data.helpers.IBasicStringGenericItemCache
-import com.jonpeps.gamescms.data.serialization.moshi.IBaseMoshiSerialization
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
+import com.squareup.moshi.JsonAdapter
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileWriter
+
+interface MoshiJsonAdapter<T> {
+    fun getJsonAdapter(): JsonAdapter<T>
+}
 
 interface IBaseMoshiJsonRepository<T> {
     suspend fun load(cacheName: String): Boolean
@@ -25,6 +29,7 @@ interface IBaseMoshiJsonRepository<T> {
 }
 
 abstract class BaseMoshiJsonRepository<T>(
+    private val moshiJsonAdapter: MoshiJsonAdapter<T>,
     private val stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation,
     private val basicStringGenericItemCache: IBasicStringGenericItemCache<T>
 ): IBaseMoshiJsonRepository<T> {
@@ -40,15 +45,15 @@ abstract class BaseMoshiJsonRepository<T>(
 
     override suspend fun load(cacheName: String): Boolean {
         errorMessage = ""
-        var success = true
-        val moshiSerializer = getMoshiSerializer()
-        val result = stringFileStorageStrSerialisation.read(mainBufferedReader)
-        if (result) {
+        var success = stringFileStorageStrSerialisation
+            .read(mainBufferedReader)
+        if (success) {
             val contents = stringFileStorageStrSerialisation.getContents()
-            if(moshiSerializer.fromJson(contents)) {
-                basicStringGenericItemCache.set(cacheName, moshiSerializer.getItem())
+            val jsonContents = moshiJsonAdapter.getJsonAdapter().fromJson(contents)
+            if(jsonContents != null) {
+                basicStringGenericItemCache.set(cacheName, jsonContents)
             } else {
-                errorMessage = moshiSerializer.getErrorMsg()
+                errorMessage = EMPTY_JSON_CONTENTS
                 success = false
             }
         } else {
@@ -61,26 +66,20 @@ abstract class BaseMoshiJsonRepository<T>(
     override suspend fun save(cacheName: String, item: T): Boolean {
         errorMessage = ""
         var success = false
-        val moshiSerializer = getMoshiSerializer()
-        if (moshiSerializer.toJson(item)) {
-            val toJsonItem = moshiSerializer.getToJsonItem()
-            if (toJsonItem != null) {
-                success = stringFileStorageStrSerialisation
-                    .write(directoryFile,
-                           mainFile,
-                           mainAbsolutePath,
-                           mainFileWriter,
-                           toJsonItem)
-                if (!success) {
-                    errorMessage = stringFileStorageStrSerialisation.getErrorMsg()
-                    return false
-                }
-            }
-        }
-        if (success) {
-            basicStringGenericItemCache.set(cacheName, item)
+        val jsonContents = moshiJsonAdapter.getJsonAdapter().toJson(item)
+        if (jsonContents.isNullOrEmpty()) {
+            errorMessage = CONVERT_TO_JSON_FAILED
         } else {
-            errorMessage = moshiSerializer.getErrorMsg()
+            success = stringFileStorageStrSerialisation.write(directoryFile,
+                                                              mainFile,
+                                                              mainAbsolutePath,
+                                                              mainFileWriter,
+                                                              jsonContents)
+            if (success) {
+                basicStringGenericItemCache.set(cacheName, item)
+            } else {
+                errorMessage = WRITE_TO_FILE_FAILED
+            }
         }
         return success
     }
@@ -124,5 +123,9 @@ abstract class BaseMoshiJsonRepository<T>(
         }
     }
 
-    abstract fun getMoshiSerializer(): IBaseMoshiSerialization<T>
+    companion object {
+        const val EMPTY_JSON_CONTENTS = "Failed to parse JSON content!"
+        const val CONVERT_TO_JSON_FAILED = "Failed to convert to JSON!"
+        const val WRITE_TO_FILE_FAILED = "Failed to write to file!"
+    }
 }

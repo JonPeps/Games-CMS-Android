@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
+    id("com.google.devtools.ksp") version "2.0.21-1.0.27" apply false
     id("org.jetbrains.kotlin.plugin.compose") version "2.1.0"
     id("com.google.dagger.hilt.android")
 }
@@ -99,8 +100,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     testImplementation(libs.junit)
-    implementation(libs.squareup.moshi.kotlin)
-    implementation(libs.moshi.kotlin.codegen)
     implementation(libs.hilt.android.v256)
     implementation(libs.androidx.room.runtime.v270)
     implementation(libs.androidx.room.ktx.v270)
@@ -113,4 +112,10 @@ dependencies {
     implementation(libs.mockk.common)
     testImplementation(libs.mockk.android.v1135)
     implementation(libs.androidx.material3.v140alpha13)
+    implementation(libs.squareup.moshi.kotlin)
+    implementation(libs.dagger)
+    kapt(libs.dagger.compiler)
+    implementation(libs.moshi)
+    implementation(libs.moshi.kotlin.vlatestversion)
+
 }
