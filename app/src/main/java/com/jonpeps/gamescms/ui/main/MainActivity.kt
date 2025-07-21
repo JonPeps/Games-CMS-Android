@@ -11,10 +11,11 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jonpeps.gamescms.data.viewmodels.CommonStringListViewModel
-import com.jonpeps.gamescms.data.viewmodels.ICommonStringListViewModel
 import com.jonpeps.gamescms.data.viewmodels.factories.ListViewModelFactory
 import com.jonpeps.gamescms.ui.applevel.DarkColors
 import com.jonpeps.gamescms.ui.applevel.LightColors
@@ -25,42 +26,45 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AppTheme(
-                false,
-        )
-    }
-}
-
-    @Composable
-    fun AppTheme(
-        useDarkTheme: Boolean = isSystemInDarkTheme()
-    ) {
-            val viewModel: ICommonStringListViewModel =
-                hiltViewModel<CommonStringListViewModel,
-                        ListViewModelFactory.ICommonStringListViewModelFactory>(
-                    creationCallback = { it.create("", "") }
-                )
-
+            val useDarkTheme = isSystemInDarkTheme()
             val colors = if (useDarkTheme) {
                 DarkColors
             } else {
                 LightColors
             }
+            val viewModel: CommonStringListViewModel =
+                hiltViewModel<CommonStringListViewModel,
+                        ListViewModelFactory.ICommonStringListViewModelFactory>(
+                    creationCallback = { it.create(
+                        "",
+                        "app/source/main/assets/table_template_list.json") }
+                )
 
-            Surface {
+            viewModel.load("ProjectsList")
+            MainContainer({ MainView(viewModel, colourScheme = colors) }, colourScheme = colors)
+        }
+}
+
+    @Composable
+    fun MainContainer(mainView: @Composable () -> Unit, colourScheme: ColorScheme) {
+          Surface {
                 MaterialTheme(
-                    colorScheme = colors,
+                    colorScheme = colourScheme,
                 ) {
-                    MainView(viewModel, colourScheme = colors)
+                    mainView()
                 }
             }
         }
     }
 
     @Composable
-    fun MainView(viewModel: ICommonStringListViewModel,
-                 colourScheme: ColorScheme) {
-        Column(modifier = Modifier.background(colourScheme.scrim).fillMaxHeight()) {
-            CommonStringListView(listOf("item1", "item2", "item3", "item4"))
+    fun MainView(viewModel: CommonStringListViewModel, colourScheme: ColorScheme) {
+        val processingState: Boolean by viewModel.isProcessing.collectAsStateWithLifecycle()
+        if (processingState) {
+            CommonLoadingScreen()
+        } else {
+            Column(modifier = Modifier.background(colourScheme.scrim).fillMaxHeight()) {
+                CommonStringListView(listOf("item1", "item2", "item3", "item4"))
+            }
         }
     }
