@@ -2,6 +2,8 @@ package com.jonpeps.gamescms.hilt.di
 
 import com.jonpeps.gamescms.data.serialization.CommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
+import com.jonpeps.gamescms.data.serialization.debug.AssetSerializationRepoHelper
+import com.jonpeps.gamescms.data.serialization.debug.IAssetSerializationRepoHelper
 import com.jonpeps.gamescms.dynamodb.services.IDynamoDbCreateTable
 import com.jonpeps.gamescms.ui.createtable.viewmodels.CreateTableViewModel
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmChangesCache
@@ -36,8 +38,13 @@ class ViewModelDiProvider {
 abstract class ViewModelHelperDiBindings {
     @Binds
     abstract fun bindCommonSerializationRepoHelper(
-        tableTemplateGroupVmRepoHelperImpl: CommonSerializationRepoHelper
+        commonSerializationRepoHelper: CommonSerializationRepoHelper
     ): ICommonSerializationRepoHelper
+
+    @Binds
+    abstract fun bindAssetSerializationRepoHelper(
+        assetSerializationRepoHelper: AssetSerializationRepoHelper
+    ): IAssetSerializationRepoHelper
 
     @Binds
     abstract fun bindTableTemplateGroupVmChangesCache(

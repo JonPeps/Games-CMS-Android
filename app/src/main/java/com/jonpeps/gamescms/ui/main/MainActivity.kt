@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
                         "app/source/main/assets/table_template_list.json") }
                 )
 
-            viewModel.load("ProjectsList")
+            viewModel.loadFromFile("ProjectsList")
             MainContainer({ MainView(viewModel, colourScheme = colors) }, colourScheme = colors)
         }
 }

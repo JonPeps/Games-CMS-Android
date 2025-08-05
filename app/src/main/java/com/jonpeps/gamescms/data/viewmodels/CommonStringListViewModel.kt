@@ -6,6 +6,7 @@ import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.ICommonDeleteFileHelper
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
+import com.jonpeps.gamescms.data.serialization.StringListStatus
 import com.jonpeps.gamescms.data.serialization.SubDeleteFlag
 import com.jonpeps.gamescms.data.viewmodels.factories.ListViewModelFactory
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.IStringListItemsVmChangesCache
@@ -17,14 +18,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-data class StringListStatus(
-    val success: Boolean,
-    val items: ArrayList<String>,
-    val message: String?,
-    val ex: Exception?)
-
 interface ICommonStringListViewModel {
-    fun load(cacheName: String, loadFromCacheIfExists: Boolean = true)
+    fun loadFromFile(cacheName: String, loadFromCacheIfExists: Boolean = true)
     fun add(name: String)
     fun delete(name: String, subDeleteFlag: SubDeleteFlag = SubDeleteFlag.NONE)
 }
@@ -50,7 +45,7 @@ class CommonStringListViewModel
     private var cacheName = ""
     private var exception: Exception? = null
 
-    override fun load(cacheName: String, loadFromCacheIfExists: Boolean) {
+    override fun loadFromFile(cacheName: String, loadFromCacheIfExists: Boolean) {
         this.cacheName = cacheName
         viewModelScope.launch(coroutineDispatcher) {
             _isProcessing.value = true
