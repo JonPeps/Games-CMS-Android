@@ -69,9 +69,12 @@ class AssetsStringListViewModel@AssistedInject constructor(
                     if (moshiStringListRepository.save(cacheName, StringListMoshi(items))) {
                         listItemsVmChangesCache.set(cacheName, items)
                     } else {
+                        items.clear()
                         success = false
+                        errorMessage = FAILED_TO_WRITE_FILE
                     }
                 } catch (ex: Exception) {
+                    items.clear()
                     exception = ex
                     errorMessage = ex.message.toString()
                     success = false
@@ -101,6 +104,7 @@ class AssetsStringListViewModel@AssistedInject constructor(
     }
 
     companion object {
-        const val FAILED_TO_LOAD_FILE = "Failed to load project list from assets!"
+        const val FAILED_TO_LOAD_FILE = "Failed to load string list from assets!"
+        const val FAILED_TO_WRITE_FILE = "Failed to write string list to local storage!"
     }
 }
