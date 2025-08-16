@@ -2,34 +2,37 @@ package com.jonpeps.gamescms.data.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jonpeps.gamescms.data.DataConstants.Companion.JSON_EXTENSION
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.StringListStatus
-import com.jonpeps.gamescms.data.serialization.debug.IAssetSerializationRepoHelper
+import com.jonpeps.gamescms.data.serialization.debug.IInputStreamSerializationRepoHelper
+import com.jonpeps.gamescms.data.viewmodels.factories.InputStreamStringListViewModelFactory
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.IStringListItemsVmChangesCache
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.io.InputStream
 
-interface IAssetsStringListViewModel {
-    fun loadFromAssets(cacheName: String, inputStream: InputStream)
+interface IInputStreamStringListViewModel {
+    fun loadFromInputStream(cacheName: String, inputStream: InputStream)
 }
 
-class AssetsStringListViewModel@AssistedInject constructor(
-    @Assisted("param2") private val stringListPath: String,
+@HiltViewModel(assistedFactory = InputStreamStringListViewModelFactory.IInputStreamStringListViewModelFactory::class)
+    class InputStreamStringListViewModel@AssistedInject constructor(
+    @Assisted("param1") private val stringListPath: String,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
-    private val assetSerializationRepoHelper: IAssetSerializationRepoHelper,
+    private val inputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper,
     private val moshiStringListRepository: IMoshiStringListRepository,
     private val listItemsVmChangesCache: IStringListItemsVmChangesCache,
     private val coroutineDispatcher: CoroutineDispatcher
-): ViewModel(), IAssetsStringListViewModel {
-    private val _status = MutableStateFlow(StringListStatus(true, arrayListOf(), "", null))
-    val status: StateFlow<StringListStatus> = _status
+): ViewModel(), IInputStreamStringListViewModel {
+    var status: StringListStatus = StringListStatus(true, arrayListOf(), "", null)
 
     private var _isProcessing = MutableStateFlow(false)
     val isProcessing: StateFlow<Boolean> = _isProcessing
@@ -37,7 +40,7 @@ class AssetsStringListViewModel@AssistedInject constructor(
     private var items = arrayListOf<String>()
     private var exception: Exception? = null
 
-    override fun loadFromAssets(cacheName: String, inputStream: InputStream) {
+    override fun loadFromInputStream(cacheName: String, inputStream: InputStream) {
         viewModelScope.launch(coroutineDispatcher) {
             _isProcessing.value = true
             items.clear()
@@ -46,10 +49,10 @@ class AssetsStringListViewModel@AssistedInject constructor(
             var success = true
             try {
                 initReadFiles(inputStream)
-                if (moshiStringListRepository.load(cacheName)) {
+                if (moshiStringListRepository.serialize(cacheName, readFileText(inputStream))) {
                     val stringList = moshiStringListRepository.getItem(cacheName)
                     if (stringList != null) {
-                        items = ArrayList(stringList.list)
+                        items = ArrayList(stringList.items)
                     } else {
                         success = false
                         errorMessage = FAILED_TO_LOAD_FILE
@@ -81,24 +84,28 @@ class AssetsStringListViewModel@AssistedInject constructor(
                 }
             }
             _isProcessing.value = false
-            _status.value = StringListStatus(success, items, errorMessage, exception)
+            status = StringListStatus(success, items, errorMessage, exception)
         }
+    }
+
+    private fun readFileText(inputStream: InputStream): String {
+        return inputStream.bufferedReader().use { it.readText() }
     }
 
     private fun initReadFiles(inputStream: InputStream) {
         moshiStringListRepository.setBufferReader(
-            assetSerializationRepoHelper.getBufferReader(inputStream)
+            inputStreamSerializationRepoHelper.getBufferReader(inputStream)
         )
     }
 
     private fun initWriteFiles(cacheName: String) {
         moshiStringListRepository.setAbsoluteFile(
-            commonSerializationRepoHelper.getAbsoluteFile(stringListPath, cacheName))
-        moshiStringListRepository.setFile(commonSerializationRepoHelper.getMainFile(cacheName))
+            commonSerializationRepoHelper.getAbsoluteFile(stringListPath, cacheName + JSON_EXTENSION))
+        moshiStringListRepository.setFile(commonSerializationRepoHelper.getMainFile(cacheName + JSON_EXTENSION))
         moshiStringListRepository.setDirectoryFile(
             commonSerializationRepoHelper.getDirectoryFile(stringListPath))
         moshiStringListRepository.setFileWriter(
-            commonSerializationRepoHelper.getFileWriter(stringListPath, cacheName))
+            commonSerializationRepoHelper.getFileWriter(stringListPath, cacheName + JSON_EXTENSION))
         moshiStringListRepository
             .setItem(cacheName, StringListMoshi(items))
     }

@@ -61,7 +61,7 @@ class CommonStringListViewModel
                     if (moshiStringListRepository.load(cacheName)) {
                         val stringList = moshiStringListRepository.getItem(cacheName)
                         if (stringList != null) {
-                            items = ArrayList(stringList.list)
+                            items = ArrayList(stringList.items)
                         } else {
                             success = false
                             errorMessage = FAILED_TO_LOAD_FILE + stringListPath

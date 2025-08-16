@@ -7,12 +7,14 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileWriter
 
+
 interface MoshiJsonAdapter<T> {
     fun getJsonAdapter(): JsonAdapter<T>
 }
 
 interface IBaseMoshiJsonRepository<T> {
     suspend fun load(cacheName: String): Boolean
+    suspend fun serialize(cacheName: String, contents: String): Boolean
     suspend fun save(cacheName: String, item: T): Boolean
     suspend fun delete(path: String, name: String): Boolean
 
@@ -82,6 +84,18 @@ abstract class BaseMoshiJsonRepository<T>(
             }
         }
         return success
+    }
+
+    override suspend fun serialize(cacheName: String, contents: String): Boolean {
+        errorMessage = ""
+        val jsonContents = moshiJsonAdapter.getJsonAdapter().fromJson(contents)
+        return if (jsonContents != null) {
+            basicStringGenericItemCache.set(cacheName, jsonContents)
+            true
+        } else {
+            errorMessage = EMPTY_JSON_CONTENTS
+            false
+        }
     }
 
     override suspend fun delete(path: String, name: String): Boolean {

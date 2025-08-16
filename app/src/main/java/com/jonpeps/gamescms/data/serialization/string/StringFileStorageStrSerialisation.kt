@@ -16,6 +16,7 @@ interface IStringFileStorageStrSerialisation {
 
     suspend fun read(bufferedReader: BufferedReader): Boolean
 
+    fun setContents(contents: String)
     fun getContents(): String
     fun getErrorMsg(): String
 }
@@ -33,6 +34,7 @@ class StringFileStorageStrSerialisation
                                absoluteFile: File,
                                fileWriter: FileWriter,
                                contents: String): Boolean {
+        this.contents = contents
         return withContext(dispatcher) {
             errorMsg = ""
             var success = true
@@ -73,6 +75,10 @@ class StringFileStorageStrSerialisation
             }
             return@withContext success
         }
+    }
+
+    override fun setContents(contents: String) {
+        this.contents = contents
     }
 
     override fun getContents(): String = contents

@@ -43,8 +43,6 @@ class CommonSerializationRepoHelper@Inject constructor() : ICommonSerializationR
     }
 
     companion object {
-        private const val FILE_EXTENSION = ".json"
-
-        fun getAbsolutePathName(path: String, fileName: String) = "$path$fileName$FILE_EXTENSION"
+        fun getAbsolutePathName(path: String, fileName: String) = "$path$fileName"
     }
 }

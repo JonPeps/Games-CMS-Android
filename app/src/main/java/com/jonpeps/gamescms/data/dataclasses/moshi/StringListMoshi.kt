@@ -6,5 +6,5 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class StringListMoshi(
     @field:Json(name = "items")
-    var list: List<String>
+    val items: List<String>
 )

@@ -11,5 +11,5 @@ class StringListMoshiJsonCache@Inject constructor()
     : BasicStringGenericItemCache<StringListMoshi>(), IStringListMoshiJsonCache {
     override val cache: MutableMap<String, StringListMoshi> = mutableMapOf()
 
-    override fun getDefaultItem(): StringListMoshi = StringListMoshi(list = listOf())
+    override fun getDefaultItem(): StringListMoshi = StringListMoshi(items = listOf())
 }

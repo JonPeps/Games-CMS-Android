@@ -117,5 +117,5 @@ dependencies {
     kapt(libs.dagger.compiler)
     implementation(libs.moshi)
     implementation(libs.moshi.kotlin.vlatestversion)
-
+    implementation(libs.gson)
 }

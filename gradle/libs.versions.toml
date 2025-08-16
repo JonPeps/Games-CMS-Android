@@ -21,6 +21,7 @@ googleHiltAndroidGradlePlugin = "2.48.1"
 googleHiltAndroidVersion = "2.48.1"
 googleHiltCompiler = "2.55"
 googleHiltCompilerVersion = "2.56"
+gson = "2.10.1"
 hiltAndroid = "2.51.1"
 hiltAndroidCompiler = "2.51.1"
 hiltAndroidCompilerVersion = "2.48"
@@ -101,6 +102,7 @@ androidx-material3-v132 = { module = "androidx.compose.material3:material3", ver
 androidx-material3-v140alpha13 = { module = "androidx.compose.material3:material3", version.ref = "androidxMaterial3" }
 dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
 dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "daggerCompiler" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 kotlinx-metadata-jvm = { module = "org.jetbrains.kotlinx:kotlinx-metadata-jvm", version.ref = "kotlinxMetadataJvm" }
 material3-window-size = { module = "androidx.compose.material3:material3-window-size-class", version.ref = "material3Version" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }

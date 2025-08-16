@@ -3,10 +3,10 @@ package com.jonpeps.gamescms.viewmodels
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
-import com.jonpeps.gamescms.data.serialization.debug.IAssetSerializationRepoHelper
-import com.jonpeps.gamescms.data.viewmodels.AssetsStringListViewModel
-import com.jonpeps.gamescms.data.viewmodels.AssetsStringListViewModel.Companion.FAILED_TO_LOAD_FILE
-import com.jonpeps.gamescms.data.viewmodels.AssetsStringListViewModel.Companion.FAILED_TO_WRITE_FILE
+import com.jonpeps.gamescms.data.serialization.debug.IInputStreamSerializationRepoHelper
+import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel
+import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel.Companion.FAILED_TO_LOAD_FILE
+import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel.Companion.FAILED_TO_WRITE_FILE
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.IStringListItemsVmChangesCache
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -20,7 +20,7 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class AssetsStringListViewModelTests {
+class InputStreamStringListViewModelTests {
     private val dispatcher = UnconfinedTestDispatcher()
     @MockK
     private lateinit var moshiStringListRepository: IMoshiStringListRepository
@@ -29,9 +29,9 @@ class AssetsStringListViewModelTests {
     @MockK
     private lateinit var commonSerializationRepoHelper: ICommonSerializationRepoHelper
     @MockK
-    private lateinit var assetSerializationRepoHelper: IAssetSerializationRepoHelper
+    private lateinit var assetSerializationRepoHelper: IInputStreamSerializationRepoHelper
 
-    private lateinit var viewModel: AssetsStringListViewModel
+    private lateinit var viewModel: InputStreamStringListViewModel
 
     private val dummyListData = arrayListOf("item1", "item2")
     private val dummyData = StringListMoshi(dummyListData)
@@ -43,7 +43,7 @@ class AssetsStringListViewModelTests {
     fun setup() {
         MockKAnnotations.init(this)
 
-        viewModel = AssetsStringListViewModel(
+        viewModel = InputStreamStringListViewModel(
             filesListPath,
             commonSerializationRepoHelper,
             assetSerializationRepoHelper,
@@ -64,7 +64,7 @@ class AssetsStringListViewModelTests {
         every { moshiStringListRepository.getErrorMsg() } returns ""
         coEvery { moshiStringListRepository.save(cachedListName, dummyData) } returns true
 
-        viewModel.loadFromAssets(cachedListName, mockk())
+        viewModel.loadFromInputStream(cachedListName, mockk())
 
         verify { listItemsVmChangesCache.set(cachedListName, dummyListData) }
         assert(viewModel.status.value.success)
@@ -78,7 +78,7 @@ class AssetsStringListViewModelTests {
         setupForReadingFiles()
         coEvery { moshiStringListRepository.load(cachedListName) } returns false
 
-        viewModel.loadFromAssets(cachedListName, mockk())
+        viewModel.loadFromInputStream(cachedListName, mockk())
 
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.message == FAILED_TO_LOAD_FILE)
@@ -92,7 +92,7 @@ class AssetsStringListViewModelTests {
         coEvery { moshiStringListRepository.load(cachedListName) } returns true
         every { moshiStringListRepository.getItem(cachedListName) } returns null
 
-        viewModel.loadFromAssets(cachedListName, mockk())
+        viewModel.loadFromInputStream(cachedListName, mockk())
 
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.message == FAILED_TO_LOAD_FILE)
@@ -105,7 +105,7 @@ class AssetsStringListViewModelTests {
         setupForReadingFiles()
         coEvery { moshiStringListRepository.load(cachedListName) } throws Exception()
 
-        viewModel.loadFromAssets(cachedListName, mockk())
+        viewModel.loadFromInputStream(cachedListName, mockk())
 
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.message != null)
@@ -122,7 +122,7 @@ class AssetsStringListViewModelTests {
         every { moshiStringListRepository.getErrorMsg() } returns ""
         coEvery { moshiStringListRepository.save(cachedListName, dummyData) } returns false
 
-        viewModel.loadFromAssets(cachedListName, mockk())
+        viewModel.loadFromInputStream(cachedListName, mockk())
 
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.message == FAILED_TO_WRITE_FILE)
@@ -139,7 +139,7 @@ class AssetsStringListViewModelTests {
         every { moshiStringListRepository.getErrorMsg() } returns ""
         coEvery { moshiStringListRepository.save(cachedListName, dummyData) } throws Exception()
 
-        viewModel.loadFromAssets(cachedListName, mockk())
+        viewModel.loadFromInputStream(cachedListName, mockk())
 
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.message != null)

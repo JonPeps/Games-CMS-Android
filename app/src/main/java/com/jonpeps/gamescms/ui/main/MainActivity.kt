@@ -15,11 +15,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jonpeps.gamescms.data.viewmodels.CommonStringListViewModel
-import com.jonpeps.gamescms.data.viewmodels.factories.ListViewModelFactory
+import com.jonpeps.gamescms.data.DataConstants.Companion.PROJECT_DIR
+import com.jonpeps.gamescms.data.DataConstants.Companion.PROJECT_LIST_CACHE_NAME
+import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel
+import com.jonpeps.gamescms.data.viewmodels.factories.InputStreamStringListViewModelFactory
 import com.jonpeps.gamescms.ui.applevel.DarkColors
 import com.jonpeps.gamescms.ui.applevel.LightColors
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
+import java.io.IOException
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -32,15 +36,25 @@ class MainActivity : AppCompatActivity() {
             } else {
                 LightColors
             }
-            val viewModel: CommonStringListViewModel =
-                hiltViewModel<CommonStringListViewModel,
-                        ListViewModelFactory.ICommonStringListViewModelFactory>(
+            val path = baseContext.filesDir.path + PROJECT_DIR
+            val directory = File(path)
+            if (!directory.exists()) {
+                val result = directory.mkdir()
+                if (!result) {
+                    // TODO: Handle error
+                }
+            }
+            val viewModel: InputStreamStringListViewModel =
+                hiltViewModel<InputStreamStringListViewModel,
+                        InputStreamStringListViewModelFactory.IInputStreamStringListViewModelFactory>(
                     creationCallback = { it.create(
-                        "",
-                        "app/source/main/assets/table_template_list.json") }
+                        path) }
                 )
-
-            viewModel.loadFromFile("ProjectsList")
+            try {
+                viewModel.loadFromInputStream(PROJECT_LIST_CACHE_NAME, assets.open("dummy_projects_list.json"))
+            } catch (ex: IOException) {
+                // TODO: Handle error
+            }
             MainContainer({ MainView(viewModel, colourScheme = colors) }, colourScheme = colors)
         }
 }
@@ -58,13 +72,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Composable
-    fun MainView(viewModel: CommonStringListViewModel, colourScheme: ColorScheme) {
+    fun MainView(viewModel: InputStreamStringListViewModel, colourScheme: ColorScheme) {
         val processingState: Boolean by viewModel.isProcessing.collectAsStateWithLifecycle()
         if (processingState) {
             CommonLoadingScreen()
         } else {
-            Column(modifier = Modifier.background(colourScheme.scrim).fillMaxHeight()) {
-                CommonStringListView(listOf("item1", "item2", "item3", "item4"))
+            Column(modifier = Modifier
+                .background(colourScheme.scrim)
+                .fillMaxHeight()) {
+                CommonStringListView(viewModel.status.items)
             }
         }
     }
