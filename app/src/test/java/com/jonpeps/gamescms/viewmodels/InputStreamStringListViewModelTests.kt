@@ -55,7 +55,7 @@ class InputStreamStringListViewModelTests {
     }
 
     @Test
-    fun `load string list SUCCESS when assets stream is VALID AND write contents to LOCAL STORAGE SUCCESS`() {
+    fun `load string list SUCCESS when INPUT STREAM is VALID AND write contents to LOCAL STORAGE SUCCESS`() {
         setupForReadingFiles()
         setupForWritingFiles()
 
@@ -75,7 +75,7 @@ class InputStreamStringListViewModelTests {
     }
 
     @Test
-    fun `load string list FAILURE when assets stream is INVALID`() {
+    fun `load string list FAILURE when INPUT STREAM is INVALID`() {
         setupForReadingFiles()
         coEvery { moshiStringListRepository.serialize(any(), any()) } returns false
         every { moshiStringListRepository.getErrorMsg() } returns FAILED_TO_LOAD_FILE
@@ -89,9 +89,24 @@ class InputStreamStringListViewModelTests {
     }
 
     @Test
-    fun `load string list FAILURE when LOAD REPOSITORY RETURNS TRUE but GET ITEM is NULL`() {
+    fun `load string list FAILURE when INPUT STREAM is VALID but GET ITEM returns NULL`() {
         setupForReadingFiles()
-        coEvery { moshiStringListRepository.load(cachedListName) } returns true
+        coEvery { moshiStringListRepository.serialize(any(), any()) } returns true
+        every { moshiStringListRepository.getItem(any()) } returns null
+        every { moshiStringListRepository.getErrorMsg() } returns FAILED_TO_LOAD_FILE
+
+        viewModel.loadFromInputStream(cachedListName, mockk())
+
+        assert(!viewModel.status.success)
+        assert(viewModel.status.message == FAILED_TO_LOAD_FILE)
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 0)
+    }
+
+    @Test
+    fun `load string list FAILURE when INPUT STREAM is VALID but GET ITEM is NULL`() {
+        setupForReadingFiles()
+        coEvery { moshiStringListRepository.serialize(any(), any()) } returns false
         every { moshiStringListRepository.getItem(cachedListName) } returns null
 
         viewModel.loadFromInputStream(cachedListName, mockk())
@@ -103,9 +118,9 @@ class InputStreamStringListViewModelTests {
     }
 
     @Test
-    fun `load string list FAILURE when LOAD REPOSITRY THROWS Exception`() {
+    fun `load string list FAILURE when SERIALIZE THROWS Exception`() {
         setupForReadingFiles()
-        coEvery { moshiStringListRepository.load(cachedListName) } throws Exception()
+        coEvery { moshiStringListRepository.serialize(any(), any()) } throws Exception()
 
         viewModel.loadFromInputStream(cachedListName, mockk())
 
@@ -119,9 +134,11 @@ class InputStreamStringListViewModelTests {
     fun `load string list SUCCESS when assets stream is VALID AND write contents to LOCAL STORAGE FAILS`() {
         setupForReadingFiles()
         setupForWritingFiles()
+        coEvery { moshiStringListRepository.serialize(any(), any()) } returns true
         coEvery { moshiStringListRepository.load(cachedListName) } returns true
         every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
         every { moshiStringListRepository.getErrorMsg() } returns ""
+
         coEvery { moshiStringListRepository.save(cachedListName, dummyData) } returns false
 
         viewModel.loadFromInputStream(cachedListName, mockk())
@@ -136,9 +153,9 @@ class InputStreamStringListViewModelTests {
     fun `load string list SUCCESS when assets stream is VALID AND write contents to LOCAL STORAGE throws Exception`() {
         setupForReadingFiles()
         setupForWritingFiles()
+        coEvery { moshiStringListRepository.serialize(any(), any()) } returns true
         coEvery { moshiStringListRepository.load(cachedListName) } returns true
         every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
-        every { moshiStringListRepository.getErrorMsg() } returns ""
         coEvery { moshiStringListRepository.save(cachedListName, dummyData) } throws Exception()
 
         viewModel.loadFromInputStream(cachedListName, mockk())
