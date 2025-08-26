@@ -68,6 +68,7 @@ moshiKotlin = "LATEST_VERSION"
 moshiKotlinCodegen = "1.14.0"
 moshiKotlinCodegenVersion = "1.9.2"
 moshiKotlinVersion = "1.14.0"
+moshiVersion = "1.12.0"
 navigationFragmentKtx = "2.8.9"
 navigationUiKtx = "2.8.9"
 powermockApiMockito = "1.6.2"
@@ -80,6 +81,10 @@ roomKtx = "2.7.0"
 roomRuntime = "2.6.1"
 roomRuntimeVersion = "2.7.0"
 runtime = "1.7.8"
+squareupMoshi = "1.15.0"
+squareupMoshiKotlin = "1.12.0"
+squareupMoshiKotlinCodegen = "1.15.0"
+squareupMoshiKotlinVersion = "1.15.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -166,8 +171,13 @@ mockk-v10 = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
 mockk-v1110 = { module = "io.mockk:mockk", version.ref = "mockkMockk" }
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshiKotlinCodegen" }
+moshi-kotlin-codegen-v1150 = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "squareupMoshiKotlinCodegen" }
 moshi-kotlin-codegen-v192 = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshiKotlinCodegenVersion" }
+moshi-kotlin-v1120 = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "squareupMoshiKotlin" }
+moshi-kotlin-v1150 = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "squareupMoshiKotlinVersion" }
 moshi-kotlin-vlatestversion = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshiKotlin" }
+moshi-v1120 = { module = "com.squareup.moshi:moshi", version.ref = "moshiVersion" }
+moshi-v1150 = { module = "com.squareup.moshi:moshi", version.ref = "squareupMoshi" }
 powermock-api-mockito = { module = "org.powermock:powermock-api-mockito", version.ref = "powermockApiMockito" }
 powermock-api-mockito2 = { module = "org.powermock:powermock-api-mockito2", version.ref = "powermockApiMockito2" }
 powermock-core = { module = "org.powermock:powermock-core", version.ref = "powermockCore" }

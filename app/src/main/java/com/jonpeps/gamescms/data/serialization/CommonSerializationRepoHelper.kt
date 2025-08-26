@@ -3,6 +3,7 @@ package com.jonpeps.gamescms.data.serialization
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileWriter
+import java.io.InputStream
 import javax.inject.Inject
 
 interface ICommonSerializationRepoHelper {
@@ -11,6 +12,7 @@ interface ICommonSerializationRepoHelper {
     fun getDirectoryFile(directory: String): File
     fun getMainFile(name: String): File
     fun getFileWriter(directory: String, name: String): FileWriter
+    fun readAll(inputStream: InputStream): String
 }
 
 class CommonSerializationRepoHelper@Inject constructor() : ICommonSerializationRepoHelper {
@@ -40,6 +42,10 @@ class CommonSerializationRepoHelper@Inject constructor() : ICommonSerializationR
             throw RuntimeException("Directory or file name is null or empty!")
         }
         return FileWriter(getAbsoluteFile(directory, name))
+    }
+
+    override fun readAll(inputStream: InputStream): String {
+        return inputStream.bufferedReader().use { it.readText() }
     }
 
     companion object {

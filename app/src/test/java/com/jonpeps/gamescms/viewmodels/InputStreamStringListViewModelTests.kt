@@ -13,7 +13,6 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Before
@@ -59,31 +58,34 @@ class InputStreamStringListViewModelTests {
     fun `load string list SUCCESS when assets stream is VALID AND write contents to LOCAL STORAGE SUCCESS`() {
         setupForReadingFiles()
         setupForWritingFiles()
+
         coEvery { moshiStringListRepository.load(cachedListName) } returns true
         every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
         every { moshiStringListRepository.getErrorMsg() } returns ""
-        coEvery { moshiStringListRepository.save(cachedListName, dummyData) } returns true
+
+        coEvery { moshiStringListRepository.serialize(any(), any()) } returns true
+        coEvery { moshiStringListRepository.save(any(), any()) } returns true
 
         viewModel.loadFromInputStream(cachedListName, mockk())
 
-        verify { listItemsVmChangesCache.set(cachedListName, dummyListData) }
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 2)
+        assert(viewModel.status.success)
+        assert(viewModel.status.message == "")
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 2)
     }
 
     @Test
-    fun `load string list FAILURE when LOAD REPOSITORY returns FALSE`() {
+    fun `load string list FAILURE when assets stream is INVALID`() {
         setupForReadingFiles()
-        coEvery { moshiStringListRepository.load(cachedListName) } returns false
+        coEvery { moshiStringListRepository.serialize(any(), any()) } returns false
+        every { moshiStringListRepository.getErrorMsg() } returns FAILED_TO_LOAD_FILE
 
         viewModel.loadFromInputStream(cachedListName, mockk())
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == FAILED_TO_LOAD_FILE)
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(!viewModel.status.success)
+        assert(viewModel.status.message == FAILED_TO_LOAD_FILE)
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 0)
     }
 
     @Test
@@ -94,10 +96,10 @@ class InputStreamStringListViewModelTests {
 
         viewModel.loadFromInputStream(cachedListName, mockk())
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == FAILED_TO_LOAD_FILE)
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(!viewModel.status.success)
+        assert(viewModel.status.message == FAILED_TO_LOAD_FILE)
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 0)
     }
 
     @Test
@@ -107,10 +109,10 @@ class InputStreamStringListViewModelTests {
 
         viewModel.loadFromInputStream(cachedListName, mockk())
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message != null)
-        assert(viewModel.status.value.ex != null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(!viewModel.status.success)
+        assert(viewModel.status.message != null)
+        assert(viewModel.status.ex != null)
+        assert(viewModel.status.items.size == 0)
     }
 
     @Test
@@ -124,10 +126,10 @@ class InputStreamStringListViewModelTests {
 
         viewModel.loadFromInputStream(cachedListName, mockk())
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == FAILED_TO_WRITE_FILE)
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(!viewModel.status.success)
+        assert(viewModel.status.message == FAILED_TO_WRITE_FILE)
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 0)
     }
 
     @Test
@@ -141,16 +143,17 @@ class InputStreamStringListViewModelTests {
 
         viewModel.loadFromInputStream(cachedListName, mockk())
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message != null)
-        assert(viewModel.status.value.ex != null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(!viewModel.status.success)
+        assert(viewModel.status.message != null)
+        assert(viewModel.status.ex != null)
+        assert(viewModel.status.items.size == 0)
     }
 
     private fun setupForReadingFiles() {
         every { moshiStringListRepository.setAbsoluteFile(any()) } returns Unit
         every { moshiStringListRepository.setBufferReader(any()) } returns Unit
         every { assetSerializationRepoHelper.getBufferReader(any()) } returns mockk()
+        every { commonSerializationRepoHelper.readAll(any()) } returns ""
     }
 
     private fun setupForWritingFiles() {

@@ -49,7 +49,7 @@ interface IInputStreamStringListViewModel {
             var success = true
             try {
                 initReadFiles(inputStream)
-                if (moshiStringListRepository.serialize(cacheName, readFileText(inputStream))) {
+                if (moshiStringListRepository.serialize(cacheName, commonSerializationRepoHelper.readAll(inputStream))) {
                     val stringList = moshiStringListRepository.getItem(cacheName)
                     if (stringList != null) {
                         items = ArrayList(stringList.items)
@@ -86,10 +86,6 @@ interface IInputStreamStringListViewModel {
             _isProcessing.value = false
             status = StringListStatus(success, items, errorMessage, exception)
         }
-    }
-
-    private fun readFileText(inputStream: InputStream): String {
-        return inputStream.bufferedReader().use { it.readText() }
     }
 
     private fun initReadFiles(inputStream: InputStream) {

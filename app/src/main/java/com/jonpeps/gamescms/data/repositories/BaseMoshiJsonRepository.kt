@@ -88,7 +88,8 @@ abstract class BaseMoshiJsonRepository<T>(
 
     override suspend fun serialize(cacheName: String, contents: String): Boolean {
         errorMessage = ""
-        val jsonContents = moshiJsonAdapter.getJsonAdapter().fromJson(contents)
+        val jsonAdapter = moshiJsonAdapter.getJsonAdapter()
+        val jsonContents = jsonAdapter.fromJson(contents)
         return if (jsonContents != null) {
             basicStringGenericItemCache.set(cacheName, jsonContents)
             true
