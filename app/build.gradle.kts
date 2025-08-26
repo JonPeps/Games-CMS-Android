@@ -118,4 +118,5 @@ dependencies {
     implementation(libs.moshi.v1150)
     implementation(libs.moshi.kotlin.v1150)
     kapt(libs.moshi.kotlin.codegen.v1150)
+    implementation(libs.androidx.ui.tooling)
 }

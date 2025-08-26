@@ -1,6 +1,5 @@
 package com.jonpeps.gamescms.data.viewmodels
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
@@ -14,8 +13,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 interface ICommonStringListViewModel {
@@ -34,21 +31,13 @@ class CommonStringListViewModel
     private val listItemsVmChangesCache: IStringListItemsVmChangesCache,
     private val commonDeleteFileHelper: ICommonDeleteFileHelper,
     private val coroutineDispatcher: CoroutineDispatcher
-): ViewModel(), ICommonStringListViewModel {
-    private val _status = MutableStateFlow(StringListStatus(true, arrayListOf(), "", null))
-    val status: StateFlow<StringListStatus> = _status
-
-    private var _isProcessing = MutableStateFlow(false)
-    val isProcessing: StateFlow<Boolean> = _isProcessing
-
-    private var items = arrayListOf<String>()
+): BaseStringListViewModel(), ICommonStringListViewModel {
     private var cacheName = ""
-    private var exception: Exception? = null
 
     override fun loadFromFile(cacheName: String, loadFromCacheIfExists: Boolean) {
         this.cacheName = cacheName
         viewModelScope.launch(coroutineDispatcher) {
-            _isProcessing.value = true
+            baseIsProcessing.value = true
             items.clear()
             exception = null
             var errorMessage = ""
@@ -79,14 +68,14 @@ class CommonStringListViewModel
                     listItemsVmChangesCache.set(cacheName, items)
                 }
             }
-            _isProcessing.value = false
-            _status.value = StringListStatus(success, items, errorMessage, exception)
+            baseIsProcessing.value = false
+            status = StringListStatus(success, items, errorMessage, exception)
         }
     }
 
     override fun add(name: String) {
         viewModelScope.launch(coroutineDispatcher) {
-            _isProcessing.value = true
+            baseIsProcessing.value = true
             initWriteFiles(name)
             items.add(name)
             var success = true
@@ -96,14 +85,14 @@ class CommonStringListViewModel
                 success = false
                 items.remove(name)
             }
-            _isProcessing.value = false
-            _status.value = StringListStatus(success, items, if (success) "" else FAILED_TO_SAVE_FILE + name, null)
+            baseIsProcessing.value = false
+            status = StringListStatus(success, items, if (success) "" else FAILED_TO_SAVE_FILE + name, null)
         }
     }
 
     override fun delete(name: String, subDeleteFlag: SubDeleteFlag) {
         viewModelScope.launch(coroutineDispatcher) {
-            _isProcessing.value = true
+            baseIsProcessing.value = true
             initWriteFiles(name)
             items.remove(name)
             var success = true
@@ -124,8 +113,8 @@ class CommonStringListViewModel
                 success = false
                 message = FAILED_TO_DELETE_FILE + name
             }
-            _isProcessing.value = false
-            _status.value = StringListStatus(success, items, message, null)
+            baseIsProcessing.value = false
+            status = StringListStatus(success, items, message, null)
         }
     }
 

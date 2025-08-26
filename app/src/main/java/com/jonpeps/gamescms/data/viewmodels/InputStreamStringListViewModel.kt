@@ -1,6 +1,5 @@
 package com.jonpeps.gamescms.data.viewmodels
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.DataConstants.Companion.JSON_EXTENSION
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
@@ -14,8 +13,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.io.InputStream
 
@@ -31,18 +28,10 @@ interface IInputStreamStringListViewModel {
     private val moshiStringListRepository: IMoshiStringListRepository,
     private val listItemsVmChangesCache: IStringListItemsVmChangesCache,
     private val coroutineDispatcher: CoroutineDispatcher
-): ViewModel(), IInputStreamStringListViewModel {
-    var status: StringListStatus = StringListStatus(true, arrayListOf(), "", null)
-
-    private var _isProcessing = MutableStateFlow(false)
-    val isProcessing: StateFlow<Boolean> = _isProcessing
-
-    private var items = arrayListOf<String>()
-    private var exception: Exception? = null
-
+): BaseStringListViewModel(), IInputStreamStringListViewModel {
     override fun loadFromInputStream(cacheName: String, inputStream: InputStream) {
         viewModelScope.launch(coroutineDispatcher) {
-            _isProcessing.value = true
+            baseIsProcessing.value = true
             items.clear()
             exception = null
             var errorMessage = ""
@@ -83,7 +72,7 @@ interface IInputStreamStringListViewModel {
                     success = false
                 }
             }
-            _isProcessing.value = false
+            baseIsProcessing.value = false
             status = StringListStatus(success, items, errorMessage, exception)
         }
     }

@@ -15,15 +15,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jonpeps.gamescms.data.DataConstants
 import com.jonpeps.gamescms.data.DataConstants.Companion.PROJECT_DIR
 import com.jonpeps.gamescms.data.DataConstants.Companion.PROJECT_LIST_CACHE_NAME
+import com.jonpeps.gamescms.data.viewmodels.BaseStringListViewModel
 import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel
 import com.jonpeps.gamescms.data.viewmodels.factories.InputStreamStringListViewModelFactory
 import com.jonpeps.gamescms.ui.applevel.DarkColors
 import com.jonpeps.gamescms.ui.applevel.LightColors
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
-import java.io.IOException
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -41,7 +42,8 @@ class MainActivity : AppCompatActivity() {
             if (!directory.exists()) {
                 val result = directory.mkdir()
                 if (!result) {
-                    // TODO: Handle error
+                    BasicNoEscapeError("Folder creation failed!", "Failed to create folder: $path")
+                    return@setContent
                 }
             }
             val viewModel: InputStreamStringListViewModel =
@@ -50,11 +52,7 @@ class MainActivity : AppCompatActivity() {
                     creationCallback = { it.create(
                         path) }
                 )
-            try {
-                viewModel.loadFromInputStream(PROJECT_LIST_CACHE_NAME, assets.open("dummy_projects_list.json"))
-            } catch (ex: IOException) {
-                // TODO: Handle error
-            }
+            viewModel.loadFromInputStream(PROJECT_LIST_CACHE_NAME, assets.open(DataConstants.Companion.Debug.DEBUG_PROJECTS_LIST))
             MainContainer({ MainView(viewModel, colourScheme = colors) }, colourScheme = colors)
         }
 }
@@ -72,7 +70,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Composable
-    fun MainView(viewModel: InputStreamStringListViewModel, colourScheme: ColorScheme) {
+    fun MainView(viewModel: BaseStringListViewModel, colourScheme: ColorScheme) {
         val processingState: Boolean by viewModel.isProcessing.collectAsStateWithLifecycle()
         if (processingState) {
             CommonLoadingScreen()

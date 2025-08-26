@@ -74,10 +74,10 @@ class CommonStringListViewModelTests {
 
         verify { listItemsVmChangesCache.set(any(), any()) }
 
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 2)
+        assert(viewModel.status.success)
+        assert(viewModel.status.message == "")
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 2)
     }
 
     @Test
@@ -95,10 +95,10 @@ class CommonStringListViewModelTests {
 
         verify { listItemsVmChangesCache.set(any(), any()) }
 
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 2)
+        assert(viewModel.status.success)
+        assert(viewModel.status.message == "")
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 2)
     }
 
     @Test
@@ -109,10 +109,10 @@ class CommonStringListViewModelTests {
 
         viewModel.loadFromFile(cachedListName, true)
 
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == dummyListData.size)
+        assert(viewModel.status.success)
+        assert(viewModel.status.message == "")
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == dummyListData.size)
     }
 
     @Test
@@ -128,10 +128,10 @@ class CommonStringListViewModelTests {
 
         viewModel.loadFromFile(cachedListName, false)
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == FAILED_TO_LOAD_FILE + filesListPath)
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(!viewModel.status.success)
+        assert(viewModel.status.message == FAILED_TO_LOAD_FILE + filesListPath)
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 0)
     }
 
     @Test
@@ -147,10 +147,10 @@ class CommonStringListViewModelTests {
 
         viewModel.loadFromFile(cachedListName, false)
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == FAILED_TO_LOAD_FILE + filesListPath)
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(!viewModel.status.success)
+        assert(viewModel.status.message == FAILED_TO_LOAD_FILE + filesListPath)
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 0)
     }
 
     @Test
@@ -161,10 +161,10 @@ class CommonStringListViewModelTests {
 
         viewModel.loadFromFile(cachedListName, false)
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == "Runtime error!")
-        assert(viewModel.status.value.ex != null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(!viewModel.status.success)
+        assert(viewModel.status.message == "Runtime error!")
+        assert(viewModel.status.ex != null)
+        assert(viewModel.status.items.size == 0)
     }
 
     @Test
@@ -178,10 +178,10 @@ class CommonStringListViewModelTests {
 
         verify { listItemsVmChangesCache.set(any(), any()) }
 
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 1)
+        assert(viewModel.status.success)
+        assert(viewModel.status.message == "")
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 1)
     }
 
     @Test
@@ -193,10 +193,10 @@ class CommonStringListViewModelTests {
 
         viewModel.add("test")
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == FAILED_TO_SAVE_FILE + "test")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(!viewModel.status.success)
+        assert(viewModel.status.message == FAILED_TO_SAVE_FILE + "test")
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 0)
     }
 
     @Test
@@ -211,10 +211,10 @@ class CommonStringListViewModelTests {
 
         viewModel.delete("test")
 
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(viewModel.status.success)
+        assert(viewModel.status.message == "")
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 0)
     }
 
     @Test
@@ -229,10 +229,10 @@ class CommonStringListViewModelTests {
 
         verify { listItemsVmChangesCache.set(any(), any()) }
 
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(viewModel.status.success)
+        assert(viewModel.status.message == "")
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 0)
     }
 
     @Test
@@ -248,10 +248,10 @@ class CommonStringListViewModelTests {
 
         viewModel.delete("test")
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == FAILED_TO_SAVE_FILE + "test")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(!viewModel.status.success)
+        assert(viewModel.status.message == FAILED_TO_SAVE_FILE + "test")
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 0)
     }
 
     @Test
@@ -262,10 +262,10 @@ class CommonStringListViewModelTests {
 
         viewModel.delete("test")
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == FAILED_TO_DELETE_FILE + "test")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(!viewModel.status.success)
+        assert(viewModel.status.message == FAILED_TO_DELETE_FILE + "test")
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 0)
     }
 
     @Test
@@ -278,10 +278,10 @@ class CommonStringListViewModelTests {
 
         viewModel.delete("test")
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == FAILED_TO_DELETE_FILE_OR_DIRECTORY + "test")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(!viewModel.status.success)
+        assert(viewModel.status.message == FAILED_TO_DELETE_FILE_OR_DIRECTORY + "test")
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 0)
     }
 
     private fun setupForReadingFiles() {

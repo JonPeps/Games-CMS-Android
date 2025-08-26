@@ -85,6 +85,7 @@ squareupMoshi = "1.15.0"
 squareupMoshiKotlin = "1.12.0"
 squareupMoshiKotlinCodegen = "1.15.0"
 squareupMoshiKotlinVersion = "1.15.0"
+uiTooling = "1.9.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -105,6 +106,7 @@ androidx-material = { module = "androidx.compose.material:material", version.ref
 androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 androidx-material3-v132 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
 androidx-material3-v140alpha13 = { module = "androidx.compose.material3:material3", version.ref = "androidxMaterial3" }
+androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
 dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
 dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "daggerCompiler" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
