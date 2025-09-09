@@ -24,8 +24,8 @@ interface ICommonStringListViewModel {
 @HiltViewModel(assistedFactory = ListViewModelFactory.ICommonStringListViewModelFactory::class)
 class CommonStringListViewModel
 @AssistedInject constructor(
-    @Assisted("param1") private val directoryOrFilesPath: String,
-    @Assisted("param2") private val stringListPath: String,
+    @Assisted("param1") private val directory: String,
+    @Assisted("param2") private val fileName: String,
     private val moshiStringListRepository: IMoshiStringListRepository,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val listItemsVmChangesCache: IStringListItemsVmChangesCache,
@@ -53,11 +53,11 @@ class CommonStringListViewModel
                             items = ArrayList(stringList.items)
                         } else {
                             success = false
-                            errorMessage = FAILED_TO_LOAD_FILE + stringListPath
+                            errorMessage = FAILED_TO_LOAD_FILE + fileName
                         }
                     } else {
                         success = false
-                        errorMessage = FAILED_TO_LOAD_FILE + stringListPath
+                        errorMessage = FAILED_TO_LOAD_FILE + fileName
                     }
                 } catch (ex: Exception) {
                     exception = ex
@@ -97,9 +97,9 @@ class CommonStringListViewModel
             items.remove(name)
             var success = true
             var message = ""
-            if (moshiStringListRepository.delete(stringListPath, name)) {
+            if (moshiStringListRepository.delete(fileName, name)) {
                 if (moshiStringListRepository.save(cacheName, StringListMoshi(items))) {
-                    if (commonDeleteFileHelper.onSubDelete(directoryOrFilesPath, name, subDeleteFlag)) {
+                    if (commonDeleteFileHelper.onSubDelete(directory, name, subDeleteFlag)) {
                         listItemsVmChangesCache.set(cacheName, items)
                     } else {
                         success = false
@@ -119,25 +119,27 @@ class CommonStringListViewModel
     }
 
     private fun initReadFiles() {
+        val totalFilename = fileName + FILE_EXTENSION
         moshiStringListRepository.setAbsoluteFile(
-            commonSerializationRepoHelper.getAbsoluteFile(stringListPath, ""))
+            commonSerializationRepoHelper.getAbsoluteFile(directory, totalFilename))
         moshiStringListRepository.setBufferReader(
-            commonSerializationRepoHelper.getBufferReader(stringListPath, ""))
+            commonSerializationRepoHelper.getBufferReader(directory, totalFilename))
     }
 
     private fun initWriteFiles(name: String) {
         moshiStringListRepository.setAbsoluteFile(
-            commonSerializationRepoHelper.getAbsoluteFile(stringListPath, name))
+            commonSerializationRepoHelper.getAbsoluteFile(directory, name))
         moshiStringListRepository.setFile(commonSerializationRepoHelper.getMainFile(name))
         moshiStringListRepository.setDirectoryFile(
-            commonSerializationRepoHelper.getDirectoryFile(stringListPath))
+            commonSerializationRepoHelper.getDirectoryFile(directory))
         moshiStringListRepository.setFileWriter(
-            commonSerializationRepoHelper.getFileWriter(stringListPath, name))
+            commonSerializationRepoHelper.getFileWriter(directory, name))
         moshiStringListRepository
             .setItem(cacheName, StringListMoshi(items))
     }
 
     companion object {
+        const val FILE_EXTENSION = ".json"
         const val FAILED_TO_LOAD_FILE = "Failed to load file: "
         const val FAILED_TO_DELETE_FILE = "Failed to delete file: "
         const val FAILED_TO_DELETE_FILE_OR_DIRECTORY = "Failed to delete file/directory: "

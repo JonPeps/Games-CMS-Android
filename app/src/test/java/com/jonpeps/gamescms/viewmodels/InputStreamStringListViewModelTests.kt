@@ -5,6 +5,7 @@ import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.debug.IInputStreamSerializationRepoHelper
 import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel
+import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel.Companion.FAILED_TO_CREATE_DIR
 import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel.Companion.FAILED_TO_LOAD_FILE
 import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel.Companion.FAILED_TO_WRITE_FILE
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.IStringListItemsVmChangesCache
@@ -62,11 +63,12 @@ class InputStreamStringListViewModelTests {
         coEvery { moshiStringListRepository.load(cachedListName) } returns true
         every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
         every { moshiStringListRepository.getErrorMsg() } returns ""
+        every { commonSerializationRepoHelper.createDirectory("") } returns true
 
         coEvery { moshiStringListRepository.serialize(any(), any()) } returns true
         coEvery { moshiStringListRepository.save(any(), any()) } returns true
 
-        viewModel.loadFromInputStream(cachedListName, mockk())
+        viewModel.loadFromInputStream(cachedListName, mockk(), "")
 
         assert(viewModel.status.success)
         assert(viewModel.status.message == "")
@@ -79,8 +81,9 @@ class InputStreamStringListViewModelTests {
         setupForReadingFiles()
         coEvery { moshiStringListRepository.serialize(any(), any()) } returns false
         every { moshiStringListRepository.getErrorMsg() } returns FAILED_TO_LOAD_FILE
+        every { commonSerializationRepoHelper.createDirectory("") } returns true
 
-        viewModel.loadFromInputStream(cachedListName, mockk())
+        viewModel.loadFromInputStream(cachedListName, mockk(), "")
 
         assert(!viewModel.status.success)
         assert(viewModel.status.message == FAILED_TO_LOAD_FILE)
@@ -89,13 +92,29 @@ class InputStreamStringListViewModelTests {
     }
 
     @Test
+    fun `load string list FAILURE when INPUT STREAM is VALID and SERIALIZE returns TRUE yet CREATE DIRECTORY TO SAVE TO, FAILS`() {
+        setupForReadingFiles()
+        coEvery { moshiStringListRepository.serialize(any(), any()) } returns true
+        every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
+        every { commonSerializationRepoHelper.createDirectory("") } returns false
+
+        viewModel.loadFromInputStream(cachedListName, mockk(), "")
+
+        assert(!viewModel.status.success)
+        assert(viewModel.status.message == FAILED_TO_CREATE_DIR + cachedListName)
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 2)
+    }
+
+    @Test
     fun `load string list FAILURE when INPUT STREAM is VALID but GET ITEM returns NULL`() {
         setupForReadingFiles()
         coEvery { moshiStringListRepository.serialize(any(), any()) } returns true
         every { moshiStringListRepository.getItem(any()) } returns null
         every { moshiStringListRepository.getErrorMsg() } returns FAILED_TO_LOAD_FILE
+        every { commonSerializationRepoHelper.createDirectory("") } returns true
 
-        viewModel.loadFromInputStream(cachedListName, mockk())
+        viewModel.loadFromInputStream(cachedListName, mockk(), "")
 
         assert(!viewModel.status.success)
         assert(viewModel.status.message == FAILED_TO_LOAD_FILE)
@@ -108,8 +127,9 @@ class InputStreamStringListViewModelTests {
         setupForReadingFiles()
         coEvery { moshiStringListRepository.serialize(any(), any()) } returns false
         every { moshiStringListRepository.getItem(cachedListName) } returns null
+        every { commonSerializationRepoHelper.createDirectory("") } returns true
 
-        viewModel.loadFromInputStream(cachedListName, mockk())
+        viewModel.loadFromInputStream(cachedListName, mockk(), "")
 
         assert(!viewModel.status.success)
         assert(viewModel.status.message == FAILED_TO_LOAD_FILE)
@@ -122,7 +142,7 @@ class InputStreamStringListViewModelTests {
         setupForReadingFiles()
         coEvery { moshiStringListRepository.serialize(any(), any()) } throws Exception()
 
-        viewModel.loadFromInputStream(cachedListName, mockk())
+        viewModel.loadFromInputStream(cachedListName, mockk(), "")
 
         assert(!viewModel.status.success)
         assert(viewModel.status.message != null)
@@ -138,10 +158,11 @@ class InputStreamStringListViewModelTests {
         coEvery { moshiStringListRepository.load(cachedListName) } returns true
         every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
         every { moshiStringListRepository.getErrorMsg() } returns ""
+        every { commonSerializationRepoHelper.createDirectory("") } returns true
 
         coEvery { moshiStringListRepository.save(cachedListName, dummyData) } returns false
 
-        viewModel.loadFromInputStream(cachedListName, mockk())
+        viewModel.loadFromInputStream(cachedListName, mockk(), "")
 
         assert(!viewModel.status.success)
         assert(viewModel.status.message == FAILED_TO_WRITE_FILE)
@@ -156,9 +177,10 @@ class InputStreamStringListViewModelTests {
         coEvery { moshiStringListRepository.serialize(any(), any()) } returns true
         coEvery { moshiStringListRepository.load(cachedListName) } returns true
         every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
+        every { commonSerializationRepoHelper.createDirectory("") } returns true
         coEvery { moshiStringListRepository.save(cachedListName, dummyData) } throws Exception()
 
-        viewModel.loadFromInputStream(cachedListName, mockk())
+        viewModel.loadFromInputStream(cachedListName, mockk(), "")
 
         assert(!viewModel.status.success)
         assert(viewModel.status.message != null)

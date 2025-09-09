@@ -107,7 +107,7 @@ class ErrorClassStringProvider : PreviewParameterProvider<ErrorStringHolder> {
 }
 
 @Composable
-fun BasicNoEscapeError(header: String, value: String) {
+fun BasicNoEscapeError(header: String, value: String?) {
     val state = rememberScrollState()
     Column(modifier = Modifier.padding(4.dp)
         .fillMaxHeight()
@@ -124,17 +124,19 @@ fun BasicNoEscapeError(header: String, value: String) {
             color = Color.Red,
             text = header
         )
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-                .fillMaxWidth()
-                .padding(16.dp)
-                .verticalScroll(state)
-        ) {
-            Text(value, modifier = Modifier.fillMaxWidth()
-                .wrapContentHeight()
-                .padding(5.dp),
-                color = Color.Red)
+        value?.let {
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .verticalScroll(state)
+            ) {
+                Text(it, modifier = Modifier.fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(5.dp),
+                    color = Color.Red)
+            }
         }
     }
 }

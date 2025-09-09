@@ -1,5 +1,7 @@
 package com.jonpeps.gamescms.data.serialization
 
+import com.jonpeps.gamescms.ui.main.BasicNoEscapeError
+import software.amazon.awssdk.services.dynamodb.endpoints.internal.Value.Bool
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileWriter
@@ -13,6 +15,7 @@ interface ICommonSerializationRepoHelper {
     fun getMainFile(name: String): File
     fun getFileWriter(directory: String, name: String): FileWriter
     fun readAll(inputStream: InputStream): String
+    fun createDirectory(path: String): Boolean
 }
 
 class CommonSerializationRepoHelper@Inject constructor() : ICommonSerializationRepoHelper {
@@ -46,6 +49,11 @@ class CommonSerializationRepoHelper@Inject constructor() : ICommonSerializationR
 
     override fun readAll(inputStream: InputStream): String {
         return inputStream.bufferedReader().use { it.readText() }
+    }
+
+    override fun createDirectory(path: String): Boolean {
+        val directory = File(path)
+        return if (directory.exists()) true else directory.mkdir()
     }
 
     companion object {

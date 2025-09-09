@@ -10,7 +10,7 @@ class DataConstants {
 
         class Debug {
             companion object {
-                const val DEBUG_LOAD = true
+                const val DEBUG_LOAD = false
                 const val DEBUG_PROJECTS_LIST = "dummy_projects_list.json"
             }
         }

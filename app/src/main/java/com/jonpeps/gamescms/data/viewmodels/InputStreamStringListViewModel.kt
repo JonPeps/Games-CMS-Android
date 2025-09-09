@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import java.io.InputStream
 
 interface IInputStreamStringListViewModel {
-    fun loadFromInputStream(cacheName: String, inputStream: InputStream)
+    fun loadFromInputStream(cacheName: String, inputStream: InputStream, directory: String)
 }
 
 @HiltViewModel(assistedFactory = InputStreamStringListViewModelFactory.IInputStreamStringListViewModelFactory::class)
@@ -29,7 +29,8 @@ interface IInputStreamStringListViewModel {
     private val listItemsVmChangesCache: IStringListItemsVmChangesCache,
     private val coroutineDispatcher: CoroutineDispatcher
 ): BaseStringListViewModel(), IInputStreamStringListViewModel {
-    override fun loadFromInputStream(cacheName: String, inputStream: InputStream) {
+
+    override fun loadFromInputStream(cacheName: String, inputStream: InputStream, directory: String) {
         viewModelScope.launch(coroutineDispatcher) {
             baseIsProcessing.value = true
             items.clear()
@@ -57,13 +58,18 @@ interface IInputStreamStringListViewModel {
             }
             if (success) {
                 try {
-                    initWriteFiles(cacheName)
-                    if (moshiStringListRepository.save(cacheName, StringListMoshi(items))) {
-                        listItemsVmChangesCache.set(cacheName, items)
-                    } else {
-                        items.clear()
+                    if (!commonSerializationRepoHelper.createDirectory(directory)) {
                         success = false
-                        errorMessage = FAILED_TO_WRITE_FILE
+                        errorMessage = FAILED_TO_CREATE_DIR + cacheName
+                    } else {
+                        initWriteFiles(cacheName)
+                        if (moshiStringListRepository.save(cacheName, StringListMoshi(items))) {
+                            listItemsVmChangesCache.set(cacheName, items)
+                        } else {
+                            items.clear()
+                            success = false
+                            errorMessage = FAILED_TO_WRITE_FILE
+                        }
                     }
                 } catch (ex: Exception) {
                     items.clear()
@@ -84,13 +90,14 @@ interface IInputStreamStringListViewModel {
     }
 
     private fun initWriteFiles(cacheName: String) {
+        val fileName = cacheName + JSON_EXTENSION
         moshiStringListRepository.setAbsoluteFile(
-            commonSerializationRepoHelper.getAbsoluteFile(stringListPath, cacheName + JSON_EXTENSION))
-        moshiStringListRepository.setFile(commonSerializationRepoHelper.getMainFile(cacheName + JSON_EXTENSION))
+            commonSerializationRepoHelper.getAbsoluteFile(stringListPath, fileName))
+        moshiStringListRepository.setFile(commonSerializationRepoHelper.getMainFile(fileName))
         moshiStringListRepository.setDirectoryFile(
             commonSerializationRepoHelper.getDirectoryFile(stringListPath))
         moshiStringListRepository.setFileWriter(
-            commonSerializationRepoHelper.getFileWriter(stringListPath, cacheName + JSON_EXTENSION))
+            commonSerializationRepoHelper.getFileWriter(stringListPath, fileName))
         moshiStringListRepository
             .setItem(cacheName, StringListMoshi(items))
     }
@@ -98,5 +105,6 @@ interface IInputStreamStringListViewModel {
     companion object {
         const val FAILED_TO_LOAD_FILE = "Failed to load string list from assets!"
         const val FAILED_TO_WRITE_FILE = "Failed to write string list to local storage!"
+        const val FAILED_TO_CREATE_DIR = "Failed to create directory: "
     }
 }
