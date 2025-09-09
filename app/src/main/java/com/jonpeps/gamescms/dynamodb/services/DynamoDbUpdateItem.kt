@@ -6,11 +6,11 @@ import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse
 
 interface IDynamoDbUpdateItem {
-    suspend fun updateItem(tableName: String, values: Map<String, AttributeValueUpdate>): UpdateItemResponse
+    suspend fun updateItem(): UpdateItemResponse
 }
 
-class DynamoDbUpdateItem : IDynamoDbUpdateItem {
-    override suspend fun updateItem(tableName: String, values: Map<String, AttributeValueUpdate>): UpdateItemResponse {
+class DynamoDbUpdateItem(private val tableName: String, private val values: Map<String, AttributeValueUpdate>) : IDynamoDbUpdateItem {
+    override suspend fun updateItem(): UpdateItemResponse {
         return DynamoDbRequest.getInstance()
             .updateItem(
                 UpdateItemRequest.builder()

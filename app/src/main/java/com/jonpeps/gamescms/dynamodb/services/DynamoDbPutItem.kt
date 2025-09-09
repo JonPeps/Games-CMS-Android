@@ -6,13 +6,12 @@ import software.amazon.awssdk.services.dynamodb.model.PutItemRequest
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse
 
 interface IDynamoDbPutItem {
-    suspend fun putItem(tableName: String,
-                        attributes: Map<String, AttributeValue>): PutItemResponse
+    suspend fun putItem(): PutItemResponse
 }
 
-class DynamoDbPutItem : IDynamoDbPutItem {
-    override suspend fun putItem(tableName: String,
-                                 attributes: Map<String, AttributeValue>): PutItemResponse  {
+class DynamoDbPutItem(private val tableName: String,
+                      private val attributes: Map<String, AttributeValue>) : IDynamoDbPutItem {
+    override suspend fun putItem(): PutItemResponse  {
         return DynamoDbRequest.getInstance()
             .putItem(PutItemRequest.builder()
                 .tableName(tableName)

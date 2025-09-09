@@ -6,11 +6,11 @@ import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse
 
 interface IDynamoDbDeleteItem {
-    suspend fun delete(tableName: String, key: Map<String, AttributeValue>): DeleteItemResponse
+    suspend fun delete(): DeleteItemResponse
 }
 
-class DynamoDbDeleteItem : IDynamoDbDeleteItem {
-    override suspend fun delete(tableName: String, key: Map<String, AttributeValue>): DeleteItemResponse {
+class DynamoDbDeleteItem(private val tableName: String, private val key: Map<String, AttributeValue>) : IDynamoDbDeleteItem {
+    override suspend fun delete(): DeleteItemResponse {
         return DynamoDbRequest.getInstance().deleteItem(DeleteItemRequest.builder()
             .tableName(tableName)
             .key(key)

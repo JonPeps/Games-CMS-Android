@@ -6,11 +6,11 @@ import software.amazon.awssdk.services.dynamodb.model.QueryRequest
 import software.amazon.awssdk.services.dynamodb.model.QueryResponse
 
 interface IDynamoDbQueryTable  {
-    suspend fun query(tableName: String, queryFilter: Map<String, Condition>): QueryResponse
+    suspend fun query(): QueryResponse
 }
 
-class DynamoDbQueryTable : IDynamoDbQueryTable {
-    override suspend fun query(tableName: String, queryFilter: Map<String, Condition>): QueryResponse {
+class DynamoDbQueryTable(private val tableName: String, private val queryFilter: Map<String, Condition>) : IDynamoDbQueryTable {
+    override suspend fun query(): QueryResponse {
         return DynamoDbRequest.getInstance().query(
             QueryRequest
                 .builder()

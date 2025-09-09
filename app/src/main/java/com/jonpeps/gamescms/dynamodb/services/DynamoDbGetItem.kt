@@ -6,11 +6,11 @@ import software.amazon.awssdk.services.dynamodb.model.GetItemRequest
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse
 
 interface IDynamoDbGetItem {
-    suspend fun getItem(tableName: String, key: Map<String, AttributeValue>): GetItemResponse
+    suspend fun getItem(): GetItemResponse
 }
 
-class DynamoDbGetItem : IDynamoDbGetItem {
-    override suspend fun getItem(tableName: String, key: Map<String, AttributeValue>): GetItemResponse {
+class DynamoDbGetItem(private val tableName: String, private val key: Map<String, AttributeValue>) : IDynamoDbGetItem {
+    override suspend fun getItem(): GetItemResponse {
         return DynamoDbRequest.getInstance().getItem(
             GetItemRequest.builder()
             .tableName(tableName)

@@ -7,15 +7,13 @@ import software.amazon.awssdk.services.dynamodb.model.CreateTableResponse
 import software.amazon.awssdk.services.dynamodb.model.KeySchemaElement
 
 interface IDynamoDbCreateTable {
-    suspend fun create(tableName: String,
-                       attributes: List<AttributeDefinition>,
-                       schemas: List<KeySchemaElement>): CreateTableResponse
+    suspend fun create(): CreateTableResponse
 }
 
-class DynamoDbCreateTable : IDynamoDbCreateTable {
-    override suspend fun create(tableName: String,
-                                attributes: List<AttributeDefinition>,
-                                schemas: List<KeySchemaElement>): CreateTableResponse {
+class DynamoDbCreateTable(private val tableName: String,
+                          private val attributes: List<AttributeDefinition>,
+                          private val schemas: List<KeySchemaElement>) : IDynamoDbCreateTable {
+    override suspend fun create(): CreateTableResponse {
         val request =
             CreateTableRequest
                 .builder()
