@@ -6,7 +6,8 @@ class DataConstants {
         const val PROJECT_DIR = "/GamesCMSApp/"
         const val PROJECTS_DIR = "projects/"
         const val PROJECT_LIST_CACHE_NAME = "project_list"
-        const val PROJECTS_LIST = PROJECT_LIST_CACHE_NAME + JSON_EXTENSION
+        const val MAIN_MENU_PROJECTS_ITEM = "Projects"
+        const val MAIN_MENU_TEMPLATES_ITEM = "Templates"
 
         class Debug {
             companion object {
