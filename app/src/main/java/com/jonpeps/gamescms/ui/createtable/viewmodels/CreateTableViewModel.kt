@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.dataclasses.createtemplate.CreateTableItemData
 import com.jonpeps.gamescms.dynamodb.mappers.DynamoDbCreateTableMapper
+import com.jonpeps.gamescms.dynamodb.services.DynamoDbCreateTable
 import com.jonpeps.gamescms.dynamodb.services.IDynamoDbCreateTable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -20,8 +21,7 @@ class TableRequestViewModelResponse<T>(
 
 @HiltViewModel
 class CreateTableViewModel
-@Inject constructor(private val dynamoDbCreateTable: IDynamoDbCreateTable,
-                    private val dispatcher: CoroutineDispatcher)
+@Inject constructor(private val dispatcher: CoroutineDispatcher)
     : ViewModel() {
 
     private val _state = MutableStateFlow(TableRequestViewModelResponse<CreateTableResponse>())
@@ -31,11 +31,8 @@ class CreateTableViewModel
         viewModelScope.launch(dispatcher) {
             try {
                 val mappedItems = DynamoDbCreateTableMapper.mapToCreateTablePair(items)
-                val response
-                    = dynamoDbCreateTable
-                        .create(tableName,
-                            mappedItems.attDefinitions,
-                            mappedItems.keySchema)
+                val dynamoDbCreateTable = DynamoDbCreateTable(tableName, mappedItems.attDefinitions, mappedItems.keySchema)
+                val response = dynamoDbCreateTable.create()
                 _state.value = TableRequestViewModelResponse(true, response, null)
             } catch (ex: Exception) {
                 _state.value = TableRequestViewModelResponse(false, null, ex)

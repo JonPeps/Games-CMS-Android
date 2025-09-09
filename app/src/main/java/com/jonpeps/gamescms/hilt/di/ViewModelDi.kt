@@ -19,10 +19,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 @InstallIn(ViewModelComponent::class)
 class ViewModelDiProvider {
     @Provides
-    fun provideCreateTableViewModel(dynamoDbCreateTable: IDynamoDbCreateTable,
-                                    dispatcher: CoroutineDispatcher
+    fun provideCreateTableViewModel(dispatcher: CoroutineDispatcher
     ): CreateTableViewModel {
-        return CreateTableViewModel(dynamoDbCreateTable, dispatcher)
+        return CreateTableViewModel(dispatcher)
     }
 }
 
