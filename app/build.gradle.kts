@@ -119,4 +119,8 @@ dependencies {
     implementation(libs.moshi.kotlin.v1150)
     kapt(libs.moshi.kotlin.codegen.v1150)
     implementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.activity.compose.v172)
+    implementation(libs.ui)
+    implementation(libs.androidx.material.v143)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 }

@@ -2,6 +2,7 @@ package com.jonpeps.gamescms.ui.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,7 +38,7 @@ import com.jonpeps.gamescms.ui.applevel.DarkColors
 import com.jonpeps.gamescms.ui.applevel.LightColors
 
 @Composable
-fun CommonStringListView(items: List<String>, useDarkTheme: Boolean = isSystemInDarkTheme()) {
+fun CommonStringListView(items: List<String>, onClick: (text: String) -> Unit = {}, useDarkTheme: Boolean = isSystemInDarkTheme()) {
     val colors = if (useDarkTheme) {
         DarkColors
     } else {
@@ -62,6 +63,7 @@ fun CommonStringListView(items: List<String>, useDarkTheme: Boolean = isSystemIn
                         color = colors.primary,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
+                            .clickable { onClick(item) }
                             .padding(10.dp, 20.dp, 10.dp)
                             .fillMaxWidth()
                             .fillMaxHeight()
@@ -79,12 +81,14 @@ fun CommonLoadingScreen(useDarkTheme: Boolean = isSystemInDarkTheme()) {
     } else {
         LightColors
     }
-    val backgroundColor
-            = Color(colors.background.red,
+    val backgroundColor = Color(
+        colors.background.red,
         colors.background.green,
         colors.background.blue,
-        alpha = 0.75f)
-    Box(contentAlignment = Alignment.Center,
+        alpha = 0.75f
+    )
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxSize()
             .background(backgroundColor)
@@ -95,15 +99,16 @@ fun CommonLoadingScreen(useDarkTheme: Boolean = isSystemInDarkTheme()) {
             strokeWidth = 5.dp
         )
     }
-}
 
-class ErrorStringHolder(val header: String, val value: String, val repeatCount: Int = 350)
+    class ErrorStringHolder(val header: String, val value: String, val repeatCount: Int = 350)
 
-class ErrorClassStringProvider : PreviewParameterProvider<ErrorStringHolder> {
-    override val values: Sequence<ErrorStringHolder>
-    = sequenceOf(
-        ErrorStringHolder(
-            "An error occurred, correct your logic!", "An exception! "))
+    class ErrorClassStringProvider : PreviewParameterProvider<ErrorStringHolder> {
+        override val values: Sequence<ErrorStringHolder> = sequenceOf(
+            ErrorStringHolder(
+                "An error occurred, correct your logic!", "An exception! "
+            )
+        )
+    }
 }
 
 @Composable

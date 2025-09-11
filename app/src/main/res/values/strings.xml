@@ -18,4 +18,8 @@
     <string name="error_no_primary_key">No primary key</string>
     <string name="error_no_sort_key">No sort key</string>
 
+    <!-- Error Handling Messages -->
+    <string name="error_unknown">An unknown error occurred</string>
+    <string name="npe_viewmodel">NPE on viewModel!</string>
+
 </resources>

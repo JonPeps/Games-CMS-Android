@@ -2,7 +2,9 @@
 activityCompose = "1.10.1"
 activityComposeVersion = "1.8.2"
 agp = "8.8.1"
+androidxActivityCompose = "1.7.2"
 androidxHiltCompiler = "1.1.0"
+androidxMaterial = "1.4.3"
 androidxMaterial3 = "1.4.0-alpha13"
 bom = "<VERSION>"
 bomVersion = "2.31.3"
@@ -44,6 +46,7 @@ kotlinxCoroutinesCore = "1.7.1"
 kotlinxCoroutinesTest = "1.7.1"
 kotlinxMetadataJvm = "LATEST_KOTLINX_METADATA_VERSION"
 lifecycleRuntimeKtx = "2.8.7"
+lifecycleViewmodelCompose = "2.9.3"
 material = "1.12.0"
 constraintlayout = "2.2.1"
 lifecycleLivedataKtx = "2.8.7"
@@ -85,10 +88,12 @@ squareupMoshi = "1.15.0"
 squareupMoshiKotlin = "1.12.0"
 squareupMoshiKotlinCodegen = "1.15.0"
 squareupMoshiKotlinVersion = "1.15.0"
+ui = "1.9.1"
 uiTooling = "1.9.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+androidx-activity-compose-v172 = { module = "androidx.activity:activity-compose", version.ref = "androidxActivityCompose" }
 androidx-activity-compose-v182 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
 androidx-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compiler" }
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
@@ -102,7 +107,9 @@ androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-com
 androidx-hilt-navigation-fragment = { module = "androidx.hilt:hilt-navigation-fragment", version.ref = "hiltCommonVersion" }
 androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltCommonVersion" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
+androidx-material-v143 = { module = "androidx.compose.material:material", version.ref = "androidxMaterial" }
 androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 androidx-material3-v132 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
 androidx-material3-v140alpha13 = { module = "androidx.compose.material3:material3", version.ref = "androidxMaterial3" }
@@ -188,6 +195,7 @@ powermock-module-junit4 = { module = "org.powermock:powermock-module-junit4", ve
 powermock-module-junit4-v173 = { module = "org.powermock:powermock-module-junit4", version.ref = "powermockModuleJunit4Version" }
 runtime = { module = "androidx.compose.runtime:runtime", version.ref = "runtime" }
 squareup-moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshiKotlinVersion" }
+ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
