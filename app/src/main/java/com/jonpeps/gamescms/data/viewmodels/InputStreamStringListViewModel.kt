@@ -16,21 +16,19 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import java.io.InputStream
 
-interface IInputStreamStringListViewModel {
-    fun loadFromInputStream(cacheName: String, inputStream: InputStream, directory: String)
-}
-
 @HiltViewModel(assistedFactory = InputStreamStringListViewModelFactory.IInputStreamStringListViewModelFactory::class)
     class InputStreamStringListViewModel@AssistedInject constructor(
     @Assisted("param1") private val stringListPath: String,
+    @Assisted("param2") private val inputStream: InputStream,
+    @Assisted("param3") private val directory: String,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val inputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper,
     private val moshiStringListRepository: IMoshiStringListRepository,
     private val listItemsVmChangesCache: IStringListItemsVmChangesCache,
     private val coroutineDispatcher: CoroutineDispatcher
-): BaseStringListViewModel(), IInputStreamStringListViewModel {
+): BaseStringListViewModel(), IBaseStringListViewModel {
 
-    override fun loadFromInputStream(cacheName: String, inputStream: InputStream, directory: String) {
+    override fun load(cacheName: String, loadFromCacheIfExists: Boolean) {
         viewModelScope.launch(coroutineDispatcher) {
             baseIsProcessing.value = true
             items.clear()

@@ -15,8 +15,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 
-interface ICommonStringListViewModel {
-    fun loadFromFile(cacheName: String, loadFromCacheIfExists: Boolean = true)
+interface ICommonStringListViewModel: IBaseStringListViewModel {
     fun add(name: String)
     fun delete(name: String, subDeleteFlag: SubDeleteFlag = SubDeleteFlag.NONE)
 }
@@ -34,7 +33,7 @@ class CommonStringListViewModel
 ): BaseStringListViewModel(), ICommonStringListViewModel {
     private var cacheName = ""
 
-    override fun loadFromFile(cacheName: String, loadFromCacheIfExists: Boolean) {
+    override fun load(cacheName: String, loadFromCacheIfExists: Boolean) {
         this.cacheName = cacheName
         viewModelScope.launch(coroutineDispatcher) {
             baseIsProcessing.value = true

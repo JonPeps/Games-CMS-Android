@@ -5,7 +5,11 @@ import com.jonpeps.gamescms.data.serialization.StringListStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-open class BaseStringListViewModel: ViewModel() {
+interface IBaseStringListViewModel {
+    fun load(cacheName: String, loadFromCacheIfExists: Boolean = true)
+}
+
+abstract class BaseStringListViewModel: ViewModel(), IBaseStringListViewModel {
     var status: StringListStatus = StringListStatus(true, arrayListOf(), "", null)
 
     protected var baseIsProcessing = MutableStateFlow(false)

@@ -59,8 +59,15 @@ class MainActivity : FragmentActivity() {
                 .fillMaxHeight()
         ) {
             CommonStringListView(listOf(MAIN_MENU_PROJECTS_ITEM, MAIN_MENU_TEMPLATES_ITEM), {
+                val fragment = when (it) {
+                    MAIN_MENU_PROJECTS_ITEM -> {
+                        ProjectsFragment()
+                    } else -> {
+                        TemplatesFragment()
+                    }
+                }
                 supportFragmentManager.commit {
-                    add()
+
                 }
             })
         }

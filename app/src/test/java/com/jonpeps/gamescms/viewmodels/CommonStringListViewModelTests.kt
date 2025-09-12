@@ -70,7 +70,7 @@ class CommonStringListViewModelTests {
         every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
         every { moshiStringListRepository.getErrorMsg() } returns ""
 
-        viewModel.loadFromFile(cachedListName, false)
+        viewModel.load(cachedListName, false)
 
         verify { listItemsVmChangesCache.set(any(), any()) }
 
@@ -91,7 +91,7 @@ class CommonStringListViewModelTests {
         every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
         every { moshiStringListRepository.getErrorMsg() } returns ""
 
-        viewModel.loadFromFile(cachedListName, true)
+        viewModel.load(cachedListName, true)
 
         verify { listItemsVmChangesCache.set(any(), any()) }
 
@@ -107,7 +107,7 @@ class CommonStringListViewModelTests {
         every { listItemsVmChangesCache.get(cachedListName) } returns dummyListData
         coEvery { moshiStringListRepository.load(cachedListName) } returns true
 
-        viewModel.loadFromFile(cachedListName, true)
+        viewModel.load(cachedListName, true)
 
         assert(viewModel.status.success)
         assert(viewModel.status.message == "")
@@ -126,7 +126,7 @@ class CommonStringListViewModelTests {
         every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
         every { moshiStringListRepository.getErrorMsg() } returns ""
 
-        viewModel.loadFromFile(cachedListName, false)
+        viewModel.load(cachedListName, false)
 
         assert(!viewModel.status.success)
         assert(viewModel.status.message == FAILED_TO_LOAD_FILE + filesListPath)
@@ -145,7 +145,7 @@ class CommonStringListViewModelTests {
         every { moshiStringListRepository.getItem(cachedListName) } returns null
         every { moshiStringListRepository.getErrorMsg() } returns ""
 
-        viewModel.loadFromFile(cachedListName, false)
+        viewModel.load(cachedListName, false)
 
         assert(!viewModel.status.success)
         assert(viewModel.status.message == FAILED_TO_LOAD_FILE + filesListPath)
@@ -159,7 +159,7 @@ class CommonStringListViewModelTests {
         every { commonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
         every { commonSerializationRepoHelper.getAbsoluteFile(any(), any()) } throws Exception("Runtime error!")
 
-        viewModel.loadFromFile(cachedListName, false)
+        viewModel.load(cachedListName, false)
 
         assert(!viewModel.status.success)
         assert(viewModel.status.message == "Runtime error!")
