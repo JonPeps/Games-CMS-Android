@@ -80,6 +80,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(platform(libs.bom.v2313))
     implementation(libs.dynamodb.enhanced)
+    implementation(libs.androidx.fragment.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

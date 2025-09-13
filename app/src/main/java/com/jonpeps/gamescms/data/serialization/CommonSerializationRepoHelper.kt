@@ -1,7 +1,5 @@
 package com.jonpeps.gamescms.data.serialization
 
-import com.jonpeps.gamescms.ui.main.BasicNoEscapeError
-import software.amazon.awssdk.services.dynamodb.endpoints.internal.Value.Bool
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileWriter
@@ -53,7 +51,10 @@ class CommonSerializationRepoHelper@Inject constructor() : ICommonSerializationR
 
     override fun createDirectory(path: String): Boolean {
         val directory = File(path)
-        return if (directory.exists()) true else directory.mkdir()
+        if (!directory.exists()) {
+            return directory.mkdirs()
+        }
+        return true
     }
 
     companion object {

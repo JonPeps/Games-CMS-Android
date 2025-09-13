@@ -18,9 +18,8 @@ import java.io.InputStream
 
 @HiltViewModel(assistedFactory = InputStreamStringListViewModelFactory.IInputStreamStringListViewModelFactory::class)
     class InputStreamStringListViewModel@AssistedInject constructor(
-    @Assisted("param1") private val stringListPath: String,
-    @Assisted("param2") private val inputStream: InputStream,
-    @Assisted("param3") private val directory: String,
+    @Assisted("param1") private val inputStream: InputStream,
+    @Assisted("param2") private val directory: String,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val inputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper,
     private val moshiStringListRepository: IMoshiStringListRepository,
@@ -30,7 +29,6 @@ import java.io.InputStream
 
     override fun load(cacheName: String, loadFromCacheIfExists: Boolean) {
         viewModelScope.launch(coroutineDispatcher) {
-            baseIsProcessing.value = true
             items.clear()
             exception = null
             var errorMessage = ""
@@ -58,7 +56,7 @@ import java.io.InputStream
                 try {
                     if (!commonSerializationRepoHelper.createDirectory(directory)) {
                         success = false
-                        errorMessage = FAILED_TO_CREATE_DIR + cacheName
+                        errorMessage = FAILED_TO_CREATE_DIR + directory
                     } else {
                         initWriteFiles(cacheName)
                         if (moshiStringListRepository.save(cacheName, StringListMoshi(items))) {
@@ -76,7 +74,7 @@ import java.io.InputStream
                     success = false
                 }
             }
-            baseIsProcessing.value = false
+            baseHasFinishedObtainingData.value = true
             status = StringListStatus(success, items, errorMessage, exception)
         }
     }
@@ -90,12 +88,12 @@ import java.io.InputStream
     private fun initWriteFiles(cacheName: String) {
         val fileName = cacheName + JSON_EXTENSION
         moshiStringListRepository.setAbsoluteFile(
-            commonSerializationRepoHelper.getAbsoluteFile(stringListPath, fileName))
+            commonSerializationRepoHelper.getAbsoluteFile(directory, fileName))
         moshiStringListRepository.setFile(commonSerializationRepoHelper.getMainFile(fileName))
         moshiStringListRepository.setDirectoryFile(
-            commonSerializationRepoHelper.getDirectoryFile(stringListPath))
+            commonSerializationRepoHelper.getDirectoryFile(directory))
         moshiStringListRepository.setFileWriter(
-            commonSerializationRepoHelper.getFileWriter(stringListPath, fileName))
+            commonSerializationRepoHelper.getFileWriter(directory, fileName))
         moshiStringListRepository
             .setItem(cacheName, StringListMoshi(items))
     }

@@ -11,20 +11,18 @@ import java.io.InputStream
 class InputStreamStringListViewModelFactory {
     @AssistedFactory
     interface IInputStreamStringListViewModelFactory {
-        fun create(@Assisted("param1") listPath: String,
-                   @Assisted("param2") inputStream: InputStream,
-                   @Assisted("param3") directory: String): InputStreamStringListViewModel
+        fun create(@Assisted("param1") inputStream: InputStream,
+                   @Assisted("param2") directory: String): InputStreamStringListViewModel
     }
 
     companion object {
         fun provideFactory(
-            stringListPath: String,
             inputStream: InputStream,
             directory: String,
             assistedFactory: IInputStreamStringListViewModelFactory
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(stringListPath, inputStream, directory) as T
+                return assistedFactory.create(inputStream, directory) as T
             }
         }
     }

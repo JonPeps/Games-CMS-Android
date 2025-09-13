@@ -1,5 +1,6 @@
 package com.jonpeps.gamescms.ui.main
 
+import android.os.Bundle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -34,6 +35,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jonpeps.gamescms.data.DataConstants.Companion.BundleKeys.Companion.COLOUR_B
+import com.jonpeps.gamescms.data.DataConstants.Companion.BundleKeys.Companion.COLOUR_G
+import com.jonpeps.gamescms.data.DataConstants.Companion.BundleKeys.Companion.COLOUR_R
 import com.jonpeps.gamescms.ui.applevel.DarkColors
 import com.jonpeps.gamescms.ui.applevel.LightColors
 
@@ -144,4 +148,17 @@ fun BasicNoEscapeError(header: String, value: String?) {
             }
         }
     }
+}
+
+fun colourToBundle(bundle: Bundle, red: Float, green: Float, blue: Float) {
+    bundle.putFloat(COLOUR_R, red)
+    bundle.putFloat(COLOUR_G, green)
+    bundle.putFloat(COLOUR_B, blue)
+}
+
+fun fromColourBundle(bundle: Bundle): Color {
+    val red = bundle.getFloat(COLOUR_R)
+    val green = bundle.getFloat(COLOUR_G)
+    val blue = bundle.getFloat(COLOUR_B)
+    return Color(red, green, blue)
 }

@@ -1,58 +1,53 @@
 package com.jonpeps.gamescms.ui.main
 
+import android.os.Bundle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jonpeps.gamescms.R
 import com.jonpeps.gamescms.data.DataConstants
+import com.jonpeps.gamescms.data.DataConstants.Companion.BundleKeys.Companion.CACHED_NAME_KEY
+import com.jonpeps.gamescms.data.DataConstants.Companion.BundleKeys.Companion.DEBUG_FILENAME_KEY
+import com.jonpeps.gamescms.data.DataConstants.Companion.BundleKeys.Companion.EXT_STORAGE_PATH
+import com.jonpeps.gamescms.data.DataConstants.Companion.BundleKeys.Companion.FILE_PATH_KEY
 import com.jonpeps.gamescms.data.viewmodels.CommonStringListViewModel
 import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel
 import com.jonpeps.gamescms.data.viewmodels.factories.InputStreamStringListViewModelFactory
 import com.jonpeps.gamescms.data.viewmodels.factories.ListViewModelFactory
 
 abstract class BaseStrListviewFragment : MainContainerFragment() {
-    protected var filePath: String? = null
-    protected var cachedName: String? = null
-    protected var debugFilename: String? = null
-    protected var colourScheme: ColorScheme? = null
-
     @Composable
     override fun GetContent() {
+        val externalStoragePath = arguments?.getString(EXT_STORAGE_PATH)?:""
+        val cachedName = arguments?.getString(CACHED_NAME_KEY)?:""
+        val debugFilename = arguments?.getString(DEBUG_FILENAME_KEY)?:""
+        val colour = fromColourBundle(arguments?:Bundle())
         val context = requireContext()
         val viewModel = if (DataConstants.Companion.Debug.DEBUG_LOAD) {
             hiltViewModel<InputStreamStringListViewModel,
                     InputStreamStringListViewModelFactory.IInputStreamStringListViewModelFactory>(
                 creationCallback = {
-                    it.create(
-                        filePath?:"",
-                        context.assets.open(debugFilename?:""),
-                        filePath?:""
-                    )
+                    it.create(context.assets.open(debugFilename), externalStoragePath)
                 }
             )
         } else {
             hiltViewModel<CommonStringListViewModel,
                     ListViewModelFactory.ICommonStringListViewModelFactory>(
                 creationCallback = {
-                    it.create(
-                        filePath?:"",
-                        cachedName?:""
-                    )
+                    it.create(externalStoragePath, cachedName)
                 })
         }
 
-        val shouldPostToUI = viewModel.isProcessing.collectAsStateWithLifecycle()
+        val shouldPostToUI = viewModel.hasFinishedObtainingData.collectAsState()
         if (shouldPostToUI.value) {
             if (viewModel.status.success) {
                 Column(
                     modifier = Modifier
-                        .background(colourScheme?.scrim?: Color.Gray)
+                        .background(colour)
                         .fillMaxHeight()
                 ) {
                     CommonStringListView(viewModel.status.items, {
@@ -67,10 +62,11 @@ abstract class BaseStrListviewFragment : MainContainerFragment() {
             }
         } else {
             CommonLoadingScreen()
+            viewModel.load(cachedName)
         }
     }
 
-    abstract fun onClick(text: String)
+    protected abstract fun onClick(text: String)
 
-    abstract fun onError(title: String, message: String? = null)
+    protected abstract fun onError(title: String, message: String? = null)
 }

@@ -12,8 +12,8 @@ interface IBaseStringListViewModel {
 abstract class BaseStringListViewModel: ViewModel(), IBaseStringListViewModel {
     var status: StringListStatus = StringListStatus(true, arrayListOf(), "", null)
 
-    protected var baseIsProcessing = MutableStateFlow(false)
-    val isProcessing: StateFlow<Boolean> = baseIsProcessing
+    protected var baseHasFinishedObtainingData = MutableStateFlow(false)
+    val hasFinishedObtainingData: StateFlow<Boolean> = baseHasFinishedObtainingData
 
     protected var items = arrayListOf<String>()
     protected var exception: Exception? = null

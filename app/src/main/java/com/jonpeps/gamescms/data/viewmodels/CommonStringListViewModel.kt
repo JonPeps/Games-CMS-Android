@@ -36,7 +36,6 @@ class CommonStringListViewModel
     override fun load(cacheName: String, loadFromCacheIfExists: Boolean) {
         this.cacheName = cacheName
         viewModelScope.launch(coroutineDispatcher) {
-            baseIsProcessing.value = true
             items.clear()
             exception = null
             var errorMessage = ""
@@ -67,14 +66,14 @@ class CommonStringListViewModel
                     listItemsVmChangesCache.set(cacheName, items)
                 }
             }
-            baseIsProcessing.value = false
+            baseHasFinishedObtainingData.value = true
             status = StringListStatus(success, items, errorMessage, exception)
         }
     }
 
     override fun add(name: String) {
         viewModelScope.launch(coroutineDispatcher) {
-            baseIsProcessing.value = true
+            baseHasFinishedObtainingData.value = false
             initWriteFiles(name)
             items.add(name)
             var success = true
@@ -84,14 +83,14 @@ class CommonStringListViewModel
                 success = false
                 items.remove(name)
             }
-            baseIsProcessing.value = false
+            baseHasFinishedObtainingData.value = true
             status = StringListStatus(success, items, if (success) "" else FAILED_TO_SAVE_FILE + name, null)
         }
     }
 
     override fun delete(name: String, subDeleteFlag: SubDeleteFlag) {
         viewModelScope.launch(coroutineDispatcher) {
-            baseIsProcessing.value = true
+            baseHasFinishedObtainingData.value = false
             initWriteFiles(name)
             items.remove(name)
             var success = true
@@ -112,7 +111,7 @@ class CommonStringListViewModel
                 success = false
                 message = FAILED_TO_DELETE_FILE + name
             }
-            baseIsProcessing.value = false
+            baseHasFinishedObtainingData.value = true
             status = StringListStatus(success, items, message, null)
         }
     }
