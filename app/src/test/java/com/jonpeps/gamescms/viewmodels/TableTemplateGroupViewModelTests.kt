@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.createtable.viewmodels
+package com.jonpeps.gamescms.viewmodels
 
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.data.dataclasses.TableItemFinal

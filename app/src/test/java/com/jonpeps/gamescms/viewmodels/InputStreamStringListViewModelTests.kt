@@ -36,7 +36,6 @@ class InputStreamStringListViewModelTests {
     private val dummyListData = arrayListOf("item1", "item2")
     private val dummyData = StringListMoshi(dummyListData)
 
-    private val filesListPath = "test1/"
     private val cachedListName = "list"
 
     @Before
@@ -44,9 +43,8 @@ class InputStreamStringListViewModelTests {
         MockKAnnotations.init(this)
 
         viewModel = InputStreamStringListViewModel(
-            filesListPath,
             mockk(),
-            "",
+            "dir",
             commonSerializationRepoHelper,
             assetSerializationRepoHelper,
             moshiStringListRepository,
@@ -65,7 +63,7 @@ class InputStreamStringListViewModelTests {
         coEvery { moshiStringListRepository.load(cachedListName) } returns true
         every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
         every { moshiStringListRepository.getErrorMsg() } returns ""
-        every { commonSerializationRepoHelper.createDirectory("") } returns true
+        every { commonSerializationRepoHelper.createDirectory("dir") } returns true
 
         coEvery { moshiStringListRepository.serialize(any(), any()) } returns true
         coEvery { moshiStringListRepository.save(any(), any()) } returns true
@@ -83,7 +81,7 @@ class InputStreamStringListViewModelTests {
         setupForReadingFiles()
         coEvery { moshiStringListRepository.serialize(any(), any()) } returns false
         every { moshiStringListRepository.getErrorMsg() } returns FAILED_TO_LOAD_FILE
-        every { commonSerializationRepoHelper.createDirectory("") } returns true
+        every { commonSerializationRepoHelper.createDirectory("dir") } returns true
 
         viewModel.load(cachedListName)
 
@@ -98,12 +96,12 @@ class InputStreamStringListViewModelTests {
         setupForReadingFiles()
         coEvery { moshiStringListRepository.serialize(any(), any()) } returns true
         every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
-        every { commonSerializationRepoHelper.createDirectory("") } returns false
+        every { commonSerializationRepoHelper.createDirectory("dir") } returns false
 
-        viewModel.load(cachedListName, mockk())
+        viewModel.load(cachedListName)
 
         assert(!viewModel.status.success)
-        assert(viewModel.status.message == FAILED_TO_CREATE_DIR + cachedListName)
+        assert(viewModel.status.message == FAILED_TO_CREATE_DIR + "dir")
         assert(viewModel.status.ex == null)
         assert(viewModel.status.items.size == 2)
     }
@@ -114,7 +112,7 @@ class InputStreamStringListViewModelTests {
         coEvery { moshiStringListRepository.serialize(any(), any()) } returns true
         every { moshiStringListRepository.getItem(any()) } returns null
         every { moshiStringListRepository.getErrorMsg() } returns FAILED_TO_LOAD_FILE
-        every { commonSerializationRepoHelper.createDirectory("") } returns true
+        every { commonSerializationRepoHelper.createDirectory("dir") } returns true
 
         viewModel.load(cachedListName)
 
@@ -129,7 +127,7 @@ class InputStreamStringListViewModelTests {
         setupForReadingFiles()
         coEvery { moshiStringListRepository.serialize(any(), any()) } returns false
         every { moshiStringListRepository.getItem(cachedListName) } returns null
-        every { commonSerializationRepoHelper.createDirectory("") } returns true
+        every { commonSerializationRepoHelper.createDirectory("dir") } returns true
 
         viewModel.load(cachedListName)
 
@@ -160,7 +158,7 @@ class InputStreamStringListViewModelTests {
         coEvery { moshiStringListRepository.load(cachedListName) } returns true
         every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
         every { moshiStringListRepository.getErrorMsg() } returns ""
-        every { commonSerializationRepoHelper.createDirectory("") } returns true
+        every { commonSerializationRepoHelper.createDirectory("dir") } returns true
 
         coEvery { moshiStringListRepository.save(cachedListName, dummyData) } returns false
 
@@ -179,7 +177,7 @@ class InputStreamStringListViewModelTests {
         coEvery { moshiStringListRepository.serialize(any(), any()) } returns true
         coEvery { moshiStringListRepository.load(cachedListName) } returns true
         every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
-        every { commonSerializationRepoHelper.createDirectory("") } returns true
+        every { commonSerializationRepoHelper.createDirectory("dir") } returns true
         coEvery { moshiStringListRepository.save(cachedListName, dummyData) } throws Exception()
 
         viewModel.load(cachedListName)

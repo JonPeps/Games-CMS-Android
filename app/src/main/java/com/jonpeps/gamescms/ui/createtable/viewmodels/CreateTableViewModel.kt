@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.dataclasses.createtemplate.CreateTableItemData
 import com.jonpeps.gamescms.dynamodb.mappers.DynamoDbCreateTableMapper
 import com.jonpeps.gamescms.dynamodb.services.DynamoDbCreateTable
-import com.jonpeps.gamescms.dynamodb.services.IDynamoDbCreateTable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow

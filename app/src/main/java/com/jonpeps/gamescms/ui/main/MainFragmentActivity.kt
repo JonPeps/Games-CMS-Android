@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.ui.main
 
 import android.os.Bundle
-import androidx.activity.compose.BackHandler
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -35,11 +35,18 @@ class MainFragmentActivity : FragmentActivity() {
                     MainContent(colors.scrim)
                 }
             }
+        }
 
-            BackHandler {
-                finish()
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (supportFragmentManager.backStackEntryCount > 0) {
+                    supportFragmentManager.popBackStack()
+                } else {
+                    finish()
+                }
             }
         }
+        onBackPressedDispatcher.addCallback(this, callback)
     }
 
     @Composable

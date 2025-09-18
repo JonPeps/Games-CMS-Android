@@ -29,7 +29,7 @@ class MainFragment : MainContainerFragment() {
                             TableTemplatesListFragment.newInstance(colour, context)
                         }
                         activity.supportFragmentManager.beginTransaction()
-                            .replace(R.id.main_fragment_activity_container, fragment)
+                            .add(R.id.main_fragment_activity_container, fragment)
                             .commit()
                     }
                 }
