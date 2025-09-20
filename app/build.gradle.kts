@@ -10,7 +10,7 @@ plugins {
 
 android {
     namespace = "com.jonpeps.gamescms"
-    compileSdk = 35
+    compileSdk = 36
 
     buildFeatures {
         buildConfig = true
@@ -124,4 +124,7 @@ dependencies {
     implementation(libs.ui)
     implementation(libs.androidx.material.v143)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
 }

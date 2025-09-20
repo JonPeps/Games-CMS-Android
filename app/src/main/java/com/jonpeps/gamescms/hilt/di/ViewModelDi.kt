@@ -4,8 +4,7 @@ import com.jonpeps.gamescms.data.serialization.CommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.debug.InputStreamSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.debug.IInputStreamSerializationRepoHelper
-import com.jonpeps.gamescms.dynamodb.services.IDynamoDbCreateTable
-import com.jonpeps.gamescms.ui.createtable.viewmodels.CreateTableViewModel
+import com.jonpeps.gamescms.ui.viewmodels.CreateTableViewModel
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmChangesCache
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupVmChangesCache
 import dagger.Binds

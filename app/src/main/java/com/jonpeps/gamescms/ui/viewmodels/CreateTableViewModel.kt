@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.ui.createtable.viewmodels
+package com.jonpeps.gamescms.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
