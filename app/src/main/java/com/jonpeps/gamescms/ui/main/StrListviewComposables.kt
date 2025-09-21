@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jonpeps.gamescms.R
 import com.jonpeps.gamescms.data.DataConstants
@@ -15,13 +14,14 @@ import com.jonpeps.gamescms.data.viewmodels.CommonStringListViewModel
 import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel
 import com.jonpeps.gamescms.data.viewmodels.factories.InputStreamStringListViewModelFactory
 import com.jonpeps.gamescms.data.viewmodels.factories.ListViewModelFactory
+import com.jonpeps.gamescms.ui.applevel.CustomColours
 
 @Composable
 fun ShowStrList(context: Context,
                 storagePath: String,
                 cachedName: String,
                 debugFilename: String,
-                backgroundColour: Color,
+                customColours: CustomColours,
                 onClick: (String) -> Unit,
                 onError: @Composable (String, String?) -> Unit) {
     val viewModel = if (DataConstants.Companion.Debug.DEBUG_LOAD) {
@@ -44,12 +44,12 @@ fun ShowStrList(context: Context,
         if (viewModel.status.success) {
             Column(
                 modifier = Modifier
-                    .background(backgroundColour)
+                    .background(customColours.background)
                     .fillMaxHeight()
             ) {
                 CommonStringListView(viewModel.status.items, {
                     onClick(it)
-                })
+                }, customColours)
             }
         } else {
             onError(
@@ -58,7 +58,7 @@ fun ShowStrList(context: Context,
             )
         }
     } else {
-        CommonLoadingScreen()
+        CommonLoadingScreen(customColours)
         viewModel.load(cachedName)
     }
 }

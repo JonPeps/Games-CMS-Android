@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -36,18 +35,14 @@ import androidx.compose.ui.unit.sp
 import com.jonpeps.gamescms.data.DataConstants.Companion.BundleKeys.Companion.COLOUR_B
 import com.jonpeps.gamescms.data.DataConstants.Companion.BundleKeys.Companion.COLOUR_G
 import com.jonpeps.gamescms.data.DataConstants.Companion.BundleKeys.Companion.COLOUR_R
-import com.jonpeps.gamescms.ui.applevel.DarkColors
-import com.jonpeps.gamescms.ui.applevel.LightColors
+import com.jonpeps.gamescms.ui.applevel.CustomColours
+
+
 
 @Composable
-fun CommonStringListView(items: List<String>, onClick: (text: String) -> Unit = {}, useDarkTheme: Boolean = isSystemInDarkTheme()) {
-    val colors = if (useDarkTheme) {
-        DarkColors
-    } else {
-        LightColors
-    }
+fun CommonStringListView(items: List<String>, onClick: (text: String) -> Unit = {}, customColours: CustomColours) {
     LazyColumn(
-            modifier = Modifier.padding(10.dp).background(colors.scrim)
+            modifier = Modifier.padding(10.dp).background(customColours.background)
         ) {
             itemsIndexed(items) { _, item ->
                 ElevatedCard(
@@ -57,13 +52,13 @@ fun CommonStringListView(items: List<String>, onClick: (text: String) -> Unit = 
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(75.dp)
-                        .background(colors.scrim)
+                        .background(customColours.background)
                         .clickable { onClick(item) }
                 ) {
                     Text(
                         text = item,
                         fontSize = 30.sp,
-                        color = colors.primary,
+                        color = customColours.primary,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
                             .padding(10.dp, 20.dp, 10.dp)
@@ -78,16 +73,11 @@ fun CommonStringListView(items: List<String>, onClick: (text: String) -> Unit = 
     }
 
 @Composable
-fun CommonLoadingScreen(useDarkTheme: Boolean = isSystemInDarkTheme()) {
-    val colors = if (useDarkTheme) {
-        DarkColors
-    } else {
-        LightColors
-    }
+fun CommonLoadingScreen(customColours: CustomColours) {
     val backgroundColor = Color(
-        colors.background.red,
-        colors.background.green,
-        colors.background.blue,
+        customColours.background.red,
+        customColours.background.green,
+        customColours.background.blue,
         alpha = 0.75f
     )
     Box(
@@ -98,7 +88,7 @@ fun CommonLoadingScreen(useDarkTheme: Boolean = isSystemInDarkTheme()) {
     ) {
         CircularProgressIndicator(
             modifier = Modifier.size(64.dp),
-            color = colors.onBackground,
+            color = customColours.spinner,
             strokeWidth = 5.dp
         )
     }

@@ -13,22 +13,34 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
+import com.jonpeps.gamescms.R
 import com.jonpeps.gamescms.data.DataConstants.Companion.MAIN_MENU_PROJECTS_ITEM
 import com.jonpeps.gamescms.data.DataConstants.Companion.MAIN_MENU_TEMPLATES_ITEM
-import com.jonpeps.gamescms.ui.applevel.DarkColors
-import com.jonpeps.gamescms.ui.applevel.LightColors
+import com.jonpeps.gamescms.ui.applevel.CustomColours
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -39,26 +51,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val useDarkTheme = isSystemInDarkTheme()
-            val colors = if (useDarkTheme) {
-                DarkColors
-            } else {
-                LightColors
-            }
-
             Surface {
-                MaterialTheme(
-                    colorScheme = colors,
-                ) {
-                    SetupNavigation(viewModel, colors)
-                }
+                MainContent(viewModel, CustomColours(isSystemInDarkTheme()))
             }
         }
     }
 
     @Composable
-    fun ShowStartScreen(viewModel: ScreenFlowViewModel, backgroundColour: Color) {
-        Box(modifier = Modifier.fillMaxHeight().fillMaxWidth().background(backgroundColour)) {
+    fun ShowStartScreen(viewModel: ScreenFlowViewModel, customColours: CustomColours) {
+        Box(modifier = Modifier.fillMaxHeight().fillMaxWidth().background(customColours.background)) {
             CommonStringListView(
                 listOf(MAIN_MENU_PROJECTS_ITEM, MAIN_MENU_TEMPLATES_ITEM), { text ->
                     if (text == MAIN_MENU_PROJECTS_ITEM) {
@@ -66,12 +67,12 @@ class MainActivity : ComponentActivity() {
                     } else {
                         viewModel.navigateTo(ScreenFlow.Screen(MAIN_MENU_TEMPLATES_ITEM))
                     }
-                })
+                }, customColours)
         }
     }
 
     @Composable
-    fun SetupNavigation(viewModel: ScreenFlowViewModel, colourScheme: ColorScheme) {
+    fun CoreNavigation(viewModel: ScreenFlowViewModel, customColours: CustomColours) {
         val backStack = viewModel.backStack
 
         BackHandler(enabled = backStack.size > 1) {
@@ -89,14 +90,14 @@ class MainActivity : ComponentActivity() {
                rememberViewModelStoreNavEntryDecorator()),
             entryProvider = entryProvider {
                 entry<ScreenFlow.Start> {
-                    ShowStartScreen(viewModel, colourScheme.scrim)
+                    ShowStartScreen(viewModel, customColours)
                 }
                 entry<ScreenFlow.Screen> {
                     when (it.screenName) {
                         MAIN_MENU_PROJECTS_ITEM ->
-                            OnProjectsListSelected(colourScheme)
+                            OnProjectsListSelected(customColours)
                         MAIN_MENU_TEMPLATES_ITEM ->
-                            OnTableTemplatesListSelected(colourScheme)
+                            OnTableTemplatesListSelected(customColours)
                         else -> {}
                     }
                 }
@@ -119,11 +120,68 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun OnProjectsListSelected(colourScheme: ColorScheme) {
+    fun MainContent(viewModel: ScreenFlowViewModel, customColours: CustomColours) {
+        val expanded = remember { mutableStateOf(false) }
+        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                CenterAlignedTopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = customColours.navBar,
+                        titleContentColor = customColours.primary
+                    ),
+                    title = {
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            viewModel.popBackStack()
+                        }) {
+                            Icon(
+                                tint = customColours.primary,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = applicationContext.getString(R.string.back_arrow_content_desc)
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = {
+                            expanded.value = !expanded.value
+                             }) {
+                            Icon(
+                                tint = customColours.primary,
+                                imageVector = Icons.Filled.MoreVert,
+                                contentDescription = applicationContext.getString(R.string.kebab_menu_content_desc)
+                            )
+                            DropdownMenu(
+                                expanded = expanded.value,
+                                onDismissRequest = { expanded.value = false }
+                            ) {
+
+                            }
+                        }
+                    },
+                    scrollBehavior = scrollBehavior,
+                )
+            },
+        ) { innerPadding ->
+            Box(modifier = Modifier
+                .padding(innerPadding)
+                .background(customColours.background)
+                .fillMaxWidth()
+                .fillMaxHeight()) {
+                    CoreNavigation(viewModel, customColours)
+            }
+        }
+    }
+
+    @Composable
+    fun OnProjectsListSelected(customColours: CustomColours) {
         ShowProjectsList(
             applicationContext,
-            colourScheme.scrim,
+            customColours,
             { _ ->
 
             },
@@ -135,10 +193,10 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun OnTableTemplatesListSelected(colourScheme: ColorScheme) {
+    fun OnTableTemplatesListSelected(customColours: CustomColours) {
         ShowTableTemplatesList(
             applicationContext,
-            colourScheme.scrim,
+            customColours,
             { _ ->
 
             },

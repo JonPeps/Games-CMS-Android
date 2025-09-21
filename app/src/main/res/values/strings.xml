@@ -22,4 +22,8 @@
     <string name="error_unknown">An unknown error occurred</string>
     <string name="npe_viewmodel">NPE on viewModel!</string>
 
+    <!-- Content Descriptions -->
+    <string name="back_arrow_content_desc">Back button</string>
+    <string name="kebab_menu_content_desc">More menu</string>"
+
 </resources>
