@@ -2,10 +2,8 @@ package com.jonpeps.gamescms.ui.main
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 
 class ScreenFlowViewModel : ViewModel()  {
-    private val _screenName = MutableStateFlow<String?>(null)
     val backStack = mutableStateListOf<ScreenFlow>()
 
     init {
@@ -17,9 +15,7 @@ class ScreenFlowViewModel : ViewModel()  {
     }
 
     fun onFinish() {
-        _screenName.value?.let {
-            navigateTo(ScreenFlow.Finish)
-        }
+        navigateTo(ScreenFlow.Finish)
     }
 
     fun popBackStack(): Boolean {

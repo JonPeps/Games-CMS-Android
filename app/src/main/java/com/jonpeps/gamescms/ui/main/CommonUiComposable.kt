@@ -30,8 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,6 +58,7 @@ fun CommonStringListView(items: List<String>, onClick: (text: String) -> Unit = 
                         .fillMaxWidth()
                         .height(75.dp)
                         .background(colors.scrim)
+                        .clickable { onClick(item) }
                 ) {
                     Text(
                         text = item,
@@ -67,10 +66,10 @@ fun CommonStringListView(items: List<String>, onClick: (text: String) -> Unit = 
                         color = colors.primary,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
-                            .clickable { onClick(item) }
                             .padding(10.dp, 20.dp, 10.dp)
                             .fillMaxWidth()
                             .fillMaxHeight()
+                            .clickable { onClick(item) }
                     )
                 }
                 Spacer(modifier = Modifier.height(10.dp))

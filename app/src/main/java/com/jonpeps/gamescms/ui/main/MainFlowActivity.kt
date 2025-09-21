@@ -20,7 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.entry
+import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
@@ -86,19 +87,21 @@ class MainActivity : ComponentActivity() {
                rememberSceneSetupNavEntryDecorator(),
                rememberSavedStateNavEntryDecorator(),
                rememberViewModelStoreNavEntryDecorator()),
-            entryProvider = { key ->
-                when (key) {
-                    ScreenFlow.Start -> NavEntry(ScreenFlow.Start) {
-                        ShowStartScreen(viewModel, colourScheme.scrim)
+            entryProvider = entryProvider {
+                entry<ScreenFlow.Start> {
+                    ShowStartScreen(viewModel, colourScheme.scrim)
+                }
+                entry<ScreenFlow.Screen> {
+                    when (it.screenName) {
+                        MAIN_MENU_PROJECTS_ITEM ->
+                            OnProjectsListSelected(colourScheme)
+                        MAIN_MENU_TEMPLATES_ITEM ->
+                            OnTableTemplatesListSelected(colourScheme)
+                        else -> {}
                     }
-                    is ScreenFlow.Screen -> NavEntry(key) {
-                        when (key.screenName) {
-                            MAIN_MENU_PROJECTS_ITEM -> OnProjectsListSelected(viewModel, colourScheme)
-                        }
-                    }
-                    ScreenFlow.Finish -> NavEntry(ScreenFlow.Finish) {
-                        finish()
-                    }
+                }
+                entry<ScreenFlow.Finish> {
+                    viewModel.onFinish()
                 }
             },
             transitionSpec = {
@@ -117,16 +120,31 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun OnProjectsListSelected(viewModel: ScreenFlowViewModel, colourScheme: ColorScheme) {
+    fun OnProjectsListSelected(colourScheme: ColorScheme) {
         ShowProjectsList(
             applicationContext,
             colourScheme.scrim,
             { _ ->
-                viewModel.navigateTo(ScreenFlow.Screen(MAIN_MENU_PROJECTS_ITEM))
+
+            },
+            { header, value -> @Composable {
+                    BasicNoEscapeError(header, value)
+                }
+            }
+        )
+    }
+
+    @Composable
+    fun OnTableTemplatesListSelected(colourScheme: ColorScheme) {
+        ShowTableTemplatesList(
+            applicationContext,
+            colourScheme.scrim,
+            { _ ->
+
             },
             { header, value -> @Composable {
                 BasicNoEscapeError(header, value)
-            }
+                }
             }
         )
     }
