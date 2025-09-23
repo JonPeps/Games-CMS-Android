@@ -32,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
@@ -52,7 +53,27 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             Surface {
-                MainContent(viewModel, CustomColours(isSystemInDarkTheme()))
+                val customColours = CustomColours(isSystemInDarkTheme())
+                MainContent(viewModel, customColours, {
+                    Navigation(viewModel,
+                        entryProvider {
+                            entry<ScreenFlow.Start> {
+                                ShowStartScreen(viewModel, customColours)
+                            }
+                            entry<ScreenFlow.Screen> {
+                                when (it.screenName) {
+                                    MAIN_MENU_PROJECTS_ITEM ->
+                                        OnProjectsListSelected(customColours)
+                                    MAIN_MENU_TEMPLATES_ITEM ->
+                                        OnTableTemplatesListSelected(customColours)
+                                    else -> {}
+                                }
+                            }
+                            entry<ScreenFlow.Finish> {
+                                viewModel.onFinish()
+                            }
+                        })
+                })
             }
         }
     }
@@ -72,7 +93,8 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun CoreNavigation(viewModel: ScreenFlowViewModel, customColours: CustomColours) {
+    fun Navigation(viewModel: ScreenFlowViewModel,
+                   entryProvider: (key: ScreenFlow) -> NavEntry<ScreenFlow>) {
         val backStack = viewModel.backStack
 
         BackHandler(enabled = backStack.size > 1) {
@@ -88,23 +110,7 @@ class MainActivity : ComponentActivity() {
                rememberSceneSetupNavEntryDecorator(),
                rememberSavedStateNavEntryDecorator(),
                rememberViewModelStoreNavEntryDecorator()),
-            entryProvider = entryProvider {
-                entry<ScreenFlow.Start> {
-                    ShowStartScreen(viewModel, customColours)
-                }
-                entry<ScreenFlow.Screen> {
-                    when (it.screenName) {
-                        MAIN_MENU_PROJECTS_ITEM ->
-                            OnProjectsListSelected(customColours)
-                        MAIN_MENU_TEMPLATES_ITEM ->
-                            OnTableTemplatesListSelected(customColours)
-                        else -> {}
-                    }
-                }
-                entry<ScreenFlow.Finish> {
-                    viewModel.onFinish()
-                }
-            },
+            entryProvider = entryProvider,
             transitionSpec = {
                 slideInHorizontally(initialOffsetX = { it }) togetherWith
                         slideOutHorizontally(targetOffsetX = { -it })
@@ -122,7 +128,9 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun MainContent(viewModel: ScreenFlowViewModel, customColours: CustomColours) {
+    fun MainContent(viewModel: ScreenFlowViewModel,
+                    customColours: CustomColours,
+                    content: @Composable () -> Unit) {
         val expanded = remember { mutableStateOf(false) }
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
         Scaffold(
@@ -159,7 +167,7 @@ class MainActivity : ComponentActivity() {
                                 expanded = expanded.value,
                                 onDismissRequest = { expanded.value = false }
                             ) {
-
+                                // TODO
                             }
                         }
                     },
@@ -172,7 +180,7 @@ class MainActivity : ComponentActivity() {
                 .background(customColours.background)
                 .fillMaxWidth()
                 .fillMaxHeight()) {
-                    CoreNavigation(viewModel, customColours)
+                    content()
             }
         }
     }
