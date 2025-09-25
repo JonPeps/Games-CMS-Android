@@ -1,28 +1,43 @@
 package com.jonpeps.gamescms.ui.main
 
+import android.os.Bundle
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import com.jonpeps.gamescms.data.DataConstants
 
-class ScreenFlowViewModel : ViewModel()  {
-    val backStack = mutableStateListOf<ScreenFlow>()
+interface IScreenFlowViewModel {
+    fun navigateTo(route: Screen, bundle: Bundle? = null)
+    fun onFinish()
+    fun popBackStack(): Boolean
+    fun getBundle(screenName: String): Bundle?
+}
+
+class ScreenFlowViewModel: ViewModel(), IScreenFlowViewModel  {
+    val backStack = mutableStateListOf<Screen>()
+    val bundles = mutableMapOf<String, Bundle?>()
 
     init {
-        backStack.add(ScreenFlow.Start)
+        backStack.add(Screen(DataConstants.KnownScreens.START))
     }
 
-    fun navigateTo(route: ScreenFlow) {
+    override fun navigateTo(route: Screen, bundle: Bundle?) {
         backStack.add(route)
+        bundles[route.screenName] = bundle
     }
 
-    fun onFinish() {
-        navigateTo(ScreenFlow.Finish)
+    override fun onFinish() {
+        navigateTo(Screen(DataConstants.KnownScreens.FINISH))
     }
 
-    fun popBackStack(): Boolean {
+    override fun popBackStack(): Boolean {
         return if (backStack.size > 1) {
             backStack.removeLastOrNull() != null
         } else {
             false
         }
+    }
+
+    override fun getBundle(screenName: String): Bundle? {
+        return bundles[screenName]
     }
 }

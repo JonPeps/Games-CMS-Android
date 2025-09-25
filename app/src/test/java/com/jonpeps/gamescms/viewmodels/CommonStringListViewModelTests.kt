@@ -131,7 +131,7 @@ class CommonStringListViewModelTests {
         assert(!viewModel.status.success)
         assert(viewModel.status.message == FAILED_TO_LOAD_FILE + filesListPath)
         assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.size == 0)
+        assert(viewModel.status.items.isEmpty())
     }
 
     @Test
@@ -150,7 +150,7 @@ class CommonStringListViewModelTests {
         assert(!viewModel.status.success)
         assert(viewModel.status.message == FAILED_TO_LOAD_FILE + filesListPath)
         assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.size == 0)
+        assert(viewModel.status.items.isEmpty())
     }
 
     @Test
@@ -164,7 +164,7 @@ class CommonStringListViewModelTests {
         assert(!viewModel.status.success)
         assert(viewModel.status.message == "Runtime error!")
         assert(viewModel.status.ex != null)
-        assert(viewModel.status.items.size == 0)
+        assert(viewModel.status.items.isEmpty())
     }
 
     @Test
@@ -196,7 +196,7 @@ class CommonStringListViewModelTests {
         assert(!viewModel.status.success)
         assert(viewModel.status.message == FAILED_TO_SAVE_FILE + "test")
         assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.size == 0)
+        assert(viewModel.status.items.isEmpty())
     }
 
     @Test
@@ -214,7 +214,7 @@ class CommonStringListViewModelTests {
         assert(viewModel.status.success)
         assert(viewModel.status.message == "")
         assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.size == 0)
+        assert(viewModel.status.items.isEmpty())
     }
 
     @Test
@@ -232,7 +232,7 @@ class CommonStringListViewModelTests {
         assert(viewModel.status.success)
         assert(viewModel.status.message == "")
         assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.size == 0)
+        assert(viewModel.status.items.isEmpty())
     }
 
     @Test
@@ -251,7 +251,7 @@ class CommonStringListViewModelTests {
         assert(!viewModel.status.success)
         assert(viewModel.status.message == FAILED_TO_SAVE_FILE + "test")
         assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.size == 0)
+        assert(viewModel.status.items.isEmpty())
     }
 
     @Test
@@ -265,7 +265,7 @@ class CommonStringListViewModelTests {
         assert(!viewModel.status.success)
         assert(viewModel.status.message == FAILED_TO_DELETE_FILE + "test")
         assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.size == 0)
+        assert(viewModel.status.items.isEmpty())
     }
 
     @Test
@@ -281,7 +281,7 @@ class CommonStringListViewModelTests {
         assert(!viewModel.status.success)
         assert(viewModel.status.message == FAILED_TO_DELETE_FILE_OR_DIRECTORY + "test")
         assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.size == 0)
+        assert(viewModel.status.items.isEmpty())
     }
 
     private fun setupForReadingFiles() {

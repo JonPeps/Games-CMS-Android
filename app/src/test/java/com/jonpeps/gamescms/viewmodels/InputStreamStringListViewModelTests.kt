@@ -88,7 +88,7 @@ class InputStreamStringListViewModelTests {
         assert(!viewModel.status.success)
         assert(viewModel.status.message == FAILED_TO_LOAD_FILE)
         assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.size == 0)
+        assert(viewModel.status.items.isEmpty())
     }
 
     @Test
@@ -119,7 +119,7 @@ class InputStreamStringListViewModelTests {
         assert(!viewModel.status.success)
         assert(viewModel.status.message == FAILED_TO_LOAD_FILE)
         assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.size == 0)
+        assert(viewModel.status.items.isEmpty())
     }
 
     @Test
@@ -134,7 +134,7 @@ class InputStreamStringListViewModelTests {
         assert(!viewModel.status.success)
         assert(viewModel.status.message == FAILED_TO_LOAD_FILE)
         assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.size == 0)
+        assert(viewModel.status.items.isEmpty())
     }
 
     @Test
@@ -147,7 +147,7 @@ class InputStreamStringListViewModelTests {
         assert(!viewModel.status.success)
         assert(viewModel.status.message != null)
         assert(viewModel.status.ex != null)
-        assert(viewModel.status.items.size == 0)
+        assert(viewModel.status.items.isEmpty())
     }
 
     @Test
@@ -167,7 +167,7 @@ class InputStreamStringListViewModelTests {
         assert(!viewModel.status.success)
         assert(viewModel.status.message == FAILED_TO_WRITE_FILE)
         assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.size == 0)
+        assert(viewModel.status.items.isEmpty())
     }
 
     @Test
@@ -185,7 +185,7 @@ class InputStreamStringListViewModelTests {
         assert(!viewModel.status.success)
         assert(viewModel.status.message != null)
         assert(viewModel.status.ex != null)
-        assert(viewModel.status.items.size == 0)
+        assert(viewModel.status.items.isEmpty())
     }
 
     private fun setupForReadingFiles() {

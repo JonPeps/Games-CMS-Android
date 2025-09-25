@@ -24,7 +24,7 @@ fun ShowStrList(context: Context,
                 customColours: CustomColours,
                 onClick: (String) -> Unit,
                 onError: @Composable (String, String?) -> Unit) {
-    val viewModel = if (DataConstants.Companion.Debug.DEBUG_LOAD) {
+    val viewModel = if (DataConstants.Debug.DEBUG_LOAD) {
         hiltViewModel<InputStreamStringListViewModel,
                 InputStreamStringListViewModelFactory.IInputStreamStringListViewModelFactory>(
             creationCallback = {
@@ -47,9 +47,9 @@ fun ShowStrList(context: Context,
                     .background(customColours.background)
                     .fillMaxHeight()
             ) {
-                CommonStringListView(viewModel.status.items, {
+                CommonStringListView(viewModel.status.items, customColours, {
                     onClick(it)
-                }, customColours)
+                })
             }
         } else {
             onError(

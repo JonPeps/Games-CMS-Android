@@ -283,7 +283,7 @@ class TableTemplateGroupViewModelTests {
         assert(viewModel.status.value.success)
         assert(viewModel.status.value.message == "")
         assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(viewModel.status.value.items.isEmpty())
     }
 
     @Test
@@ -306,7 +306,7 @@ class TableTemplateGroupViewModelTests {
         assert(viewModel.status.value.success)
         assert(viewModel.status.value.message == "")
         assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(viewModel.status.value.items.isEmpty())
         assert(viewModel.status.value.currentIndex == 0)
     }
 
@@ -318,7 +318,7 @@ class TableTemplateGroupViewModelTests {
         assert(viewModel.status.value.success)
         assert(viewModel.status.value.message == "")
         assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(viewModel.status.value.items.isEmpty())
         assert(viewModel.status.value.currentIndex == 0)
         assert(viewModel.getIndex() == 0)
     }
@@ -345,7 +345,7 @@ class TableTemplateGroupViewModelTests {
         assert(viewModel.status.value.success)
         assert(viewModel.status.value.message == "")
         assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 0)
+        assert(viewModel.status.value.items.isEmpty())
         assert(viewModel.status.value.currentIndex == 0)
     }
 
