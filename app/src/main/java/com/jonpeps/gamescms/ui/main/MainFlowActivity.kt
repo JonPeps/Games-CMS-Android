@@ -42,20 +42,25 @@ class MainActivity : ComponentActivity() {
             Surface {
                 val customColours = CustomColours(isSystemInDarkTheme())
                 MainContent(viewModel, customColours, {
-                    val entryProvider = ScreenFlowBuilder.Builder().add(
-                        Screen(DataConstants.KnownScreens.START),
-                        { ShowStartScreen(viewModel, customColours) }
-                    ).add(Screen(DataConstants.KnownScreens.PROJECTS), {
-                        OnProjectsListSelected(applicationContext, customColours) {
-                            // TODO
-                        }
-                    })
-                    .add(Screen(DataConstants.KnownScreens.TABLE_TEMPLATES),
-                    {
-                        OnTableTemplatesListSelected(applicationContext, customColours) {
-                            // TODO
-                        } })
-                    .build()
+
+                    val entryProvider = ScreenFlowBuilder.Builder()
+                        .add(Screen(DataConstants.KnownScreens.START),
+                            {
+                                ShowStartScreen(viewModel, customColours)
+                            }
+                        ).add(Screen(DataConstants.KnownScreens.PROJECTS),
+                            {
+                                OnProjectsListSelected(applicationContext, customColours) {
+                                    // TODO
+                                }
+                            }
+                        ).add(Screen(DataConstants.KnownScreens.TABLE_TEMPLATES),
+                            {
+                                OnTableTemplatesListSelected(applicationContext, customColours) {
+                                    // TODO
+                                    }
+                                }
+                        ).build()
 
                     Navigation(viewModel,
                         entryProvider = entryProvider
