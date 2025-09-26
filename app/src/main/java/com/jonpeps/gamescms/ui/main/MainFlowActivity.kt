@@ -28,7 +28,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import com.jonpeps.gamescms.R
-import com.jonpeps.gamescms.data.DataConstants
+import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.PROJECTS
+import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.START
+import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.TABLE_TEMPLATES
 import com.jonpeps.gamescms.ui.applevel.CustomColours
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -42,28 +44,20 @@ class MainActivity : ComponentActivity() {
             Surface {
                 val customColours = CustomColours(isSystemInDarkTheme())
                 MainContent(viewModel, customColours, {
-
-                    val entryProvider = ScreenFlowBuilder.Builder()
-                        .add(Screen(DataConstants.KnownScreens.START),
-                            {
+                    Navigation(viewModel,
+                        entryProvider = ScreenFlowBuilder.Builder()
+                            .add(START, {
                                 ShowStartScreen(viewModel, customColours)
-                            }
-                        ).add(Screen(DataConstants.KnownScreens.PROJECTS),
-                            {
+                            })
+                            .add(PROJECTS, {
                                 OnProjectsListSelected(applicationContext, customColours) {
                                     // TODO
-                                }
-                            }
-                        ).add(Screen(DataConstants.KnownScreens.TABLE_TEMPLATES),
-                            {
+                                }})
+                            .add(TABLE_TEMPLATES, {
                                 OnTableTemplatesListSelected(applicationContext, customColours) {
                                     // TODO
-                                    }
-                                }
-                        ).build()
-
-                    Navigation(viewModel,
-                        entryProvider = entryProvider
+                                }}
+                            ).build()
                     ) {
                         if (!viewModel.popBackStack()) {
                             finish()
@@ -115,7 +109,7 @@ class MainActivity : ComponentActivity() {
                                 expanded = expanded.value,
                                 onDismissRequest = { expanded.value = false }
                             ) {
-                                // TODO
+
                             }
                         }
                     },

@@ -94,6 +94,7 @@ fragmentCompose = "1.8.9"
 # Navigation libraries versions
 nav3Core = "1.0.0-alpha01"
 lifecycleViewmodelNav3 = "1.0.0-alpha01"
+androidxMaterial3Version = "1.4.0"
 
 
 
@@ -208,6 +209,7 @@ androidx-fragment-compose = { group = "androidx.fragment", name = "fragment-comp
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNav3" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "androidxMaterial3Version" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

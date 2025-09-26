@@ -9,9 +9,9 @@ data class Screen(val screenName: String)
 data class ScreenFlowEntryItem(val screen: Screen, val content: @Composable () -> Unit)
 
 class ScreenFlowBuilder private constructor() {
-    data class Builder(var screenFlowEntryItems: MutableList<ScreenFlowEntryItem> = mutableListOf()) {
-        fun add(screen: Screen, content: @Composable () -> Unit)
-        = apply { this.screenFlowEntryItems.add(ScreenFlowEntryItem(screen, content)) }
+    data class Builder(val screenFlowEntryItems: MutableList<ScreenFlowEntryItem> = mutableListOf()) {
+        fun add(screenName: String, content: @Composable () -> Unit)
+        = apply { screenFlowEntryItems.add(ScreenFlowEntryItem(Screen(screenName), content)) }
 
         fun build(): (Screen) -> NavEntry<Screen> {
             return entryProvider {

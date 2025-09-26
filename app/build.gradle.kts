@@ -81,6 +81,7 @@ dependencies {
     implementation(platform(libs.bom.v2313))
     implementation(libs.dynamodb.enhanced)
     implementation(libs.androidx.fragment.compose)
+    implementation(libs.androidx.compose.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -128,4 +129,8 @@ dependencies {
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.material3.v140alpha13)
+
+
 }
