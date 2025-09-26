@@ -22,7 +22,6 @@ class CustomMenuBuilder private constructor() {
         fun add(customMenuItemText: CustomMenuItemText, enabled: Boolean, onClick: () -> Unit) =
             apply { customMenuItems.add(CustomMenuItem(customMenuItemText, enabled, onClick)) }
 
-        @Composable
         fun build(): @Composable (ColumnScope.() -> Unit) {
             return ColumnScope@ {
                 customMenuItems.forEach { item ->
