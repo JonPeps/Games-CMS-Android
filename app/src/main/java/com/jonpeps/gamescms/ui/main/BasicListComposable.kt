@@ -25,7 +25,7 @@ fun ShowProjectsList(context: Context,
 }
 
 @Composable
-fun OnProjectsListSelected(context: Context, customColours: CustomColours, onItemClicked: (String) -> Unit) {
+fun ProjectsStrList(context: Context, customColours: CustomColours, onItemClicked: (String) -> Unit) {
     ShowProjectsList(
         context,
         customColours,
@@ -41,7 +41,7 @@ fun OnProjectsListSelected(context: Context, customColours: CustomColours, onIte
 
 
 @Composable
-fun OnTableTemplatesListSelected(context: Context, customColours: CustomColours, onItemClicked: (String) -> Unit) {
+fun TableTemplatesStrList(context: Context, customColours: CustomColours, onItemClicked: (String) -> Unit) {
     ShowTableTemplatesList(
         context,
         customColours,

@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import com.jonpeps.gamescms.data.DataConstants
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 interface IScreenFlowViewModel {
     fun navigateTo(route: Screen, bundle: Bundle? = null)
@@ -15,6 +17,8 @@ interface IScreenFlowViewModel {
 class ScreenFlowViewModel: ViewModel(), IScreenFlowViewModel  {
     val backStack = mutableStateListOf<Screen>()
     val bundles = mutableMapOf<String, Bundle?>()
+    val _showDropdownMenu = MutableStateFlow(false)
+    val ShowDropdownMenu: StateFlow<Boolean> = _showDropdownMenu
 
     init {
         backStack.add(Screen(DataConstants.KnownScreens.START))

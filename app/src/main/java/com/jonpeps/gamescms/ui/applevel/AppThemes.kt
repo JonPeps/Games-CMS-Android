@@ -15,7 +15,7 @@ class CustomColours(isDark: Boolean) {
         Color(0xFFFFFFFF)
             else Color(0xFF000000)
 
-    val navBar: Color = if (isDark)
+    val secondary: Color = if (isDark)
         Color(0xFF000000)
             else Color(0xFFFFFFFF)
 }
