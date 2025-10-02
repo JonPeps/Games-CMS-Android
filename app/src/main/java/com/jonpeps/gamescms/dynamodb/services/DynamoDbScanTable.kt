@@ -1,17 +1,18 @@
 package com.jonpeps.gamescms.dynamodb.services
 
-import com.jonpeps.gamescms.dynamodb.services.core.DynamoDbRequest
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.Condition
 import software.amazon.awssdk.services.dynamodb.model.ScanRequest
 import software.amazon.awssdk.services.dynamodb.model.ScanResponse
+import javax.inject.Inject
 
 interface IDynamoDbScanTable {
-    suspend fun scan(): ScanResponse
+    suspend fun scan(tableName: String, scanFilter: Map<String, Condition>): ScanResponse
 }
 
-class DynamoDbScanTable(private val tableName: String, private val scanFilter: Map<String, Condition>): IDynamoDbScanTable {
-    override suspend fun scan(): ScanResponse {
-        return DynamoDbRequest.getInstance().scan(
+class DynamoDbScanTable @Inject constructor(private val dynamoDbClient: DynamoDbClient): IDynamoDbScanTable {
+    override suspend fun scan(tableName: String, scanFilter: Map<String, Condition>): ScanResponse {
+        return dynamoDbClient.scan(
             ScanRequest
                 .builder()
                 .tableName(tableName)

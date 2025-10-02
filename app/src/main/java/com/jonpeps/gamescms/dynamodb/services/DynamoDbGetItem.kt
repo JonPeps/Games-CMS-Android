@@ -1,17 +1,18 @@
 package com.jonpeps.gamescms.dynamodb.services
 
-import com.jonpeps.gamescms.dynamodb.services.core.DynamoDbRequest
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse
+import javax.inject.Inject
 
 interface IDynamoDbGetItem {
-    suspend fun getItem(): GetItemResponse
+    suspend fun getItem(tableName: String, key: Map<String, AttributeValue>): GetItemResponse
 }
 
-class DynamoDbGetItem(private val tableName: String, private val key: Map<String, AttributeValue>) : IDynamoDbGetItem {
-    override suspend fun getItem(): GetItemResponse {
-        return DynamoDbRequest.getInstance().getItem(
+class DynamoDbGetItem @Inject constructor(private val dynamoDbClient: DynamoDbClient) : IDynamoDbGetItem {
+    override suspend fun getItem(tableName: String, key: Map<String, AttributeValue>): GetItemResponse {
+        return dynamoDbClient.getItem(
             GetItemRequest.builder()
             .tableName(tableName)
             .key(key)

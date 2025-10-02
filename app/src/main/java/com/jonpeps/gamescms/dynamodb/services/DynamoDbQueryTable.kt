@@ -1,17 +1,18 @@
 package com.jonpeps.gamescms.dynamodb.services
 
-import com.jonpeps.gamescms.dynamodb.services.core.DynamoDbRequest
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.Condition
 import software.amazon.awssdk.services.dynamodb.model.QueryRequest
 import software.amazon.awssdk.services.dynamodb.model.QueryResponse
+import javax.inject.Inject
 
 interface IDynamoDbQueryTable  {
-    suspend fun query(): QueryResponse
+    suspend fun query(tableName: String, queryFilter: Map<String, Condition>): QueryResponse
 }
 
-class DynamoDbQueryTable(private val tableName: String, private val queryFilter: Map<String, Condition>) : IDynamoDbQueryTable {
-    override suspend fun query(): QueryResponse {
-        return DynamoDbRequest.getInstance().query(
+class DynamoDbQueryTable @Inject constructor(private val dynamoDbClient: DynamoDbClient) : IDynamoDbQueryTable {
+    override suspend fun query(tableName: String, queryFilter: Map<String, Condition>): QueryResponse {
+        return dynamoDbClient.query(
             QueryRequest
                 .builder()
                 .tableName(tableName)

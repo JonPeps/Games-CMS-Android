@@ -26,33 +26,30 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import com.jonpeps.gamescms.R
 import com.jonpeps.gamescms.ui.applevel.CustomColours
 
-class MainFlowBuilder private constructor() {
+class MainFlowWithNavBarBuilder private constructor() {
     data class Builder(val context: Context,
                        val viewModel: ScreenFlowViewModel,
                        val customColours: CustomColours) {
         private var customItemText: CustomItemText? = null
+
         private lateinit var onIconBack: () -> Unit
-        private lateinit var menuItems: @Composable() () -> Unit
-        private lateinit var content: @Composable () -> Unit
-        private var hasBackButton = false
-        private var hasMenuItems = false
+        private lateinit var menuItems: @Composable () -> Unit
+        private lateinit var mainContent: @Composable () -> Unit
 
         fun setNavBarTitle(customItemText: CustomItemText) = apply {
             this.customItemText = customItemText
         }
 
         fun onIconBack(onIconBack: () -> Unit) = apply {
-            this.hasBackButton = true
             this.onIconBack = onIconBack
         }
 
         fun menuItems(menuItems: @Composable () -> Unit) = apply {
-            this.hasMenuItems = true
             this.menuItems = menuItems
         }
 
         fun setContent(content: @Composable () -> Unit) = apply {
-            this.content = content
+            this.mainContent = content
         }
 
         @OptIn(ExperimentalMaterial3Api::class)
@@ -77,34 +74,30 @@ class MainFlowBuilder private constructor() {
                             }
                         },
                         navigationIcon = {
-                            if (hasBackButton) {
-                                IconButton(onClick = {
-                                    onIconBack()
-                                }) {
-                                    Icon(
-                                        tint = customColours.primary,
-                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                        contentDescription = context.getString(R.string.back_arrow_content_desc)
-                                    )
-                                }
+                            IconButton(onClick = {
+                                onIconBack()
+                            }) {
+                                Icon(
+                                    tint = customColours.primary,
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = context.getString(R.string.back_arrow_content_desc)
+                                )
                             }
                         },
                         actions = {
-                            if (hasMenuItems) {
-                                IconButton(onClick = {
-                                    expanded.value = !expanded.value
-                                }) {
-                                    Icon(
-                                        tint = customColours.primary,
-                                        imageVector = Icons.Filled.MoreVert,
-                                        contentDescription = context.getString(R.string.kebab_menu_content_desc)
-                                    )
-                                    DropdownMenu(
-                                        expanded = expanded.value,
-                                        onDismissRequest = { expanded.value = false }
-                                    ) {
-                                        menuItems()
-                                    }
+                            IconButton(onClick = {
+                                expanded.value = !expanded.value
+                            }) {
+                                Icon(
+                                    tint = customColours.primary,
+                                    imageVector = Icons.Filled.MoreVert,
+                                    contentDescription = context.getString(R.string.kebab_menu_content_desc)
+                                )
+                                DropdownMenu(
+                                    expanded = expanded.value,
+                                    onDismissRequest = { expanded.value = false }
+                                ) {
+                                    menuItems()
                                 }
                             }
                         },
@@ -117,7 +110,7 @@ class MainFlowBuilder private constructor() {
                     .background(customColours.background)
                     .fillMaxWidth()
                     .fillMaxHeight()) {
-                        content()
+                        mainContent()
                 }
             }
         }

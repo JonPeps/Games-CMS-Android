@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
                         onClick = {
                         }
                     )
-                MainFlowBuilder
+                MainFlowWithNavBarBuilder
                     .Builder(applicationContext, viewModel, customColours)
                     .setNavBarTitle(CustomItemText("Main Screen", 20.sp, customColours.primary, FontStyle.Normal))
                     .onIconBack {

@@ -1,25 +1,28 @@
 package com.jonpeps.gamescms.dynamodb.services
 
-import com.jonpeps.gamescms.dynamodb.services.core.DynamoDbRequest
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition
 import software.amazon.awssdk.services.dynamodb.model.CreateTableRequest
 import software.amazon.awssdk.services.dynamodb.model.CreateTableResponse
 import software.amazon.awssdk.services.dynamodb.model.KeySchemaElement
+import javax.inject.Inject
 
 interface IDynamoDbCreateTable {
-    suspend fun create(): CreateTableResponse
+    suspend fun create(tableName: String,
+                       attributes: List<AttributeDefinition>,
+                       schemas: List<KeySchemaElement>): CreateTableResponse
 }
 
-class DynamoDbCreateTable(private val tableName: String,
-                          private val attributes: List<AttributeDefinition>,
-                          private val schemas: List<KeySchemaElement>) : IDynamoDbCreateTable {
-    override suspend fun create(): CreateTableResponse {
+class DynamoDbCreateTable @Inject constructor(private val dynamoDbClient: DynamoDbClient) : IDynamoDbCreateTable {
+    override suspend fun create(tableName: String,
+                                attributes: List<AttributeDefinition>,
+                                schemas: List<KeySchemaElement>): CreateTableResponse {
         val request =
             CreateTableRequest
                 .builder()
                 .tableName(tableName)
                 .attributeDefinitions(attributes)
                 .keySchema(schemas)
-        return DynamoDbRequest.getInstance().createTable(request.build())
+        return dynamoDbClient.createTable(request.build())
     }
 }

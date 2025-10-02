@@ -1,17 +1,18 @@
 package com.jonpeps.gamescms.dynamodb.services
 
-import com.jonpeps.gamescms.dynamodb.services.core.DynamoDbRequest
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse
+import javax.inject.Inject
 
 interface IDynamoDbUpdateItem {
-    suspend fun updateItem(): UpdateItemResponse
+    suspend fun updateItem(tableName: String, values: Map<String, AttributeValueUpdate>): UpdateItemResponse
 }
 
-class DynamoDbUpdateItem(private val tableName: String, private val values: Map<String, AttributeValueUpdate>) : IDynamoDbUpdateItem {
-    override suspend fun updateItem(): UpdateItemResponse {
-        return DynamoDbRequest.getInstance()
+class DynamoDbUpdateItem @Inject constructor(private val dynamoDbClient: DynamoDbClient) : IDynamoDbUpdateItem {
+    override suspend fun updateItem(tableName: String, values: Map<String, AttributeValueUpdate>): UpdateItemResponse {
+        return dynamoDbClient
             .updateItem(
                 UpdateItemRequest.builder()
                 .tableName(tableName)
