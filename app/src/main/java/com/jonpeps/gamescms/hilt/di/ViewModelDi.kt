@@ -13,14 +13,15 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import kotlinx.coroutines.CoroutineDispatcher
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 
 @Module
 @InstallIn(ViewModelComponent::class)
 class ViewModelDiProvider {
     @Provides
-    fun provideCreateTableViewModel(dispatcher: CoroutineDispatcher
+    fun provideCreateTableViewModel(dynamoDbClient: DynamoDbClient, dispatcher: CoroutineDispatcher
     ): CreateTableViewModel {
-        return CreateTableViewModel(dispatcher)
+        return CreateTableViewModel(dynamoDbClient, dispatcher)
     }
 }
 

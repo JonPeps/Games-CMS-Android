@@ -11,7 +11,7 @@ interface IDynamoDbDeleteTable {
 
 class DynamoDbDeleteTable @Inject constructor(private val dynamoDbClient: DynamoDbClient): IDynamoDbDeleteTable {
     override suspend fun delete(tableName: String): DeleteTableResponse {
-        return dynamoDbClient
-            .deleteTable(DeleteTableRequest.builder().tableName(tableName).build())
-        }
+        val request = DeleteTableRequest.builder().tableName(tableName).build()
+        return dynamoDbClient.deleteTable(request)
+    }
 }

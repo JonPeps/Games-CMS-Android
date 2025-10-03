@@ -23,6 +23,7 @@ class DynamoDbCreateTable @Inject constructor(private val dynamoDbClient: Dynamo
                 .tableName(tableName)
                 .attributeDefinitions(attributes)
                 .keySchema(schemas)
-        return dynamoDbClient.createTable(request.build())
+                .build()
+        return dynamoDbClient.createTable(request)
     }
 }

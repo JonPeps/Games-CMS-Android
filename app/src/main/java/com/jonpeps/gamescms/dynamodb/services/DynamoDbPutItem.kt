@@ -14,10 +14,10 @@ interface IDynamoDbPutItem {
 class DynamoDbPutItem @Inject constructor(private val dynamoDbClient: DynamoDbClient) : IDynamoDbPutItem {
     override suspend fun putItem(tableName: String,
                                  attributes: Map<String, AttributeValue>): PutItemResponse  {
-        return dynamoDbClient
-            .putItem(PutItemRequest.builder()
-                .tableName(tableName)
-                .item(attributes)
-                .build())
+        val request = PutItemRequest.builder()
+            .tableName(tableName)
+            .item(attributes)
+            .build()
+        return dynamoDbClient.putItem(request)
     }
 }

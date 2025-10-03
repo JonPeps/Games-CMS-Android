@@ -12,11 +12,10 @@ interface IDynamoDbUpdateItem {
 
 class DynamoDbUpdateItem @Inject constructor(private val dynamoDbClient: DynamoDbClient) : IDynamoDbUpdateItem {
     override suspend fun updateItem(tableName: String, values: Map<String, AttributeValueUpdate>): UpdateItemResponse {
-        return dynamoDbClient
-            .updateItem(
-                UpdateItemRequest.builder()
-                .tableName(tableName)
-                .attributeUpdates(values)
-                .build())
+        val request = UpdateItemRequest.builder()
+            .tableName(tableName)
+            .attributeUpdates(values)
+            .build()
+        return dynamoDbClient.updateItem(request)
     }
 }

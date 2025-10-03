@@ -12,10 +12,10 @@ interface IDynamoDbGetItem {
 
 class DynamoDbGetItem @Inject constructor(private val dynamoDbClient: DynamoDbClient) : IDynamoDbGetItem {
     override suspend fun getItem(tableName: String, key: Map<String, AttributeValue>): GetItemResponse {
-        return dynamoDbClient.getItem(
-            GetItemRequest.builder()
+        val request = GetItemRequest.builder()
             .tableName(tableName)
             .key(key)
-            .build())
+            .build()
+        return dynamoDbClient.getItem(request)
     }
 }

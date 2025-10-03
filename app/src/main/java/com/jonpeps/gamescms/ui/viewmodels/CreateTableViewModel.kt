@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import software.amazon.awssdk.services.dynamodb.model.CreateTableResponse
 import javax.inject.Inject
 
@@ -20,7 +21,8 @@ class TableRequestViewModelResponse<T>(
 
 @HiltViewModel
 class CreateTableViewModel
-@Inject constructor(private val dispatcher: CoroutineDispatcher)
+@Inject constructor(private val dynamoDbClient: DynamoDbClient,
+                    private val dispatcher: CoroutineDispatcher)
     : ViewModel() {
 
     private val _state = MutableStateFlow(TableRequestViewModelResponse<CreateTableResponse>())
@@ -30,8 +32,8 @@ class CreateTableViewModel
         viewModelScope.launch(dispatcher) {
             try {
                 val mappedItems = DynamoDbCreateTableMapper.mapToCreateTablePair(items)
-                val dynamoDbCreateTable = DynamoDbCreateTable(tableName, mappedItems.attDefinitions, mappedItems.keySchema)
-                val response = dynamoDbCreateTable.create()
+                val dynamoDbCreateTable = DynamoDbCreateTable(dynamoDbClient)
+                val response = dynamoDbCreateTable.create(tableName, mappedItems.attDefinitions, mappedItems.keySchema)
                 _state.value = TableRequestViewModelResponse(true, response, null)
             } catch (ex: Exception) {
                 _state.value = TableRequestViewModelResponse(false, null, ex)

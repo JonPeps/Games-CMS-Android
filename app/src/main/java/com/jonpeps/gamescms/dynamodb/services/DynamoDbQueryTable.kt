@@ -12,11 +12,10 @@ interface IDynamoDbQueryTable  {
 
 class DynamoDbQueryTable @Inject constructor(private val dynamoDbClient: DynamoDbClient) : IDynamoDbQueryTable {
     override suspend fun query(tableName: String, queryFilter: Map<String, Condition>): QueryResponse {
-        return dynamoDbClient.query(
-            QueryRequest
-                .builder()
-                .tableName(tableName)
-                .queryFilter(queryFilter)
-                .build())
+        val request = QueryRequest.builder()
+            .tableName(tableName)
+            .queryFilter(queryFilter)
+            .build()
+        return dynamoDbClient.query(request)
     }
 }

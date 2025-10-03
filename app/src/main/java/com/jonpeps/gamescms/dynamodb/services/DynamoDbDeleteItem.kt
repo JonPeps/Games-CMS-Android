@@ -12,9 +12,10 @@ interface IDynamoDbDeleteItem {
 
 class DynamoDbDeleteItem @Inject constructor(private val dynamoDbClient: DynamoDbClient) : IDynamoDbDeleteItem {
     override suspend fun delete(tableName: String, key: Map<String, AttributeValue>): DeleteItemResponse {
-        return dynamoDbClient.deleteItem(DeleteItemRequest.builder()
+        val request = DeleteItemRequest.builder()
             .tableName(tableName)
             .key(key)
-            .build())
+            .build()
+        return dynamoDbClient.deleteItem(request)
     }
 }

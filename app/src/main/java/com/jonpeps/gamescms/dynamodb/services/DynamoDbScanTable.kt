@@ -12,11 +12,10 @@ interface IDynamoDbScanTable {
 
 class DynamoDbScanTable @Inject constructor(private val dynamoDbClient: DynamoDbClient): IDynamoDbScanTable {
     override suspend fun scan(tableName: String, scanFilter: Map<String, Condition>): ScanResponse {
-        return dynamoDbClient.scan(
-            ScanRequest
-                .builder()
-                .tableName(tableName)
-                .scanFilter(scanFilter)
-                .build())
+        val request = ScanRequest.builder()
+            .tableName(tableName)
+            .scanFilter(scanFilter)
+            .build()
+        return dynamoDbClient.scan(request)
     }
 }
