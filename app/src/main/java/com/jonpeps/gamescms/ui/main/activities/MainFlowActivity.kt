@@ -54,7 +54,8 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun BuildProjectsList(context: Context, customColours: CustomColours) {
-        return BasicStrListBuilder.Builder(context, customColours)
+        return BasicStrListBuilder
+            .Builder(context, customColours)
             .setStoragePath(context.getExternalFilesDir(null)?.absolutePath + MAIN_DIR + PROJECTS_DIR)
             .setCachedName(PROJECT_LIST_CACHE_NAME)
             .setDebugFilename(DEBUG_PROJECTS_LIST)
@@ -67,7 +68,8 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun BuildTemplatesList(context: Context, customColours: CustomColours) {
-        return BasicStrListBuilder.Builder(context, customColours)
+        return BasicStrListBuilder
+            .Builder(context, customColours)
             .setStoragePath(context.getExternalFilesDir(null)?.absolutePath + MAIN_DIR + TEMPLATES_DIR)
             .setCachedName(TEMPLATES_LIST_CACHE_NAME)
             .setDebugFilename(DEBUG_TEMPLATES_LIST)
@@ -80,7 +82,8 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun buildNavScreenEntries(customColours: CustomColours): (Screen) -> NavEntry<Screen> {
-        return ScreenFlowBuilder.Builder()
+        return ScreenFlowBuilder
+            .Builder()
             .add(START, { ShowStartScreen(viewModel, customColours) })
             .add(PROJECTS, { BuildProjectsList(applicationContext, customColours)} )
             .add(TABLE_TEMPLATES, { BuildTemplatesList(applicationContext, customColours) })
@@ -89,13 +92,13 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun buildMainNavigation(navScreenEntries: (Screen) -> NavEntry<Screen>): NavBuilder.Builder {
-        return NavBuilder.Builder(viewModel).setOnBack {
+        return NavBuilder.Builder(viewModel)
+            .setOnBack {
             if(!viewModel.popBackStack()) {
-                finish()
+                finish() }
+            }.navContent {
+                navScreenEntries(it)
             }
-        }.navContent {
-            navScreenEntries(it)
-        }
     }
 
     @Composable
