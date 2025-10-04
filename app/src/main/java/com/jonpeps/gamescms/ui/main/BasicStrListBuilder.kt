@@ -34,52 +34,52 @@ class BasicStrListBuilder private constructor() {
         fun Build() {
             ShowStrList(context, storagePath, cachedName, debugFilename, customColours, onClick, onError)
         }
-    }
 
-    @Composable
-    private fun ShowStrList(context: Context,
-                    storagePath: String,
-                    cachedName: String,
-                    debugFilename: String,
-                    customColours: CustomColours,
-                    onClick: (String) -> Unit,
-                    onError: @Composable (String, String?) -> Unit) {
-        val viewModel = if (DataConstants.Debug.DEBUG_LOAD) {
-            hiltViewModel<InputStreamStringListViewModel,
-                    InputStreamStringListViewModelFactory.IInputStreamStringListViewModelFactory>(
-                creationCallback = {
-                    it.create(context.assets.open(debugFilename), storagePath)
-                }
-            )
-        } else {
-            hiltViewModel<CommonStringListViewModel,
-                    ListViewModelFactory.ICommonStringListViewModelFactory>(
-                creationCallback = {
-                    it.create(storagePath, cachedName)
-                })
-        }
-
-        val shouldPostToUI = viewModel.hasFinishedObtainingData.collectAsState()
-        if (shouldPostToUI.value) {
-            if (viewModel.status.success) {
-                Column(
-                    modifier = Modifier
-                        .background(customColours.background)
-                        .fillMaxHeight()
-                ) {
-                    CommonStringListView(viewModel.status.items, customColours, {
-                        onClick(it)
+        @Composable
+        private fun ShowStrList(context: Context,
+                                storagePath: String,
+                                cachedName: String,
+                                debugFilename: String,
+                                customColours: CustomColours,
+                                onClick: (String) -> Unit,
+                                onError: @Composable (String, String?) -> Unit) {
+            val viewModel = if (DataConstants.Debug.DEBUG_LOAD) {
+                hiltViewModel<InputStreamStringListViewModel,
+                        InputStreamStringListViewModelFactory.IInputStreamStringListViewModelFactory>(
+                    creationCallback = {
+                        it.create(context.assets.open(debugFilename), storagePath)
+                    }
+                )
+            } else {
+                hiltViewModel<CommonStringListViewModel,
+                        ListViewModelFactory.ICommonStringListViewModelFactory>(
+                    creationCallback = {
+                        it.create(storagePath, cachedName)
                     })
+            }
+
+            val shouldPostToUI = viewModel.hasFinishedObtainingData.collectAsState()
+            if (shouldPostToUI.value) {
+                if (viewModel.status.success) {
+                    Column(
+                        modifier = Modifier
+                            .background(customColours.background)
+                            .fillMaxHeight()
+                    ) {
+                        CommonStringListView(viewModel.status.items, customColours, {
+                            onClick(it)
+                        })
+                    }
+                } else {
+                    onError(
+                        viewModel.status.message ?: context.getString(R.string.error_unknown),
+                        viewModel.status.ex?.message
+                    )
                 }
             } else {
-                onError(
-                    viewModel.status.message ?: context.getString(R.string.error_unknown),
-                    viewModel.status.ex?.message
-                )
+                CommonLoadingScreen(customColours)
+                viewModel.load(cachedName)
             }
-        } else {
-            CommonLoadingScreen(customColours)
-            viewModel.load(cachedName)
         }
     }
 }
