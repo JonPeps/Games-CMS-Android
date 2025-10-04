@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.ui.main
+package com.jonpeps.gamescms.ui.main.builders
 
 import android.content.Context
 import androidx.compose.foundation.background
@@ -15,6 +15,8 @@ import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel
 import com.jonpeps.gamescms.data.viewmodels.factories.InputStreamStringListViewModelFactory
 import com.jonpeps.gamescms.data.viewmodels.factories.ListViewModelFactory
 import com.jonpeps.gamescms.ui.applevel.CustomColours
+import com.jonpeps.gamescms.ui.main.composables.CommonLoadingScreen
+import com.jonpeps.gamescms.ui.main.composables.CommonStringListView
 
 class BasicStrListBuilder private constructor() {
     data class Builder(val context: Context, val customColours: CustomColours) {
@@ -62,7 +64,7 @@ class BasicStrListBuilder private constructor() {
             if (shouldPostToUI.value) {
                 if (viewModel.status.success) {
                     Column(
-                        modifier = Modifier
+                        modifier = Modifier.Companion
                             .background(customColours.background)
                             .fillMaxHeight()
                     ) {

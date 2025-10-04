@@ -1,8 +1,9 @@
-package com.jonpeps.gamescms.ui.main
+package com.jonpeps.gamescms.ui.main.builders
 
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.jonpeps.gamescms.ui.main.builders.data.CustomItemText
 
 data class CustomMenuItem(val customMenuItemText: CustomItemText,
                           val enabled: Boolean,

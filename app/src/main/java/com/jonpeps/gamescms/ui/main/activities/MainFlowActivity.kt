@@ -1,13 +1,18 @@
-package com.jonpeps.gamescms.ui.main
+package com.jonpeps.gamescms.ui.main.activities
 
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.sp
 import androidx.navigation3.runtime.NavEntry
@@ -22,6 +27,16 @@ import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.PROJECTS
 import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.START
 import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.TABLE_TEMPLATES
 import com.jonpeps.gamescms.ui.applevel.CustomColours
+import com.jonpeps.gamescms.ui.main.composables.BasicNoEscapeError
+import com.jonpeps.gamescms.ui.main.composables.CommonStringListView
+import com.jonpeps.gamescms.ui.main.builders.BasicStrListBuilder
+import com.jonpeps.gamescms.ui.main.builders.DropdownMenuItemBuilder
+import com.jonpeps.gamescms.ui.main.builders.MainFlowWithNavBarBuilder
+import com.jonpeps.gamescms.ui.main.builders.NavBuilder
+import com.jonpeps.gamescms.ui.main.builders.Screen
+import com.jonpeps.gamescms.ui.main.builders.ScreenFlowBuilder
+import com.jonpeps.gamescms.ui.main.builders.data.CustomItemText
+import com.jonpeps.gamescms.ui.viewmodels.ScreenFlowViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -86,16 +101,23 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun BuildMainContent(customColours: CustomColours) {
         val menuItems = DropdownMenuItemBuilder.Builder()
-            .add(CustomItemText("Item 1",
-                20.sp, customColours.primary, FontStyle.Normal),
+            .add(
+                CustomItemText(
+                    "Item 1",
+                    20.sp, customColours.primary, FontStyle.Normal
+                ),
                 true,
                 onClick = {
                 }
             )
         MainFlowWithNavBarBuilder
             .Builder(applicationContext, viewModel, customColours)
-            .setNavBarTitle(CustomItemText("Main Screen",
-                20.sp, customColours.primary, FontStyle.Normal))
+            .setNavBarTitle(
+                CustomItemText(
+                    "Main Screen",
+                    20.sp, customColours.primary, FontStyle.Normal
+                )
+            )
             .onIconBack {
                 viewModel.popBackStack()
             }.menuItems {
@@ -103,6 +125,21 @@ class MainActivity : ComponentActivity() {
             }.setContent {
                 buildMainNavigation(buildNavScreenEntries(customColours)).Build()
             }.Build()
+    }
+
+    @Composable
+    private fun ShowStartScreen(viewModel: ScreenFlowViewModel, customColours: CustomColours) {
+        Box(modifier = Modifier.fillMaxHeight().fillMaxWidth().background(customColours.background)) {
+            CommonStringListView(
+                listOf(PROJECTS, TABLE_TEMPLATES), customColours
+            ) { text ->
+                if (text == PROJECTS) {
+                    viewModel.navigateTo(Screen(PROJECTS))
+                } else {
+                    viewModel.navigateTo(Screen(TABLE_TEMPLATES))
+                }
+            }
+        }
     }
 }
 

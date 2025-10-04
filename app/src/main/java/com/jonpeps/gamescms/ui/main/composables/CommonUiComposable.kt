@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.ui.main
+package com.jonpeps.gamescms.ui.main.composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

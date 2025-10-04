@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.ui.main
+package com.jonpeps.gamescms.ui.main.builders
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.slideInHorizontally
@@ -10,6 +10,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
+import com.jonpeps.gamescms.ui.viewmodels.ScreenFlowViewModel
 
 class NavBuilder private constructor() {
     data class Builder(val viewModel: ScreenFlowViewModel) {

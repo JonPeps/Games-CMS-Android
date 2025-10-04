@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.ui.main
+package com.jonpeps.gamescms.ui.main.builders
 
 import android.content.Context
 import androidx.compose.foundation.background
@@ -25,11 +25,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import com.jonpeps.gamescms.R
 import com.jonpeps.gamescms.ui.applevel.CustomColours
+import com.jonpeps.gamescms.ui.viewmodels.ScreenFlowViewModel
+import com.jonpeps.gamescms.ui.main.builders.data.CustomItemText
 
 class MainFlowWithNavBarBuilder private constructor() {
     data class Builder(val context: Context,
                        val viewModel: ScreenFlowViewModel,
-                       val customColours: CustomColours) {
+                       val customColours: CustomColours
+    ) {
         private var customItemText: CustomItemText? = null
 
         private lateinit var onIconBack: () -> Unit
@@ -58,7 +61,7 @@ class MainFlowWithNavBarBuilder private constructor() {
             val expanded = remember { mutableStateOf(false) }
             val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
             Scaffold(
-                modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+                modifier = Modifier.Companion.nestedScroll(scrollBehavior.nestedScrollConnection),
                 topBar = {
                     CenterAlignedTopAppBar(
                         colors = TopAppBarDefaults.topAppBarColors(
@@ -67,10 +70,12 @@ class MainFlowWithNavBarBuilder private constructor() {
                         ),
                         title = {
                             customItemText?.let {
-                                Text(text = it.text,
-                                     fontSize = it.fontSize,
-                                     color = it.color,
-                                     fontStyle = it.fontStyle)
+                                Text(
+                                    text = it.text,
+                                    fontSize = it.fontSize,
+                                    color = it.color,
+                                    fontStyle = it.fontStyle
+                                )
                             }
                         },
                         navigationIcon = {
@@ -105,12 +110,14 @@ class MainFlowWithNavBarBuilder private constructor() {
                     )
                 },
             ) { innerPadding ->
-                Box(modifier = Modifier
-                    .padding(innerPadding)
-                    .background(customColours.background)
-                    .fillMaxWidth()
-                    .fillMaxHeight()) {
-                        mainContent()
+                Box(
+                    modifier = Modifier.Companion
+                        .padding(innerPadding)
+                        .background(customColours.background)
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                ) {
+                    mainContent()
                 }
             }
         }

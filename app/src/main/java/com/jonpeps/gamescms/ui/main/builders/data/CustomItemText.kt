@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.ui.main
+package com.jonpeps.gamescms.ui.main.builders.data
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
