@@ -84,7 +84,7 @@ class MainActivity : ComponentActivity() {
     private fun buildNavScreenEntries(customColours: CustomColours): (Screen) -> NavEntry<Screen> {
         return ScreenFlowBuilder
             .Builder()
-            .add(START, { ShowStartScreen(viewModel, customColours) })
+            .add(START, { BuildStartScreen(viewModel, customColours) })
             .add(PROJECTS, { BuildProjectsList(applicationContext, customColours)} )
             .add(TABLE_TEMPLATES, { BuildTemplatesList(applicationContext, customColours) })
             .build()
@@ -131,7 +131,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun ShowStartScreen(viewModel: ScreenFlowViewModel, customColours: CustomColours) {
+    private fun BuildStartScreen(viewModel: ScreenFlowViewModel, customColours: CustomColours) {
         Box(modifier = Modifier.fillMaxHeight().fillMaxWidth().background(customColours.background)) {
             CommonStringListView(
                 listOf(PROJECTS, TABLE_TEMPLATES), customColours
