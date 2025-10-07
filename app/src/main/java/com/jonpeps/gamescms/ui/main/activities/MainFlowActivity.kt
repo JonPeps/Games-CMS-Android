@@ -21,8 +21,6 @@ import com.jonpeps.gamescms.data.DataConstants.Companion.PROJECTS_DIR
 import com.jonpeps.gamescms.data.DataConstants.Companion.PROJECT_LIST_CACHE_NAME
 import com.jonpeps.gamescms.data.DataConstants.Companion.TEMPLATES_DIR
 import com.jonpeps.gamescms.data.DataConstants.Companion.TEMPLATES_LIST_CACHE_NAME
-import com.jonpeps.gamescms.data.DataConstants.Debug.Companion.DEBUG_PROJECTS_LIST
-import com.jonpeps.gamescms.data.DataConstants.Debug.Companion.DEBUG_TEMPLATES_LIST
 import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.PROJECTS
 import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.START
 import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.TABLE_TEMPLATES
@@ -30,11 +28,11 @@ import com.jonpeps.gamescms.ui.applevel.CustomColours
 import com.jonpeps.gamescms.ui.main.composables.BasicNoEscapeError
 import com.jonpeps.gamescms.ui.main.composables.CommonStringListView
 import com.jonpeps.gamescms.ui.main.builders.BasicStrListBuilder
-import com.jonpeps.gamescms.ui.main.builders.DropdownMenuItemBuilder
 import com.jonpeps.gamescms.ui.main.builders.MainFlowWithNavBarBuilder
 import com.jonpeps.gamescms.ui.main.builders.NavBuilder
 import com.jonpeps.gamescms.ui.main.builders.Screen
 import com.jonpeps.gamescms.ui.main.builders.ScreenFlowBuilder
+import com.jonpeps.gamescms.ui.main.builders.StartFlowComposeBuilder
 import com.jonpeps.gamescms.ui.main.builders.data.CustomItemText
 import com.jonpeps.gamescms.ui.viewmodels.ScreenFlowViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,7 +45,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Surface {
-                BuildMainContent(CustomColours(isSystemInDarkTheme()))
+                val customColours = CustomColours(isSystemInDarkTheme())
+                val mainBuilder = StartFlowComposeBuilder
+                    .Builder(applicationContext, viewModel, customColours)
+                    .addStrListItemFromFile(
+                            START,
+                            listOf(PROJECTS_DIR),
+                            PROJECT_LIST_CACHE_NAME,
+                            ""
+                    )
             }
         }
     }
@@ -58,7 +64,6 @@ class MainActivity : ComponentActivity() {
             .Builder(context, customColours)
             .setStoragePath(context.getExternalFilesDir(null)?.absolutePath + MAIN_DIR + PROJECTS_DIR)
             .setCachedName(PROJECT_LIST_CACHE_NAME)
-            .setDebugFilename(DEBUG_PROJECTS_LIST)
             .setOnClick {
                 // TODO
             }
@@ -72,7 +77,6 @@ class MainActivity : ComponentActivity() {
             .Builder(context, customColours)
             .setStoragePath(context.getExternalFilesDir(null)?.absolutePath + MAIN_DIR + TEMPLATES_DIR)
             .setCachedName(TEMPLATES_LIST_CACHE_NAME)
-            .setDebugFilename(DEBUG_TEMPLATES_LIST)
             .setOnClick {
                 // TODO
             }
@@ -103,16 +107,6 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun BuildMainContent(customColours: CustomColours) {
-        val menuItems = DropdownMenuItemBuilder.Builder()
-            .add(
-                CustomItemText(
-                    "Item 1",
-                    20.sp, customColours.primary, FontStyle.Normal
-                ),
-                true,
-                onClick = {
-                }
-            )
         MainFlowWithNavBarBuilder
             .Builder(applicationContext, viewModel, customColours)
             .setNavBarTitle(
@@ -123,8 +117,6 @@ class MainActivity : ComponentActivity() {
             )
             .onIconBack {
                 viewModel.popBackStack()
-            }.menuItems {
-                menuItems.Build()
             }.setContent {
                 buildMainNavigation(buildNavScreenEntries(customColours)).Build()
             }.Build()

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -32,6 +33,29 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jonpeps.gamescms.ui.applevel.CustomColours
+
+@Composable
+fun CommonEmptyScreen(text: String, customColours: CustomColours) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .padding(10.dp)
+            .fillMaxSize()
+            .fillMaxHeight()
+            .background(customColours.background)
+    ) {
+        Text(
+            text = text,
+            fontSize = 30.sp,
+            color = customColours.primary,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .wrapContentWidth()
+                .wrapContentHeight()
+        )
+    }
+}
 
 @Composable
 fun CommonStringListView(items: List<String>, customColours: CustomColours, onClick: (text: String) -> Unit = {}) {
