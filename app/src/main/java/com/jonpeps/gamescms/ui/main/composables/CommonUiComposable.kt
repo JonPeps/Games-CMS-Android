@@ -39,7 +39,6 @@ fun CommonEmptyScreen(text: String, customColours: CustomColours) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .padding(10.dp)
             .fillMaxSize()
             .fillMaxHeight()
             .background(customColours.background)
@@ -49,10 +48,11 @@ fun CommonEmptyScreen(text: String, customColours: CustomColours) {
             fontSize = 30.sp,
             color = customColours.primary,
             fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
             modifier = Modifier
-                .align(Alignment.Center)
+                .padding(25.dp)
                 .wrapContentWidth()
-                .wrapContentHeight()
+                .wrapContentHeight(align = Alignment.CenterVertically)
         )
     }
 }

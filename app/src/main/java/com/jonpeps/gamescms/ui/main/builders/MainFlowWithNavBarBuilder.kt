@@ -38,6 +38,7 @@ class MainFlowWithNavBarBuilder private constructor() {
         private lateinit var onIconBack: () -> Unit
         private lateinit var menuItems: @Composable () -> Unit
         private lateinit var mainContent: @Composable () -> Unit
+        private var showMenu = false
 
         fun setNavBarTitle(customItemText: CustomItemText) = apply {
             this.customItemText = customItemText
@@ -49,6 +50,7 @@ class MainFlowWithNavBarBuilder private constructor() {
 
         fun menuItems(menuItems: @Composable () -> Unit) = apply {
             this.menuItems = menuItems
+            showMenu = true
         }
 
         fun setContent(content: @Composable () -> Unit) = apply {
@@ -90,20 +92,24 @@ class MainFlowWithNavBarBuilder private constructor() {
                             }
                         },
                         actions = {
-                            IconButton(onClick = {
-                                expanded.value = !expanded.value
-                            }) {
-                                Icon(
-                                    tint = customColours.primary,
-                                    imageVector = Icons.Filled.MoreVert,
-                                    contentDescription = context.getString(R.string.kebab_menu_content_desc)
-                                )
-                                DropdownMenu(
-                                    expanded = expanded.value,
-                                    onDismissRequest = { expanded.value = false }
-                                ) {
-                                    menuItems()
+                            if (showMenu) {
+                                IconButton(onClick = {
+                                    expanded.value = !expanded.value
+                                }) {
+                                    Icon(
+                                        tint = customColours.primary,
+                                        imageVector = Icons.Filled.MoreVert,
+                                        contentDescription = context.getString(R.string.kebab_menu_content_desc)
+                                    )
+                                    DropdownMenu(
+                                        expanded = expanded.value,
+                                        onDismissRequest = { expanded.value = false }
+                                    ) {
+                                        menuItems()
+                                    }
                                 }
+                            } else {
+                                null
                             }
                         },
                         scrollBehavior = scrollBehavior,

@@ -60,13 +60,18 @@ class StartFlowComposeBuilder private constructor() {
                 screenFlowBuilder.add(it.screenName, it.content)
             }
 
-            NavBuilder.Builder(viewModel)
-                .setOnBack {
+            MainFlowWithNavBarBuilder
+                .Builder(context, viewModel, customColours)
+                .onIconBack {
                     if(!viewModel.popBackStack()) {
                         val mainActivity = context as MainActivity
                         mainActivity.finish()
                     }
-                }.navContent(screenFlowBuilder.build())
+                }.setContent {
+                    NavBuilder
+                        .Builder(viewModel)
+                        .navContent(screenFlowBuilder.build()).Build()
+                }.Build()
         }
     }
 
