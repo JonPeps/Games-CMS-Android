@@ -2,7 +2,7 @@ package com.jonpeps.gamescms.data.viewmodels
 
 import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
-import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
+import com.jonpeps.gamescms.data.repositories.MoshiJsonRepository
 import com.jonpeps.gamescms.data.serialization.ICommonDeleteFileHelper
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.StringListStatus
@@ -25,7 +25,7 @@ class CommonStringListViewModel
 @AssistedInject constructor(
     @Assisted("param1") private val directory: String,
     @Assisted("param2") private val fileName: String,
-    private val moshiStringListRepository: IMoshiStringListRepository,
+    private val moshiStringListRepository: MoshiJsonRepository<StringListMoshi>,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val listItemsVmChangesCache: IStringListItemsVmChangesCache,
     private val commonDeleteFileHelper: ICommonDeleteFileHelper,

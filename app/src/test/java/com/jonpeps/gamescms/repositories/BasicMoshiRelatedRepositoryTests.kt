@@ -4,7 +4,7 @@ import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.repositories.BaseMoshiJsonRepository.Companion.CONVERT_TO_JSON_FAILED
 import com.jonpeps.gamescms.data.repositories.BaseMoshiJsonRepository.Companion.WRITE_TO_FILE_FAILED
 import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
-import com.jonpeps.gamescms.data.repositories.MoshiStringListRepository
+import com.jonpeps.gamescms.data.repositories.MoshiJsonRepository
 import com.jonpeps.gamescms.data.repositories.StringListMoshiJsonAdapter
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
 import com.jonpeps.gamescms.ui.tabletemplates.repositories.IStringListMoshiJsonCache
@@ -51,16 +51,17 @@ class BasicMoshiRelatedRepositoryTests {
     private val templateName = "test"
     private val dummyData = StringListMoshi(listOf("test"))
 
-    private lateinit var moshiStringListRepository: IMoshiStringListRepository
+    private lateinit var moshiStringListRepository: MoshiJsonRepository<StringListMoshi>
 
     @Before
     fun setup() {
         MockKAnnotations.init(this)
 
-        moshiStringListRepository = MoshiStringListRepository(
+        moshiStringListRepository = MoshiJsonRepository(
             stringListMoshiJsonAdapter,
             tableTemplateStringListMoshiJsonCache,
-            stringFileStorageStrSerialisation)
+            stringFileStorageStrSerialisation
+        )
 
         moshiStringListRepository.setAbsoluteFile(absolutePath)
         moshiStringListRepository.setFile(file)

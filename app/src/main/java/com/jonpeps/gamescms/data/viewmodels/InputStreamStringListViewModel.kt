@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import java.io.InputStream
 
 @HiltViewModel(assistedFactory = InputStreamStringListViewModelFactory.IInputStreamStringListViewModelFactory::class)
-    class InputStreamStringListViewModel@AssistedInject constructor(
+class InputStreamStringListViewModel@AssistedInject constructor(
     @Assisted("param1") private val inputStream: InputStream,
     @Assisted("param2") private val directory: String,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,

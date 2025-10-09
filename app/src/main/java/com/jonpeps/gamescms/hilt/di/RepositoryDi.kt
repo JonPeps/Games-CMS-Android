@@ -1,6 +1,5 @@
 package com.jonpeps.gamescms.hilt.di
 
-import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.repositories.MoshiStringListRepository
 import com.jonpeps.gamescms.data.repositories.StringListMoshiJsonAdapter
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
@@ -23,9 +22,13 @@ class RepositoryDiProvider {
     @Provides
     fun provideMoshiStringListRepository(stringListMoshiJsonAdapter: StringListMoshiJsonAdapter,
                                          stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation,
-                                         stringMoshiJsonCache: IStringListMoshiJsonCache)
-    : IMoshiStringListRepository {
-        return MoshiStringListRepository(stringListMoshiJsonAdapter, stringMoshiJsonCache, stringFileStorageStrSerialisation)
+                                         stringMoshiJsonCache: StringListMoshiJsonCache)
+    : MoshiStringListRepository {
+        return MoshiStringListRepository(
+            stringListMoshiJsonAdapter,
+            stringFileStorageStrSerialisation,
+            stringMoshiJsonCache
+        )
     }
 
     @Provides
