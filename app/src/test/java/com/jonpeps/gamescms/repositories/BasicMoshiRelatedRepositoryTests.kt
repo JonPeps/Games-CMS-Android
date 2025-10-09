@@ -7,7 +7,7 @@ import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.repositories.MoshiStringListRepository
 import com.jonpeps.gamescms.data.repositories.StringListMoshiJsonAdapter
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.IStringListMoshiJsonCache
+import com.jonpeps.gamescms.data.repositories.IStringListMoshiJsonCache
 import com.squareup.moshi.JsonAdapter
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery

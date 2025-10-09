@@ -7,9 +7,9 @@ import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSeria
 import com.jonpeps.gamescms.data.serialization.string.IStringSerialization
 import com.jonpeps.gamescms.data.serialization.string.StringFileStorageStrSerialisation
 import com.jonpeps.gamescms.data.serialization.string.StringSerialization
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.TableTemplateItemListMoshiAdapter
-import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.IStringListItemsVmChangesCache
-import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.StringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.repositories.TableTemplateMoshiJsonAdapter
+import com.jonpeps.gamescms.data.repositories.IStringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.repositories.StringListItemsVmChangesCache
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,8 +42,8 @@ class SerializationDiProvider {
     }
 
     @Provides
-    fun providesTableTemplateItemListMoshiAdapter(): TableTemplateItemListMoshiAdapter {
-        return TableTemplateItemListMoshiAdapter()
+    fun providesTableTemplateItemListMoshiAdapter(): TableTemplateMoshiJsonAdapter {
+        return TableTemplateMoshiJsonAdapter()
     }
 
     @Provides

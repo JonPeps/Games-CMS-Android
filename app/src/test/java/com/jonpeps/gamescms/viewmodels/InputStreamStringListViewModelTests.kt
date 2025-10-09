@@ -8,7 +8,7 @@ import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel
 import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel.Companion.FAILED_TO_CREATE_DIR
 import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel.Companion.FAILED_TO_LOAD_FILE
 import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel.Companion.FAILED_TO_WRITE_FILE
-import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.IStringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.repositories.IStringListItemsVmChangesCache
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every

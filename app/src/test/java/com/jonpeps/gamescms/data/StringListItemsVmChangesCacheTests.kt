@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.data
 
-import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.IStringListItemsVmChangesCache
-import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.StringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.repositories.IStringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.repositories.StringListItemsVmChangesCache
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

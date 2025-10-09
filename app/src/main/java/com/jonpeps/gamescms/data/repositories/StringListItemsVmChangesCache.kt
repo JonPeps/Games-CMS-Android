@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.ui.tabletemplates.viewmodels
+package com.jonpeps.gamescms.data.repositories
 
 import com.jonpeps.gamescms.data.helpers.ChangesCachePair
 import com.jonpeps.gamescms.data.helpers.GenericSerializationChangesCache

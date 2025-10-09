@@ -1,5 +1,6 @@
 package com.jonpeps.gamescms.data.viewmodels
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.DataConstants.Companion.JSON_EXTENSION
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
@@ -8,11 +9,13 @@ import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.StringListStatus
 import com.jonpeps.gamescms.data.serialization.debug.IInputStreamSerializationRepoHelper
 import com.jonpeps.gamescms.data.viewmodels.factories.InputStreamStringListViewModelFactory
-import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.IStringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.repositories.IStringListItemsVmChangesCache
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.io.InputStream
 
@@ -25,9 +28,16 @@ import java.io.InputStream
     private val moshiStringListRepository: IMoshiStringListRepository,
     private val listItemsVmChangesCache: IStringListItemsVmChangesCache,
     private val coroutineDispatcher: CoroutineDispatcher
-): BaseStringListViewModel(), IBaseStringListViewModel {
+): ViewModel() {
+    var status: StringListStatus = StringListStatus(true, arrayListOf(), "", null)
 
-    override fun load(cacheName: String, loadFromCacheIfExists: Boolean) {
+    var baseHasFinishedObtainingData = MutableStateFlow(false)
+    val hasFinishedObtainingData: StateFlow<Boolean> = baseHasFinishedObtainingData
+
+    var items = arrayListOf<String>()
+    var exception: Exception? = null
+
+    fun load(cacheName: String, loadFromCacheIfExists: Boolean) {
         viewModelScope.launch(coroutineDispatcher) {
             items.clear()
             exception = null

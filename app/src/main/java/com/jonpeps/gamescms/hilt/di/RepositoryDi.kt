@@ -4,13 +4,13 @@ import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.repositories.MoshiStringListRepository
 import com.jonpeps.gamescms.data.repositories.StringListMoshiJsonAdapter
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateFileRepository
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.IStringListMoshiJsonCache
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.ITableTemplateStringMoshiJsonCache
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.StringListMoshiJsonCache
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.TableTemplateFileRepository
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.TableTemplateItemListMoshiAdapter
-import com.jonpeps.gamescms.ui.tabletemplates.repositories.TableTemplateStringMoshiJsonCache
+import com.jonpeps.gamescms.data.repositories.ITableTemplateFileRepository
+import com.jonpeps.gamescms.data.repositories.IStringListMoshiJsonCache
+import com.jonpeps.gamescms.data.repositories.ITableTemplateStringMoshiJsonCache
+import com.jonpeps.gamescms.data.repositories.StringListMoshiJsonCache
+import com.jonpeps.gamescms.data.repositories.TableTemplateFileRepository
+import com.jonpeps.gamescms.data.repositories.TableTemplateMoshiJsonAdapter
+import com.jonpeps.gamescms.data.repositories.TableTemplateStringMoshiJsonCache
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -29,7 +29,7 @@ class RepositoryDiProvider {
     }
 
     @Provides
-    fun provideTableTemplateFileRepository(tableTemplateItemListMoshiAdapter: TableTemplateItemListMoshiAdapter,
+    fun provideTableTemplateFileRepository(tableTemplateItemListMoshiAdapter: TableTemplateMoshiJsonAdapter,
                                            stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation,
                                            tableTemplateStringMoshiCache: TableTemplateStringMoshiJsonCache
     )

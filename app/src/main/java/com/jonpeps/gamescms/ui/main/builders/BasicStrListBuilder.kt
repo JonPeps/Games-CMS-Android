@@ -9,7 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jonpeps.gamescms.R
-import com.jonpeps.gamescms.data.viewmodels.CommonStringListViewModel
+import com.jonpeps.gamescms.data.viewmodels.StartFlowStringListViewModel
 import com.jonpeps.gamescms.data.viewmodels.factories.ListViewModelFactory
 import com.jonpeps.gamescms.ui.applevel.CustomColours
 import com.jonpeps.gamescms.ui.main.composables.CommonLoadingScreen
@@ -40,7 +40,7 @@ class BasicStrListBuilder private constructor() {
                                 onClick: (String) -> Unit,
                                 onError: @Composable (String, String?) -> Unit) {
             val viewModel =
-                hiltViewModel<CommonStringListViewModel,
+                hiltViewModel<StartFlowStringListViewModel,
                         ListViewModelFactory.ICommonStringListViewModelFactory>(
                     creationCallback = {
                         it.create(storagePath, cachedName)

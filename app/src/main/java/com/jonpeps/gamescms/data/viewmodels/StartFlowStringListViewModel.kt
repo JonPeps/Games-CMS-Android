@@ -8,20 +8,23 @@ import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.StringListStatus
 import com.jonpeps.gamescms.data.serialization.SubDeleteFlag
 import com.jonpeps.gamescms.data.viewmodels.factories.ListViewModelFactory
-import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.IStringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.repositories.IStringListItemsVmChangesCache
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import java.io.File
 
-interface ICommonStringListViewModel: IBaseStringListViewModel {
+interface IStartFlowStringListViewModel {
+    fun load(cacheName: String, loadFromCacheIfExists: Boolean = true)
     fun add(name: String)
     fun delete(name: String, subDeleteFlag: SubDeleteFlag = SubDeleteFlag.NONE)
+    fun deleteAll()
 }
 
 @HiltViewModel(assistedFactory = ListViewModelFactory.ICommonStringListViewModelFactory::class)
-class CommonStringListViewModel
+class StartFlowStringListViewModel
 @AssistedInject constructor(
     @Assisted("param1") private val directory: String,
     @Assisted("param2") private val fileName: String,
@@ -30,7 +33,7 @@ class CommonStringListViewModel
     private val listItemsVmChangesCache: IStringListItemsVmChangesCache,
     private val commonDeleteFileHelper: ICommonDeleteFileHelper,
     private val coroutineDispatcher: CoroutineDispatcher
-): BaseStringListViewModel(), ICommonStringListViewModel {
+): BaseStringListViewModel(), IStartFlowStringListViewModel {
     private var cacheName = ""
 
     override fun load(cacheName: String, loadFromCacheIfExists: Boolean) {
@@ -113,6 +116,12 @@ class CommonStringListViewModel
             }
             baseHasFinishedObtainingData.value = true
             status = StringListStatus(success, items, message, null)
+        }
+    }
+
+    override fun deleteAll() {
+        viewModelScope.launch(coroutineDispatcher) {
+            commonDeleteFileHelper.deleteDirectory(File(directory))
         }
     }
 
