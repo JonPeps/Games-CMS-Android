@@ -19,25 +19,25 @@ class TableTemplateMoshiJsonAdapter : MoshiJsonAdapter<TableTemplateItemListMosh
 
 ///////////////////////////////////////////////////////////////////////////////
 
-interface IMoshiStringListRepository : IBaseMoshiJsonRepository<StringListMoshi>
+interface IMoshiStringListRepository : IBaseCachedMoshiJsonRepository<StringListMoshi>
 
 open class MoshiStringListRepository
 @Inject constructor(stringListMoshiJsonAdapter: StringListMoshiJsonAdapter,
                     tableTemplateStringMoshiJsonCache: IStringListMoshiJsonCache,
                     stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation
-) : BaseMoshiJsonRepository<StringListMoshi>(stringListMoshiJsonAdapter,
+) : BaseCachedMoshiJsonRepository<StringListMoshi>(stringListMoshiJsonAdapter,
     stringFileStorageStrSerialisation,
     tableTemplateStringMoshiJsonCache), IMoshiStringListRepository
 
 ////////////////////////////////////////////////////////////////////////////////
 
-interface ITableTemplateFileRepository : IBaseMoshiJsonRepository<TableTemplateItemListMoshi>
+interface ITableTemplateFileRepository : IBaseCachedMoshiJsonRepository<TableTemplateItemListMoshi>
 
 class TableTemplateFileRepository
 @Inject constructor(tableTemplateItemListMoshiAdapter: TableTemplateMoshiJsonAdapter,
                     tableTemplateStringMoshiJsonCache: ITableTemplateStringMoshiJsonCache,
                     stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation)
-    : BaseMoshiJsonRepository<TableTemplateItemListMoshi>(tableTemplateItemListMoshiAdapter,
+    : BaseCachedMoshiJsonRepository<TableTemplateItemListMoshi>(tableTemplateItemListMoshiAdapter,
     stringFileStorageStrSerialisation,
     tableTemplateStringMoshiJsonCache), ITableTemplateFileRepository
 

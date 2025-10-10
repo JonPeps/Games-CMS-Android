@@ -119,7 +119,6 @@ class TableTemplateGroupViewModel
                     tableTemplateGroupVmChangesCache.set(templateName, items)
                 }
             }
-            _isProcessing.value = false
             _status.value = TableTemplateStatus(success, items, index, errorMessage, exception)
         }
     }
@@ -152,7 +151,6 @@ class TableTemplateGroupViewModel
             if (success) {
                 tableTemplateGroupVmChangesCache.updateCurrent(templateName, items)
             }
-            _isProcessing.value = false
             _status.value = TableTemplateStatus(success, items, index, errorMessage, exception)
         }
     }
@@ -163,7 +161,6 @@ class TableTemplateGroupViewModel
         items.add(TableItemFinal(name = "", dataType = ItemType.STRING,
             isPrimary = false, value = "", editable = true, isSortKey = false)
         )
-        _isProcessing.value = false
         _status.value = TableTemplateStatus(true, items, index, "", null)
     }
 
@@ -227,7 +224,7 @@ class TableTemplateGroupViewModel
     }
 
     override fun addPage() {
-        if (items.size >= 1) {
+        if (items.isNotEmpty()) {
             index++
         }
         items.add(index, TableItemFinal(name = "", dataType = ItemType.STRING,

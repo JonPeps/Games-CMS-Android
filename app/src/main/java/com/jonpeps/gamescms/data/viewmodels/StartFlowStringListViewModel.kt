@@ -7,7 +7,7 @@ import com.jonpeps.gamescms.data.serialization.ICommonDeleteFileHelper
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.StringListStatus
 import com.jonpeps.gamescms.data.serialization.SubDeleteFlag
-import com.jonpeps.gamescms.data.viewmodels.factories.ListViewModelFactory
+import com.jonpeps.gamescms.data.viewmodels.factories.StartFlowStringListViewModelFactory
 import com.jonpeps.gamescms.data.repositories.IStringListItemsVmChangesCache
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -23,7 +23,7 @@ interface IStartFlowStringListViewModel {
     fun deleteAll()
 }
 
-@HiltViewModel(assistedFactory = ListViewModelFactory.ICommonStringListViewModelFactory::class)
+@HiltViewModel(assistedFactory = StartFlowStringListViewModelFactory.IStartFlowStringListViewModelFactory::class)
 class StartFlowStringListViewModel
 @AssistedInject constructor(
     @Assisted("param1") private val directory: String,

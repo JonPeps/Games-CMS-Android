@@ -7,9 +7,9 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 
 @Suppress("UNCHECKED_CAST")
-class ListViewModelFactory {
+class StartFlowStringListViewModelFactory {
     @AssistedFactory
-    interface ICommonStringListViewModelFactory {
+    interface IStartFlowStringListViewModelFactory {
         fun create(@Assisted("param1") directoryPath: String, @Assisted("param2") listPath: String): StartFlowStringListViewModel
     }
 
@@ -17,7 +17,7 @@ class ListViewModelFactory {
         fun provideFactory(
             directoryPath: String,
             stringListPath: String,
-            assistedFactory: ICommonStringListViewModelFactory
+            assistedFactory: IStartFlowStringListViewModelFactory
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return assistedFactory.create(directoryPath, stringListPath) as T

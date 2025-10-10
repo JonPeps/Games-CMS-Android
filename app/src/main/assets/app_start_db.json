@@ -1,5 +1,5 @@
 {
-    "template_name": "app_start_db",
+    "template_name": "app_start_config",
     "items": [
         {
             "name": "Id",

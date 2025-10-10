@@ -26,13 +26,9 @@ import java.io.InputStream
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val inputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper,
     private val moshiStringListRepository: IMoshiStringListRepository,
-    private val listItemsVmChangesCache: IStringListItemsVmChangesCache,
     private val coroutineDispatcher: CoroutineDispatcher
 ): ViewModel() {
     var status: StringListStatus = StringListStatus(true, arrayListOf(), "", null)
-
-    var baseHasFinishedObtainingData = MutableStateFlow(false)
-    val hasFinishedObtainingData: StateFlow<Boolean> = baseHasFinishedObtainingData
 
     var items = arrayListOf<String>()
     var exception: Exception? = null
@@ -84,7 +80,6 @@ import java.io.InputStream
                     success = false
                 }
             }
-            baseHasFinishedObtainingData.value = true
             status = StringListStatus(success, items, errorMessage, exception)
         }
     }
