@@ -6,9 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
 import com.jonpeps.gamescms.data.dataclasses.mappers.TableItemFinalMapper
+import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.factories.TableTemplateGroupViewModelFactory
-import com.jonpeps.gamescms.data.repositories.ITableTemplateFileRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -51,7 +51,7 @@ interface ITableTemplateGroupViewModel {
 class TableTemplateGroupViewModel
 @AssistedInject constructor(
     @Assisted private val tableTemplateFilesPath: String,
-    private val tableTemplateRepository: ITableTemplateFileRepository,
+    private val tableTemplateRepository: IMoshiTableTemplateRepository,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val tableTemplateGroupVmChangesCache: ITableTemplateGroupVmChangesCache,
     private val coroutineDispatcher: CoroutineDispatcher)
@@ -95,8 +95,8 @@ class TableTemplateGroupViewModel
             } else {
                 try {
                     initReadFiles(name)
-                    if (tableTemplateRepository.load(templateName)) {
-                        val tableListItem = tableTemplateRepository.getItem(templateName)
+                    if (tableTemplateRepository.load()) {
+                        val tableListItem = tableTemplateRepository.getItem()
                         tableListItem?.let {
                             templateName = it.templateName
                             items.clear()
@@ -132,9 +132,9 @@ class TableTemplateGroupViewModel
             var errorMessage = ""
             try {
                 initWriteFiles(name)
-                val toSave = tableTemplateRepository.getItem(templateName)
+                val toSave = tableTemplateRepository.getItem()
                 toSave?.let {
-                    if (tableTemplateRepository.save(templateName, it)) {
+                    if (tableTemplateRepository.save(it)) {
                         success = true
                     } else {
                         errorMessage = tableTemplateRepository.getErrorMsg()
@@ -300,12 +300,12 @@ class TableTemplateGroupViewModel
         tableTemplateRepository.setAbsoluteFile(
             commonSerializationRepoHelper.getAbsoluteFile(tableTemplateFilesPath, name))
         tableTemplateRepository.setFile(commonSerializationRepoHelper.getMainFile(name))
-        tableTemplateRepository.setDirectoryFile(
+        tableTemplateRepository.assignDirectoryFile(
             commonSerializationRepoHelper.getDirectoryFile(tableTemplateFilesPath))
         tableTemplateRepository.setFileWriter(
             commonSerializationRepoHelper.getFileWriter(tableTemplateFilesPath, name))
         tableTemplateRepository
-            .setItem(templateName, TableItemFinalMapper.toTableTemplateItemListMoshi(name, items))
+            .setItem(TableItemFinalMapper.toTableTemplateItemListMoshi(name, items))
     }
 
     companion object {

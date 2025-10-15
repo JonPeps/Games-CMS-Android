@@ -64,7 +64,7 @@ class BasicMoshiRelatedRepositoryTests {
 
         moshiStringListRepository.setAbsoluteFile(absolutePath)
         moshiStringListRepository.setFile(file)
-        moshiStringListRepository.setDirectoryFile(directoryFile)
+        moshiStringListRepository.assignDirectoryFile(directoryFile)
         moshiStringListRepository.setBufferReader(bufferedReader)
         moshiStringListRepository.setFileWriter(fileWriter)
 

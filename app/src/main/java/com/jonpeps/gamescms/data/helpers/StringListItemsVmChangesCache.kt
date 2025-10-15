@@ -1,8 +1,5 @@
-package com.jonpeps.gamescms.data.repositories
+package com.jonpeps.gamescms.data.helpers
 
-import com.jonpeps.gamescms.data.helpers.ChangesCachePair
-import com.jonpeps.gamescms.data.helpers.GenericSerializationChangesCache
-import com.jonpeps.gamescms.data.helpers.IGenericSerializationCache
 import javax.inject.Inject
 
 interface IStringListItemsVmChangesCache : IGenericSerializationCache<ArrayList<String>>

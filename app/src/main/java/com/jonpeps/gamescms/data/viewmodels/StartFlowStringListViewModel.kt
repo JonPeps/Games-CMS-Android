@@ -2,13 +2,13 @@ package com.jonpeps.gamescms.data.viewmodels
 
 import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
-import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
+import com.jonpeps.gamescms.data.repositories.ICachedMoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.ICommonDeleteFileHelper
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.StringListStatus
 import com.jonpeps.gamescms.data.serialization.SubDeleteFlag
 import com.jonpeps.gamescms.data.viewmodels.factories.StartFlowStringListViewModelFactory
-import com.jonpeps.gamescms.data.repositories.IStringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.helpers.IStringListItemsVmChangesCache
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +28,7 @@ class StartFlowStringListViewModel
 @AssistedInject constructor(
     @Assisted("param1") private val directory: String,
     @Assisted("param2") private val fileName: String,
-    private val moshiStringListRepository: IMoshiStringListRepository,
+    private val moshiStringListRepository: ICachedMoshiStringListRepository,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val listItemsVmChangesCache: IStringListItemsVmChangesCache,
     private val commonDeleteFileHelper: ICommonDeleteFileHelper,
@@ -86,7 +86,6 @@ class StartFlowStringListViewModel
                 success = false
                 items.remove(name)
             }
-            baseHasFinishedObtainingData.value = true
             status = StringListStatus(success, items, if (success) "" else FAILED_TO_SAVE_FILE + name, null)
         }
     }
@@ -114,7 +113,6 @@ class StartFlowStringListViewModel
                 success = false
                 message = FAILED_TO_DELETE_FILE + name
             }
-            baseHasFinishedObtainingData.value = true
             status = StringListStatus(success, items, message, null)
         }
     }
@@ -137,7 +135,7 @@ class StartFlowStringListViewModel
         moshiStringListRepository.setAbsoluteFile(
             commonSerializationRepoHelper.getAbsoluteFile(directory, name))
         moshiStringListRepository.setFile(commonSerializationRepoHelper.getMainFile(name))
-        moshiStringListRepository.setDirectoryFile(
+        moshiStringListRepository.assignDirectoryFile(
             commonSerializationRepoHelper.getDirectoryFile(directory))
         moshiStringListRepository.setFileWriter(
             commonSerializationRepoHelper.getFileWriter(directory, name))

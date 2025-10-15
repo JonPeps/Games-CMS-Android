@@ -575,7 +575,7 @@ class TableTemplateGroupViewModelTests {
     }
 
     private fun setupForWritingFiles() {
-        every { tableTemplateRepository.setDirectoryFile(any()) } returns Unit
+        every { tableTemplateRepository.assignDirectoryFile(any()) } returns Unit
         every { tableTemplateRepository.setFileWriter(any()) } returns Unit
         every { tableTemplateRepository.setFile(any()) } returns Unit
         every { tableTemplateRepository.setItem(templateName, any()) } returns Unit

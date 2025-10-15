@@ -9,7 +9,7 @@ import com.jonpeps.gamescms.data.viewmodels.StartFlowStringListViewModel.Compani
 import com.jonpeps.gamescms.data.viewmodels.StartFlowStringListViewModel.Companion.FAILED_TO_DELETE_FILE_OR_DIRECTORY
 import com.jonpeps.gamescms.data.viewmodels.StartFlowStringListViewModel.Companion.FAILED_TO_LOAD_FILE
 import com.jonpeps.gamescms.data.viewmodels.StartFlowStringListViewModel.Companion.FAILED_TO_SAVE_FILE
-import com.jonpeps.gamescms.data.repositories.IStringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.helpers.IStringListItemsVmChangesCache
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -291,7 +291,7 @@ class CommonStringListViewModelTests {
 
     private fun setupForWritingFiles() {
         every { moshiStringListRepository.setAbsoluteFile(any()) } returns Unit
-        every { moshiStringListRepository.setDirectoryFile(any()) } returns Unit
+        every { moshiStringListRepository.assignDirectoryFile(any()) } returns Unit
         every { moshiStringListRepository.setFile(any()) } returns Unit
         every { moshiStringListRepository.setFileWriter(any()) } returns Unit
         every { moshiStringListRepository.setItem(any(), any()) } returns Unit

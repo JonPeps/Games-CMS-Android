@@ -8,8 +8,8 @@ import com.jonpeps.gamescms.data.serialization.string.IStringSerialization
 import com.jonpeps.gamescms.data.serialization.string.StringFileStorageStrSerialisation
 import com.jonpeps.gamescms.data.serialization.string.StringSerialization
 import com.jonpeps.gamescms.data.repositories.TableTemplateMoshiJsonAdapter
-import com.jonpeps.gamescms.data.repositories.IStringListItemsVmChangesCache
-import com.jonpeps.gamescms.data.repositories.StringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.helpers.IStringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.helpers.StringListItemsVmChangesCache
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

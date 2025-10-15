@@ -7,7 +7,7 @@ import java.io.FileWriter
 interface IBaseMoshiRepo {
     suspend fun delete(path: String, name: String): Boolean
 
-    fun setDirectoryFile(path: File)
+    fun assignDirectoryFile(path: File)
     fun setFile(file: File)
     fun setAbsoluteFile(absoluteFile: File)
     fun setBufferReader(bufferedReader: BufferedReader)
@@ -30,7 +30,7 @@ abstract class BaseMoshiRepo: IBaseMoshiRepo {
 
     override fun getErrorMsg(): String = errorMessage
 
-    override fun setDirectoryFile(path: File) {
+    override fun assignDirectoryFile(path: File) {
         directoryFile = path
     }
     override fun setFile(file: File) {
@@ -47,5 +47,11 @@ abstract class BaseMoshiRepo: IBaseMoshiRepo {
 
     override fun setFileWriter(fileWriter: FileWriter) {
         mainFileWriter = fileWriter
+    }
+
+    companion object {
+        const val EMPTY_JSON_CONTENTS = "Failed to parse JSON content!"
+        const val CONVERT_TO_JSON_FAILED = "Failed to convert to JSON!"
+        const val WRITE_TO_FILE_FAILED = "Failed to write to file!"
     }
 }

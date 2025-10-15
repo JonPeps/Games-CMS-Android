@@ -86,10 +86,4 @@ abstract class BaseCachedMoshiJsonRepository<T>(
             cacheMap[cacheName] = item
         }
     }
-
-    companion object {
-        const val EMPTY_JSON_CONTENTS = "Failed to parse JSON content!"
-        const val CONVERT_TO_JSON_FAILED = "Failed to convert to JSON!"
-        const val WRITE_TO_FILE_FAILED = "Failed to write to file!"
-    }
 }

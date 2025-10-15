@@ -14,8 +14,8 @@ class TableTemplateGroupViewModelFactory {
 
     companion object {
         fun provideFactory(
-            assistedFactory: ITableTemplateGroupViewModelFactory,
-            tableTemplateFilesPath: String
+            tableTemplateFilesPath: String,
+            assistedFactory: ITableTemplateGroupViewModelFactory
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return assistedFactory.create(tableTemplateFilesPath) as T
