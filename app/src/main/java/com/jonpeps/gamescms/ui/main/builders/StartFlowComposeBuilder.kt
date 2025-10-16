@@ -39,7 +39,7 @@ class StartFlowComposeBuilder private constructor() {
             strListItems.add(StrListItem(screenName, content))
         }
 
-        fun menuItems(menuItems: @Composable () -> Unit) = apply {
+        fun addMenuItems(menuItems: @Composable () -> Unit) = apply {
             this.menuItems = menuItems
         }
 

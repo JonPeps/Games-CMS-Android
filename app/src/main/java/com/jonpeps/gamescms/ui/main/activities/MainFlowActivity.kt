@@ -45,18 +45,18 @@ class MainFlowActivity : ComponentActivity() {
                     .Builder()
                     .add(CustomItemText(
                         context.getString(R.string.menu_item_defaults),
-                        12.sp,
+                        20.sp,
                         customColours.primary,
                         FontStyle.Normal), enabled = true
                     ) { }
                     .add(CustomItemText(
                         context.getString(R.string.menu_item_debug),
-                        12.sp,
+                        20.sp,
                         customColours.primary,
                         FontStyle.Normal), enabled = true
                     ) { }
 
-                val mainBuilder = StartFlowComposeBuilder
+                    StartFlowComposeBuilder
                     .Builder(context, viewModel, customColours)
                     .addStrListItemFromFile(
                             PROJECTS,
@@ -82,11 +82,9 @@ class MainFlowActivity : ComponentActivity() {
                                 }
                             }
                         }
-                    }).menuItems {
+                    }).addMenuItems {
                         dropdownMenuItemBuilder.Build()
-                    }
-
-                mainBuilder.Build()
+                    }.Build()
             }
         }
     }
