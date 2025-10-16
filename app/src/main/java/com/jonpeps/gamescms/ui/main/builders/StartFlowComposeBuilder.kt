@@ -1,12 +1,14 @@
 package com.jonpeps.gamescms.ui.main.builders
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.compose.runtime.Composable
+import com.jonpeps.gamescms.R
 import com.jonpeps.gamescms.data.DataConstants.Companion.MAIN_DIR
 import com.jonpeps.gamescms.ui.applevel.CustomColours
-import com.jonpeps.gamescms.ui.main.activities.MainActivity
-import com.jonpeps.gamescms.ui.main.composables.BasicNoEscapeError
+import com.jonpeps.gamescms.ui.main.activities.MainFlowActivity
+import com.jonpeps.gamescms.ui.main.composables.BasicError
 import com.jonpeps.gamescms.ui.viewmodels.ScreenFlowViewModel
 
 class StartFlowComposeBuilder private constructor() {
@@ -24,6 +26,8 @@ class StartFlowComposeBuilder private constructor() {
         private val strListItemsFromFile: MutableList<StrListItemFromFile> = mutableListOf()
         private val strListItems: MutableList<StrListItem> = mutableListOf()
 
+        private lateinit var menuItems: @Composable () -> Unit
+
         fun addStrListItemFromFile(screenName: String,
                                    folders: List<String>,
                                    cacheName: String,
@@ -33,6 +37,10 @@ class StartFlowComposeBuilder private constructor() {
 
         fun addStrListItem(screenName: String, content: @Composable () -> Unit) = apply {
             strListItems.add(StrListItem(screenName, content))
+        }
+
+        fun menuItems(menuItems: @Composable () -> Unit) = apply {
+            this.menuItems = menuItems
         }
 
         @Composable
@@ -51,7 +59,13 @@ class StartFlowComposeBuilder private constructor() {
                         viewModel.navigateTo(Screen(item.toScreen),
                             Bundle().apply { putString(BUNDLE_ITEM_CLICKED_ID, it) })
                     }
-                    .setOnError { header, value -> @Composable { BasicNoEscapeError(header, value) }
+                    .setOnError { header, value -> @Composable {
+                        BasicError(customColours, header, value, context.getString(R.string.cta_dismiss), {
+                            (context as MainFlowActivity).finish()
+                            context.startActivity(
+                                Intent(context,
+                                    MainFlowActivity::class.java))
+                        }) }
                     }
                 screenFlowBuilder.add(item.screenName, { builder.Build() })
             }
@@ -64,9 +78,11 @@ class StartFlowComposeBuilder private constructor() {
                 .Builder(context, viewModel, customColours)
                 .onIconBack {
                     if(!viewModel.popBackStack()) {
-                        val mainActivity = context as MainActivity
+                        val mainActivity = context as MainFlowActivity
                         mainActivity.finish()
                     }
+                }.menuItems {
+                    menuItems()
                 }.setContent {
                     NavBuilder
                         .Builder(viewModel)

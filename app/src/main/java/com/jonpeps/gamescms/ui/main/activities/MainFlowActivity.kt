@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.unit.sp
+import com.jonpeps.gamescms.R
 import com.jonpeps.gamescms.data.DataConstants.Companion.PROJECTS_DIR
 import com.jonpeps.gamescms.data.DataConstants.Companion.PROJECT_LIST_CACHE_NAME
 import com.jonpeps.gamescms.data.DataConstants.Companion.TEMPLATES_DIR
@@ -19,23 +22,42 @@ import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.PROJECTS
 import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.START
 import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.TABLE_TEMPLATES
 import com.jonpeps.gamescms.ui.applevel.CustomColours
+import com.jonpeps.gamescms.ui.main.builders.DropdownMenuItemBuilder
 import com.jonpeps.gamescms.ui.main.composables.CommonStringListView
 import com.jonpeps.gamescms.ui.main.builders.Screen
 import com.jonpeps.gamescms.ui.main.builders.StartFlowComposeBuilder
+import com.jonpeps.gamescms.ui.main.builders.data.CustomItemText
 import com.jonpeps.gamescms.ui.viewmodels.ScreenFlowViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainFlowActivity : ComponentActivity() {
     private val viewModel: ScreenFlowViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             Surface {
+                val context = applicationContext
                 val customColours = CustomColours(isSystemInDarkTheme())
+
+                val dropdownMenuItemBuilder = DropdownMenuItemBuilder
+                    .Builder()
+                    .add(CustomItemText(
+                        context.getString(R.string.menu_item_defaults),
+                        12.sp,
+                        customColours.primary,
+                        FontStyle.Normal), enabled = true
+                    ) { }
+                    .add(CustomItemText(
+                        context.getString(R.string.menu_item_debug),
+                        12.sp,
+                        customColours.primary,
+                        FontStyle.Normal), enabled = true
+                    ) { }
+
                 val mainBuilder = StartFlowComposeBuilder
-                    .Builder(applicationContext, viewModel, customColours)
+                    .Builder(context, viewModel, customColours)
                     .addStrListItemFromFile(
                             PROJECTS,
                             listOf(PROJECTS_DIR),
@@ -60,10 +82,12 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
-                    })
+                    }).menuItems {
+                        dropdownMenuItemBuilder.Build()
+                    }
+
                 mainBuilder.Build()
             }
         }
     }
 }
-

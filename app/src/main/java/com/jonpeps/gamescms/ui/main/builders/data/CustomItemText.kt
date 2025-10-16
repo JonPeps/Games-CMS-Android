@@ -8,5 +8,5 @@ data class CustomItemText(
     val text: String,
     val fontSize: TextUnit,
     val color: Color,
-    val fontStyle: FontStyle
+    val fontStyle: FontStyle?
 )

@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import com.jonpeps.gamescms.ui.main.builders.data.CustomItemText
 
 data class CustomMenuItem(val customMenuItemText: CustomItemText,
-                          val enabled: Boolean,
+                          val enabled: Boolean? = true,
                           val onClick: () -> Unit)
 
 class DropdownMenuItemBuilder private constructor() {
@@ -22,7 +22,7 @@ class DropdownMenuItemBuilder private constructor() {
                                   fontSize = item.customMenuItemText.fontSize,
                                   color = item.customMenuItemText.color,
                                   fontStyle = item.customMenuItemText.fontStyle) },
-                    enabled = item.enabled,
+                    enabled = item.enabled?:true,
                     onClick = item.onClick
                 )
             }

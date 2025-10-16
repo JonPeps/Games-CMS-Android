@@ -19,14 +19,17 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -123,9 +126,11 @@ fun CommonLoadingScreen(customColours: CustomColours) {
 }
 
 @Composable
-fun BasicNoEscapeError(header: String, value: String?) {
+fun BasicError(customColours: CustomColours, header: String, value: String?, dismissBtnText: String?, onDismiss: () -> Unit?) {
     val state = rememberScrollState()
-    Column(modifier = Modifier.padding(4.dp)
+    Column(modifier = Modifier
+        .background(customColours.background)
+        .padding(4.dp)
         .fillMaxHeight()
         .border(
             width = 2.dp, color = Color.Gray,
@@ -152,6 +157,16 @@ fun BasicNoEscapeError(header: String, value: String?) {
                     .wrapContentHeight()
                     .padding(5.dp),
                     color = Color.Red)
+            }
+        }
+        dismissBtnText?.let {
+            ElevatedButton(onClick = { onDismiss() }, colors = ButtonColors(
+                customColours.background,
+                customColours.primary,
+                customColours.background,
+                customColours.primary)) {
+                Text(text = it, color = customColours.primary,
+                    fontSize = 20.sp)
             }
         }
     }

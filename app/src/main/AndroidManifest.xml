@@ -10,7 +10,7 @@
         android:theme="@style/Theme.GamesCMS"
         tools:targetApi="31">
         <activity
-            android:name=".ui.main.activities.MainActivity"
+            android:name=".ui.main.activities.MainFlowActivity"
             android:exported="true"
             android:theme="@style/Theme.GamesCMS.NoActionBar">
             <intent-filter>

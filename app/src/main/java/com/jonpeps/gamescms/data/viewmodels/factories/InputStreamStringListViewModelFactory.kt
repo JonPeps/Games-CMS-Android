@@ -11,10 +11,10 @@ import java.io.InputStream
 @Suppress("UNCHECKED_CAST")
 class InputStreamStringListViewModelFactory {
     @AssistedFactory
-    interface IInputStreamToJsonViewModelFactory {
-        fun createStringListVm(@Assisted("param1") inputStream: InputStream,
-                               @Assisted("param2") directory: String,
-                               @Assisted("param3") moshiStringListRepository: IMoshiStringListRepository
+    interface IInputStreamToStringListVmFactory {
+        fun create(@Assisted("param1") inputStream: InputStream,
+                   @Assisted("param2") directory: String,
+                   @Assisted("param3") moshiStringListRepository: IMoshiStringListRepository
         ): InputStreamStringListViewModel
     }
 
@@ -23,10 +23,10 @@ class InputStreamStringListViewModelFactory {
             inputStream: InputStream,
             directory: String,
             moshiStringListRepository: IMoshiStringListRepository,
-            assistedFactory: IInputStreamToJsonViewModelFactory
+            assistedFactory: IInputStreamToStringListVmFactory
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.createStringListVm(inputStream, directory, moshiStringListRepository) as T
+                return assistedFactory.create(inputStream, directory, moshiStringListRepository) as T
             }
         }
     }

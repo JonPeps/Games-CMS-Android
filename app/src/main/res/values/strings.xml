@@ -26,4 +26,9 @@
     <string name="back_arrow_content_desc">Back button</string>
     <string name="kebab_menu_content_desc">More menu</string>"
 
+    <!-- CTA & Menu Items-->
+    <string name="cta_dismiss">Dismiss</string>
+    <string name="menu_item_debug">Debug</string>
+    <string name="menu_item_defaults">Defaults</string>
+
 </resources>
