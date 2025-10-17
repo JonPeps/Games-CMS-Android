@@ -25,6 +25,8 @@ class StartFlowComposeBuilder private constructor() {
 
         private val strListItemsFromFile: MutableList<StrListItemFromFile> = mutableListOf()
         private val strListItems: MutableList<StrListItem> = mutableListOf()
+        private var showBackIcon = false
+        private lateinit var onEndOfBackstack: () -> Unit
 
         private lateinit var menuItems: @Composable () -> Unit
 
@@ -43,9 +45,18 @@ class StartFlowComposeBuilder private constructor() {
             this.menuItems = menuItems
         }
 
+        fun showBackIcon(show: Boolean) = apply {
+            showBackIcon = show
+        }
+
+        fun setEndOfBackstack(onEnd: () -> Unit) = apply {
+            this.onEndOfBackstack = onEnd
+        }
+
         @Composable
         fun Build() {
             val externalPath = context.getExternalFilesDir(null)
+
             val screenFlowBuilder = ScreenFlowBuilder.Builder()
             strListItemsFromFile.forEach { item ->
                 var path = externalPath?.absolutePath + "/" + MAIN_DIR
@@ -74,18 +85,22 @@ class StartFlowComposeBuilder private constructor() {
                 screenFlowBuilder.add(it.screenName, it.content)
             }
 
-            MainFlowWithNavBarBuilder
-                .Builder(context, viewModel, customColours)
-                .onIconBack {
-                    if(!viewModel.popBackStack()) {
-                        val mainActivity = context as MainFlowActivity
-                        mainActivity.finish()
-                    }
-                }.menuItems {
+            val mainFlowWithNavBarBuilder =
+                MainFlowWithNavBarBuilder.Builder(context, viewModel, customColours)
+
+            if (showBackIcon) {
+                mainFlowWithNavBarBuilder.showBackIcon(true).onIconBack {
+                    viewModel.popBackStack()
+                }
+            }
+            mainFlowWithNavBarBuilder.menuItems {
                     menuItems()
                 }.setContent {
                     NavBuilder
-                        .Builder(viewModel)
+                        .Builder(context, viewModel)
+                        .setEndOfBackstack {
+                            onEndOfBackstack
+                        }
                         .navContent(screenFlowBuilder.build()).Build()
                 }.Build()
         }

@@ -39,6 +39,7 @@ class MainFlowWithNavBarBuilder private constructor() {
         private lateinit var menuItems: @Composable () -> Unit
         private lateinit var mainContent: @Composable () -> Unit
         private var showMenu = false
+        private var showBackIcon = false
 
         fun setNavBarTitle(customItemText: CustomItemText) = apply {
             this.customItemText = customItemText
@@ -51,6 +52,10 @@ class MainFlowWithNavBarBuilder private constructor() {
         fun menuItems(menuItems: @Composable () -> Unit) = apply {
             this.menuItems = menuItems
             showMenu = true
+        }
+
+        fun showBackIcon(show: Boolean) = apply {
+            showBackIcon = show
         }
 
         fun setContent(content: @Composable () -> Unit) = apply {
@@ -81,14 +86,18 @@ class MainFlowWithNavBarBuilder private constructor() {
                             }
                         },
                         navigationIcon = {
-                            IconButton(onClick = {
-                                onIconBack()
-                            }) {
-                                Icon(
-                                    tint = customColours.primary,
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = context.getString(R.string.back_arrow_content_desc)
-                                )
+                            if (showBackIcon) {
+                                IconButton(onClick = {
+                                    onIconBack()
+                                }) {
+                                    Icon(
+                                        tint = customColours.primary,
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = context.getString(R.string.back_arrow_content_desc)
+                                    )
+                                }
+                            } else {
+                                null
                             }
                         },
                         actions = {

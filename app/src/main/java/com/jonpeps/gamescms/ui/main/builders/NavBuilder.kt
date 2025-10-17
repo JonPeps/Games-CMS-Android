@@ -1,6 +1,6 @@
 package com.jonpeps.gamescms.ui.main.builders
 
-import androidx.activity.compose.BackHandler
+import android.content.Context
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -13,12 +13,12 @@ import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
 import com.jonpeps.gamescms.ui.viewmodels.ScreenFlowViewModel
 
 class NavBuilder private constructor() {
-    data class Builder(val viewModel: ScreenFlowViewModel) {
-        private lateinit var onBack: () -> Unit
+    data class Builder(val context: Context, val viewModel: ScreenFlowViewModel) {
         private lateinit var entryProvider: (key: Screen) -> NavEntry<Screen>
+        private lateinit var onEndOfBackstack: () -> Unit
 
-        fun setOnBack(onBack: () -> Unit) = apply {
-            this.onBack = onBack
+        fun setEndOfBackstack(onEnd: () -> Unit) = apply {
+            this.onEndOfBackstack = onEnd
         }
 
         fun navContent(entryProvider: (key: Screen) -> NavEntry<Screen>) = apply {
@@ -27,15 +27,12 @@ class NavBuilder private constructor() {
 
         @Composable
         fun Build() {
-            val backStack = viewModel.backStack
-            BackHandler(enabled = backStack.size > 1) {
-                viewModel.popBackStack()
-            }
             NavDisplay(
-                backStack = backStack,
+                backStack = viewModel.backStack,
                 onBack = {
-                    onBack()
-                }, entryDecorators = listOf(
+                    viewModel.popBackStack()
+                         },
+                entryDecorators = listOf(
                     rememberSceneSetupNavEntryDecorator(),
                     rememberSavedStateNavEntryDecorator(),
                     rememberViewModelStoreNavEntryDecorator()
