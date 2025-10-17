@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.sp
@@ -42,7 +41,6 @@ class MainFlowActivity : ComponentActivity() {
             Surface {
                 val context = applicationContext
                 val customColours = CustomColours(isSystemInDarkTheme())
-                val isOnFirstScreen by viewModel.isOnFirstScreen.collectAsState(true)
 
                 val dropdownMenuItemBuilder = DropdownMenuItemBuilder
                     .Builder()
@@ -59,7 +57,7 @@ class MainFlowActivity : ComponentActivity() {
                         FontStyle.Normal), enabled = true
                     ) { }
 
-                StartFlowComposeBuilder
+                val startFlowComposeBuilder = StartFlowComposeBuilder
                     .Builder(context, viewModel, customColours)
                     .setEndOfBackstack(
                         onEnd = { finish() }
@@ -91,8 +89,12 @@ class MainFlowActivity : ComponentActivity() {
                     }).addMenuItems {
                         dropdownMenuItemBuilder.Build()
                     }
-                    .showBackIcon(!isOnFirstScreen)
-                    .Build()
+                    if (viewModel.isOnFirstScreen.collectAsState(true).value) {
+                        startFlowComposeBuilder.showBackIcon(false)
+                    } else {
+                        startFlowComposeBuilder.showBackIcon(true)
+                    }
+                startFlowComposeBuilder.Build()
             }
         }
     }
