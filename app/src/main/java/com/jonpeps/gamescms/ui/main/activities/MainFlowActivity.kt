@@ -1,5 +1,7 @@
 package com.jonpeps.gamescms.ui.main.activities
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,6 +26,7 @@ import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.PROJECTS
 import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.START
 import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.TABLE_TEMPLATES
 import com.jonpeps.gamescms.ui.applevel.CustomColours
+import com.jonpeps.gamescms.ui.main.activities.debug.DebugRevertToDefaultsActivity
 import com.jonpeps.gamescms.ui.main.builders.DropdownMenuItemBuilder
 import com.jonpeps.gamescms.ui.main.composables.CommonStringListView
 import com.jonpeps.gamescms.ui.main.builders.Screen
@@ -43,57 +46,67 @@ class MainFlowActivity : ComponentActivity() {
                 val context = applicationContext
                 val customColours = CustomColours(isSystemInDarkTheme())
 
-                val dropdownMenuItemBuilder = DropdownMenuItemBuilder
-                    .Builder()
-                    .add(CustomItemText(
-                        context.getString(R.string.menu_item_defaults),
-                        20.sp,
-                        customColours.primary,
-                        FontStyle.Normal), enabled = true
-                    ) { }
-                    .add(CustomItemText(
-                        context.getString(R.string.menu_item_debug),
-                        20.sp,
-                        customColours.primary,
-                        FontStyle.Normal), enabled = true
-                    ) { }
-
-                    val startFlowComposeBuilder = StartFlowComposeBuilder
-                    .Builder(context, viewModel, customColours)
-                    .setEndOfBackstack(
-                        onEnd = { finish() }
-                    )
-                    .addStrListItemFromFile(
-                            PROJECTS,
-                            listOf(PROJECTS_DIR),
-                            PROJECT_LIST_CACHE_NAME,
-                            ""
-                    )
-                    .addStrListItemFromFile(
-                        TABLE_TEMPLATES,
-                        listOf(TEMPLATES_DIR),
-                        TEMPLATES_LIST_CACHE_NAME,
+                val startFlowComposeBuilder = StartFlowComposeBuilder
+                .Builder(context, viewModel, customColours)
+                .setEndOfBackstack(
+                    onEnd = { finish() }
+                )
+                .addStrListItemFromFile(
+                        PROJECTS,
+                        listOf(PROJECTS_DIR),
+                        PROJECT_LIST_CACHE_NAME,
                         ""
-                    )
-                    .addStrListItem(START, {
-                        Box(modifier = Modifier.fillMaxHeight().fillMaxWidth().background(customColours.background)) {
-                            CommonStringListView(
-                                listOf(PROJECTS, TABLE_TEMPLATES), customColours
-                            ) { text ->
-                                if (text == PROJECTS) {
-                                    viewModel.navigateTo(Screen(PROJECTS))
-                                } else {
-                                    viewModel.navigateTo(Screen(TABLE_TEMPLATES))
-                                }
+                )
+                .addStrListItemFromFile(
+                    TABLE_TEMPLATES,
+                    listOf(TEMPLATES_DIR),
+                    TEMPLATES_LIST_CACHE_NAME,
+                    ""
+                )
+                .addStrListItem(START, {
+                    Box(modifier = Modifier.fillMaxHeight().fillMaxWidth().background(customColours.background)) {
+                        CommonStringListView(
+                            listOf(PROJECTS, TABLE_TEMPLATES), customColours
+                        ) { text ->
+                            if (text == PROJECTS) {
+                                viewModel.navigateTo(Screen(PROJECTS))
+                            } else {
+                                viewModel.navigateTo(Screen(TABLE_TEMPLATES))
                             }
                         }
-                    }).addMenuItems {
-                        dropdownMenuItemBuilder.Build()
                     }
-                val showBackArrow by viewModel.isOnFirstScreen.collectAsState(true)
-                startFlowComposeBuilder.showBackIcon(!showBackArrow)
+                })
+                val isOnFirstScreen by viewModel.isOnFirstScreen.collectAsState(true)
+                if (isOnFirstScreen) {
+                    startFlowComposeBuilder.addMenuItems {
+                        getFirstScreenDropdownMenu(context, customColours).Build()
+                    }
+                }
+                startFlowComposeBuilder.showBackIcon(!isOnFirstScreen)
+                    .showMenuItems(isOnFirstScreen)
                     .Build()
             }
         }
+    }
+
+    private fun getFirstScreenDropdownMenu(
+        context: Context, customColours: CustomColours
+    ): DropdownMenuItemBuilder.Builder {
+        return DropdownMenuItemBuilder.Builder()
+            .add(CustomItemText(
+            context.getString(R.string.menu_item_defaults),
+            20.sp,
+            customColours.primary,
+            FontStyle.Normal), enabled = true
+        ) {
+            val intent = Intent(this, DebugRevertToDefaultsActivity::class.java)
+            startActivity(intent)
+        }
+        .add(CustomItemText(
+            context.getString(R.string.menu_item_debug),
+            20.sp,
+            customColours.primary,
+            FontStyle.Normal), enabled = true
+        ) { }
     }
 }

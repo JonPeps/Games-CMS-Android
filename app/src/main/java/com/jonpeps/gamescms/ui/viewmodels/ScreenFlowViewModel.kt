@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface IScreenFlowViewModel {
     fun navigateTo(route: Screen, bundle: Bundle? = null)
+    fun getCurrentScreen(): Screen
     fun popBackStack()
     fun getBundle(screenName: String): Bundle?
 }
@@ -30,6 +31,8 @@ class ScreenFlowViewModel: ViewModel(), IScreenFlowViewModel  {
         bundles[route.screenName] = bundle
         _isOnFirstScreen.value = false
     }
+
+    override fun getCurrentScreen(): Screen = backStack[backStack.size-1]
 
     override fun popBackStack() {
         backStack.removeLastOrNull() != null

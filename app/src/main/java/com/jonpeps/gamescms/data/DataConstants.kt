@@ -14,9 +14,10 @@ class DataConstants {
         companion object {
             const val START = "Start"
             const val PROJECTS = "Projects"
-            const val TABLE_TEMPLATES = "TableTemplates"
+            const val TABLE_TEMPLATES = "Table Templates"
 
-            const val FINISH = "Finish"
+            const val INSERT_DUMMY_PROJECTS = "Insert Dummy Projects"
+            const val INSERT_DEFAULT_TEMPLATES = "Insert Default Templates"
         }
 
         class BundleKeys {

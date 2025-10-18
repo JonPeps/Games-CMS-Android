@@ -26,6 +26,7 @@ class StartFlowComposeBuilder private constructor() {
         private val strListItemsFromFile: MutableList<StrListItemFromFile> = mutableListOf()
         private val strListItems: MutableList<StrListItem> = mutableListOf()
         private var showBackIcon = false
+        private var showMenuItems = true
         private lateinit var onEndOfBackstack: () -> Unit
 
         private lateinit var menuItems: @Composable () -> Unit
@@ -43,6 +44,10 @@ class StartFlowComposeBuilder private constructor() {
 
         fun addMenuItems(menuItems: @Composable () -> Unit) = apply {
             this.menuItems = menuItems
+        }
+
+        fun showMenuItems(show: Boolean) = apply {
+            showMenuItems = show
         }
 
         fun showBackIcon(show: Boolean) = apply {
@@ -93,9 +98,12 @@ class StartFlowComposeBuilder private constructor() {
                     viewModel.popBackStack()
                 }
             }
-            mainFlowWithNavBarBuilder.menuItems {
+            if (showMenuItems) {
+                mainFlowWithNavBarBuilder.menuItems {
                     menuItems()
-                }.setContent {
+                }
+            }
+            mainFlowWithNavBarBuilder.setContent {
                     NavBuilder
                         .Builder(context, viewModel)
                         .setEndOfBackstack {
