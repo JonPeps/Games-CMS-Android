@@ -58,7 +58,7 @@ class MainFlowActivity : ComponentActivity() {
                         FontStyle.Normal), enabled = true
                     ) { }
 
-                val startFlowComposeBuilder = StartFlowComposeBuilder
+                    StartFlowComposeBuilder
                     .Builder(context, viewModel, customColours)
                     .setEndOfBackstack(
                         onEnd = { finish() }
@@ -89,10 +89,8 @@ class MainFlowActivity : ComponentActivity() {
                         }
                     }).addMenuItems {
                         dropdownMenuItemBuilder.Build()
-                    }
-                    val isOnFirstScreen by viewModel.isOnFirstScreen.collectAsState(true)
-                    startFlowComposeBuilder.showBackIcon(!isOnFirstScreen)
-                startFlowComposeBuilder.Build()
+                    }.showBackIcon(!viewModel.isOnFirstScreen.collectAsState(true).value)
+                    .Build()
             }
         }
     }
