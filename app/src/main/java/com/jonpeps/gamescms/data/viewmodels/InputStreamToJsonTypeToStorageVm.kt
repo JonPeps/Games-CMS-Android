@@ -20,6 +20,10 @@ data class InputStreamToJsonStorageStatus<T>(
     val exception: Exception?
 )
 
+interface IInputStreamToJsonTypeToStorageVm {
+    fun process(fileName: String)
+}
+
 open class InputStreamToJsonTypeToStorageVm<T>(
     private val inputStream: InputStream,
     private val directory: String,
@@ -27,7 +31,7 @@ open class InputStreamToJsonTypeToStorageVm<T>(
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val inputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper,
     private val coroutineDispatcher: CoroutineDispatcher
-): ViewModel() {
+): ViewModel(), IInputStreamToJsonTypeToStorageVm {
     var status =
         MutableStateFlow(InputStreamToJsonStorageStatus<T>(true, null, "", null))
 
@@ -36,7 +40,7 @@ open class InputStreamToJsonTypeToStorageVm<T>(
     var exception: Exception? = null
     private var item: T? = null
 
-    fun load(fileName: String) {
+    override fun process(fileName: String) {
         viewModelScope.launch(coroutineDispatcher) {
             exception = null
             var errorMessage = ""

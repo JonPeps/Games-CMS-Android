@@ -10,25 +10,25 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
-import com.jonpeps.gamescms.ui.viewmodels.ScreenFlowViewModel
+import com.jonpeps.gamescms.ui.viewmodels.IScreenFlowViewModel
 
 class NavBuilder private constructor() {
-    data class Builder(val context: Context, val viewModel: ScreenFlowViewModel) {
-        private lateinit var entryProvider: (key: Screen) -> NavEntry<Screen>
+    data class Builder<K: Any>(val context: Context, val viewModel: IScreenFlowViewModel<K>) {
+        private lateinit var entryProvider: (key: K) -> NavEntry<K>
         private lateinit var onEndOfBackstack: () -> Unit
 
         fun setEndOfBackstack(onEnd: () -> Unit) = apply {
             this.onEndOfBackstack = onEnd
         }
 
-        fun navContent(entryProvider: (key: Screen) -> NavEntry<Screen>) = apply {
+        fun navContent(entryProvider: (key: K) -> NavEntry<K>) = apply {
             this.entryProvider = entryProvider
         }
 
         @Composable
         fun Build() {
             NavDisplay(
-                backStack = viewModel.backStack,
+                backStack = viewModel.getBackstack(),
                 onBack = {
                     viewModel.popBackStack()
                          },

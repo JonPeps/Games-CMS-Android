@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,21 +26,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import com.jonpeps.gamescms.R
 import com.jonpeps.gamescms.ui.applevel.CustomColours
-import com.jonpeps.gamescms.ui.viewmodels.ScreenFlowViewModel
 import com.jonpeps.gamescms.ui.main.builders.data.CustomItemText
 
-class MainFlowWithNavBarBuilder private constructor() {
+data class CustomMenuItem(val customMenuItemText: CustomItemText,
+                          val enabled: Boolean? = true,
+                          val onClick: () -> Unit)
+
+class NavBarBuilder private constructor() {
     data class Builder(val context: Context,
-                       val viewModel: ScreenFlowViewModel,
-                       val customColours: CustomColours
+                       val customColours: CustomColours,
+                       val customMenuItems: MutableList<CustomMenuItem> = mutableListOf()
     ) {
         private var customItemText: CustomItemText? = null
 
         private lateinit var onIconBack: () -> Unit
-        private lateinit var menuItems: @Composable () -> Unit
         private lateinit var mainContent: @Composable () -> Unit
         private var showMenu = false
         private var showBackIcon = false
+
+        fun addDropdownMenuItem(customMenuItemText: CustomItemText, enabled: Boolean, onClick: () -> Unit) =
+            apply { customMenuItems.add(CustomMenuItem(customMenuItemText, enabled, onClick)) }
 
         fun setNavBarTitle(customItemText: CustomItemText) = apply {
             this.customItemText = customItemText
@@ -49,13 +55,12 @@ class MainFlowWithNavBarBuilder private constructor() {
             this.onIconBack = onIconBack
         }
 
-        fun menuItems(menuItems: @Composable () -> Unit) = apply {
-            this.menuItems = menuItems
-            showMenu = true
-        }
-
         fun showBackIcon(show: Boolean) = apply {
             showBackIcon = show
+        }
+
+        fun showMenu(show: Boolean) = apply {
+            showMenu = show
         }
 
         fun setContent(content: @Composable () -> Unit) = apply {
@@ -114,7 +119,16 @@ class MainFlowWithNavBarBuilder private constructor() {
                                         expanded = expanded.value,
                                         onDismissRequest = { expanded.value = false }
                                     ) {
-                                        menuItems()
+                                        customMenuItems.forEach { item ->
+                                            DropdownMenuItem(
+                                                text = { Text(text = item.customMenuItemText.text,
+                                                    fontSize = item.customMenuItemText.fontSize,
+                                                    color = item.customMenuItemText.color,
+                                                    fontStyle = item.customMenuItemText.fontStyle) },
+                                                enabled = item.enabled?:true,
+                                                onClick = item.onClick
+                                            )
+                                        }
                                     }
                                 }
                             } else {

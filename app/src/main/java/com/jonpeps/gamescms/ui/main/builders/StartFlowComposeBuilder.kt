@@ -8,6 +8,7 @@ import com.jonpeps.gamescms.R
 import com.jonpeps.gamescms.data.DataConstants.Companion.MAIN_DIR
 import com.jonpeps.gamescms.ui.applevel.CustomColours
 import com.jonpeps.gamescms.ui.main.activities.MainFlowActivity
+import com.jonpeps.gamescms.ui.main.builders.data.CustomItemText
 import com.jonpeps.gamescms.ui.main.composables.BasicError
 import com.jonpeps.gamescms.ui.viewmodels.ScreenFlowViewModel
 
@@ -21,15 +22,14 @@ class StartFlowComposeBuilder private constructor() {
 
     data class Builder(val context: Context,
                        val viewModel: ScreenFlowViewModel,
-                       val customColours: CustomColours) {
+                       val customColours: CustomColours,
+                       val customMenuItems: MutableList<CustomMenuItem> = mutableListOf()) {
 
         private val strListItemsFromFile: MutableList<StrListItemFromFile> = mutableListOf()
         private val strListItems: MutableList<StrListItem> = mutableListOf()
         private var showBackIcon = false
         private var showMenuItems = true
         private lateinit var onEndOfBackstack: () -> Unit
-
-        private lateinit var menuItems: @Composable () -> Unit
 
         fun addStrListItemFromFile(screenName: String,
                                    folders: List<String>,
@@ -38,12 +38,11 @@ class StartFlowComposeBuilder private constructor() {
             strListItemsFromFile.add(StrListItemFromFile(screenName, folders, cacheName, toScreen))
         }
 
+        fun addDropdownMenuItem(customMenuItemText: CustomItemText, enabled: Boolean, onClick: () -> Unit) =
+            apply { customMenuItems.add(CustomMenuItem(customMenuItemText, enabled, onClick)) }
+
         fun addStrListItem(screenName: String, content: @Composable () -> Unit) = apply {
             strListItems.add(StrListItem(screenName, content))
-        }
-
-        fun addMenuItems(menuItems: @Composable () -> Unit) = apply {
-            this.menuItems = menuItems
         }
 
         fun showMenuItems(show: Boolean) = apply {
@@ -72,7 +71,7 @@ class StartFlowComposeBuilder private constructor() {
                     .setStoragePath(path)
                     .setCachedName(item.cacheName)
                     .setOnClick {
-                        viewModel.navigateTo(Screen(item.toScreen),
+                        viewModel.navigateTo(Screen(item.toScreen), BUNDLE_ITEM_CLICKED_ID,
                             Bundle().apply { putString(BUNDLE_ITEM_CLICKED_ID, it) })
                     }
                     .setOnError { header, value -> @Composable {
@@ -91,7 +90,7 @@ class StartFlowComposeBuilder private constructor() {
             }
 
             val mainFlowWithNavBarBuilder =
-                MainFlowWithNavBarBuilder.Builder(context, viewModel, customColours)
+                NavBarBuilder.Builder(context, customColours)
 
             if (showBackIcon) {
                 mainFlowWithNavBarBuilder.showBackIcon(true).onIconBack {
@@ -99,9 +98,13 @@ class StartFlowComposeBuilder private constructor() {
                 }
             }
             if (showMenuItems) {
-                mainFlowWithNavBarBuilder.menuItems {
-                    menuItems()
+                customMenuItems.forEach {
+                    mainFlowWithNavBarBuilder.addDropdownMenuItem(
+                        it.customMenuItemText,
+                        it.enabled?:true,
+                        it.onClick)
                 }
+                mainFlowWithNavBarBuilder.showMenu(true)
             }
             mainFlowWithNavBarBuilder.setContent {
                     NavBuilder

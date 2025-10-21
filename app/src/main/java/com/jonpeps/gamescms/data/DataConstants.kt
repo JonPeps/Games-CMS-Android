@@ -16,7 +16,7 @@ class DataConstants {
             const val PROJECTS = "Projects"
             const val TABLE_TEMPLATES = "Table Templates"
 
-            const val INSERT_DUMMY_PROJECTS = "Insert Dummy Projects"
+            const val INSERT_DEFAULT_PROJECTS = "Insert Default Project"
             const val INSERT_DEFAULT_TEMPLATES = "Insert Default Templates"
         }
 
@@ -36,8 +36,8 @@ class DataConstants {
     class Debug {
         companion object {
             const val DEBUG_LOAD = true
-            const val DEBUG_TEMPLATES_LIST = "table_templates_list.json"
-            const val DEBUG_PROJECTS_LIST = "dummy_projects_list.json"
+            const val DEBUG_TEMPLATES_LIST = "default_templates/table_templates_list.json"
+            const val DEBUG_PROJECTS_LIST = "dummy_projects/dummy_projects_list.json"
         }
     }
 }
