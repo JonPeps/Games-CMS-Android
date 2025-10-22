@@ -16,8 +16,10 @@ class DataConstants {
             const val PROJECTS = "Projects"
             const val TABLE_TEMPLATES = "Table Templates"
 
+            const val ADD_DEFAULTS = "Add Defaults"
             const val INSERT_DEFAULT_PROJECTS = "Insert Default Project"
             const val INSERT_DEFAULT_TEMPLATES = "Insert Default Templates"
+            const val INSERT_TEMPLATES = "Insert Templates"
         }
 
         class BundleKeys {

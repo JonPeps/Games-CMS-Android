@@ -25,17 +25,16 @@ import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.PROJECTS
 import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.START
 import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.TABLE_TEMPLATES
 import com.jonpeps.gamescms.ui.applevel.CustomColours
-import com.jonpeps.gamescms.ui.main.activities.debug.AddDefaultsActivity
 import com.jonpeps.gamescms.ui.main.composables.CommonStringListView
 import com.jonpeps.gamescms.ui.main.builders.Screen
 import com.jonpeps.gamescms.ui.main.builders.StartFlowComposeBuilder
 import com.jonpeps.gamescms.ui.main.builders.data.CustomItemText
-import com.jonpeps.gamescms.ui.viewmodels.ScreenFlowViewModel
+import com.jonpeps.gamescms.ui.viewmodels.MainFlowViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainFlowActivity : ComponentActivity() {
-    private val viewModel: ScreenFlowViewModel by viewModels()
+    private val viewModel: MainFlowViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

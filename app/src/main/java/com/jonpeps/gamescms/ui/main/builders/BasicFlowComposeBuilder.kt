@@ -1,0 +1,76 @@
+package com.jonpeps.gamescms.ui.main.builders
+
+import android.content.Context
+import androidx.compose.runtime.Composable
+import com.jonpeps.gamescms.ui.applevel.CustomColours
+import com.jonpeps.gamescms.ui.main.builders.data.CustomItemText
+import com.jonpeps.gamescms.ui.viewmodels.IScreenFlowViewModel
+
+class BasicFlowComposeBuilder private constructor() {
+    data class Builder(val context: Context,
+                       val viewModel: IScreenFlowViewModel<Screen>,
+                       val customColours: CustomColours,
+                       val customMenuItems: MutableList<CustomMenuItem> = mutableListOf())
+         {
+
+        private var showBackIcon = false
+        private var showMenuItems = true
+        private lateinit var onEndOfBackstack: () -> Unit
+        val screenFlowBuilder = ScreenFlowBuilder.Builder()
+
+        fun addDropdownMenuItem(
+            customMenuItemText: CustomItemText,
+            enabled: Boolean,
+            onClick: () -> Unit
+        ) = apply { customMenuItems.add(CustomMenuItem(customMenuItemText, enabled, onClick)) }
+
+        fun addScreenItem(screenName: String, content: @Composable () -> Unit) = apply {
+            screenFlowBuilder.add(screenName, content)
+        }
+
+        fun showMenuItems(show: Boolean) = apply {
+            showMenuItems = show
+        }
+
+        fun showBackIcon(show: Boolean) = apply {
+            showBackIcon = show
+        }
+
+        fun setEndOfBackstack(onEnd: () -> Unit) = apply {
+            this.onEndOfBackstack = onEnd
+        }
+
+        @Composable
+        fun Build() {
+            val mainFlowWithNavBarBuilder =
+                NavBarBuilder.Builder(context, customColours)
+
+            if (showBackIcon) {
+                mainFlowWithNavBarBuilder.showBackIcon(true).onIconBack {
+                    viewModel.popBackStack()
+                }
+            }
+            if (showMenuItems) {
+                customMenuItems.forEach {
+                    mainFlowWithNavBarBuilder.addDropdownMenuItem(
+                        it.customMenuItemText,
+                        it.enabled?:true,
+                        it.onClick)
+                }
+                mainFlowWithNavBarBuilder.showMenu(true)
+            }
+            mainFlowWithNavBarBuilder.setContent {
+                NavBuilder
+                    .Builder(context, viewModel)
+                    .setEndOfBackstack {
+                        onEndOfBackstack
+                    }
+                    .navContent(screenFlowBuilder.build()).Build()
+            }.Build()
+        }
+    }
+
+    companion object {
+        const val BUNDLE_ITEM_CLICKED_ID = "bundle_id_str_item"
+    }
+}
