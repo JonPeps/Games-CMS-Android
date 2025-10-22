@@ -16,23 +16,23 @@ data class StrListItemFromFile(val screenName: String,
                                val cacheName: String,
                                val toScreen: String)
 
-class StartFlowComposeBuilder private constructor() {
+class BuildStrListViewFromFile private constructor() {
     data class Builder(val context: Context,
                        val viewModel: BaseScreenFlowViewModel<Screen>,
-                       val builder: BasicFlowComposeBuilder,
-        val customColours: CustomColours) {
+                       val screenFlowBuilder: ScreenFlowBuilder.Builder,
+                       val customColours: CustomColours) {
         private val strListItemsFromFile: MutableList<StrListItemFromFile> = mutableListOf()
 
-        fun addStrListItemFromFile(screenName: String,
-                                   folders: List<String>,
-                                   cacheName: String,
-                                   toScreen: String) = apply {
+        fun addStrListItem(screenName: String,
+                           folders: List<String>,
+                           cacheName: String,
+                           toScreen: String) = apply {
             strListItemsFromFile.add(StrListItemFromFile(screenName, folders, cacheName, toScreen))
         }
 
+        @Composable
         fun Build() {
             val externalPath = context.getExternalFilesDir(null)
-            val screenFlowBuilder = ScreenFlowBuilder.Builder()
             strListItemsFromFile.forEach { item ->
                 var path = externalPath?.absolutePath + "/" + MAIN_DIR
                 item.folders.forEach {

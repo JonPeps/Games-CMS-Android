@@ -25,9 +25,10 @@ import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.PROJECTS
 import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.START
 import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.TABLE_TEMPLATES
 import com.jonpeps.gamescms.ui.applevel.CustomColours
+import com.jonpeps.gamescms.ui.main.builders.BasicFlowComposeBuilder
+import com.jonpeps.gamescms.ui.main.builders.BuildStrListViewFromFile
 import com.jonpeps.gamescms.ui.main.composables.CommonStringListView
 import com.jonpeps.gamescms.ui.main.builders.Screen
-import com.jonpeps.gamescms.ui.main.builders.StartFlowComposeBuilder
 import com.jonpeps.gamescms.ui.main.builders.data.CustomItemText
 import com.jonpeps.gamescms.ui.viewmodels.MainFlowViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,24 +44,12 @@ class MainFlowActivity : ComponentActivity() {
                 val context = applicationContext
                 val customColours = CustomColours(isSystemInDarkTheme())
 
-                val startFlowComposeBuilder = StartFlowComposeBuilder
+                val basicFlowComposeBuilder = BasicFlowComposeBuilder
                 .Builder(context, viewModel, customColours)
                 .setEndOfBackstack(
                     onEnd = { finish() }
                 )
-                .addStrListItemFromFile(
-                        PROJECTS,
-                        listOf(PROJECTS_DIR),
-                        PROJECT_LIST_CACHE_NAME,
-                        ""
-                )
-                .addStrListItemFromFile(
-                    TABLE_TEMPLATES,
-                    listOf(TEMPLATES_DIR),
-                    TEMPLATES_LIST_CACHE_NAME,
-                    ""
-                )
-                .addStrListItem(START, {
+                .addScreenItem(START, {
                     Box(modifier = Modifier.fillMaxHeight().fillMaxWidth().background(customColours.background)) {
                         CommonStringListView(
                             listOf(PROJECTS, TABLE_TEMPLATES), customColours
@@ -73,11 +62,29 @@ class MainFlowActivity : ComponentActivity() {
                         }
                     }
                 })
+                BuildStrListViewFromFile.Builder(
+                    context,
+                    viewModel,
+                    basicFlowComposeBuilder.screenFlowBuilder,
+                    customColours
+                )
+                .addStrListItem(
+                        PROJECTS,
+                        listOf(PROJECTS_DIR),
+                        PROJECT_LIST_CACHE_NAME,
+                        ""
+                )
+                .addStrListItem(
+                    TABLE_TEMPLATES,
+                    listOf(TEMPLATES_DIR),
+                    TEMPLATES_LIST_CACHE_NAME,
+                    ""
+                ).Build()
 
                 val isOnFirstScreen by viewModel.isOnFirstScreen.collectAsState(true)
 
                 if (isOnFirstScreen) {
-                    startFlowComposeBuilder.addDropdownMenuItem(CustomItemText(
+                    basicFlowComposeBuilder.addDropdownMenuItem(CustomItemText(
                         context.getString(R.string.menu_item_defaults),
                         20.sp,
                         customColours.primary,
@@ -93,7 +100,7 @@ class MainFlowActivity : ComponentActivity() {
                         FontStyle.Normal), enabled = true
                     ) { }
                 }
-                startFlowComposeBuilder.showBackIcon(!isOnFirstScreen)
+                basicFlowComposeBuilder.showBackIcon(!isOnFirstScreen)
                     .showMenuItems(isOnFirstScreen)
                     .Build()
             }
