@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.ui.main.builders
+package com.jonpeps.gamescms.ui.main.builders.core
 
 import androidx.compose.runtime.Composable
 import androidx.navigation3.runtime.NavEntry

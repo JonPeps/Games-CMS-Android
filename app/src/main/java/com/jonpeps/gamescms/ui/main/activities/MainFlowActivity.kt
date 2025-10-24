@@ -25,10 +25,10 @@ import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.PROJECTS
 import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.START
 import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.TABLE_TEMPLATES
 import com.jonpeps.gamescms.ui.applevel.CustomColours
-import com.jonpeps.gamescms.ui.main.builders.BasicFlowComposeBuilder
-import com.jonpeps.gamescms.ui.main.builders.BuildStrListViewFromFile
+import com.jonpeps.gamescms.ui.main.builders.core.BasicFlowComposeBuilder
+import com.jonpeps.gamescms.ui.main.builders.core.BuildStrListViewFromFile
 import com.jonpeps.gamescms.ui.main.composables.CommonStringListView
-import com.jonpeps.gamescms.ui.main.builders.Screen
+import com.jonpeps.gamescms.ui.main.builders.core.Screen
 import com.jonpeps.gamescms.ui.main.builders.data.CustomItemText
 import com.jonpeps.gamescms.ui.viewmodels.MainFlowViewModel
 import dagger.hilt.android.AndroidEntryPoint

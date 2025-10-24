@@ -11,7 +11,7 @@ import androidx.compose.material3.Surface
 import com.jonpeps.gamescms.data.DataConstants
 import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.ADD_DEFAULTS
 import com.jonpeps.gamescms.ui.applevel.CustomColours
-import com.jonpeps.gamescms.ui.main.builders.BasicFlowComposeBuilder
+import com.jonpeps.gamescms.ui.main.builders.core.BasicFlowComposeBuilder
 import com.jonpeps.gamescms.ui.main.composables.CommonStringListView
 import com.jonpeps.gamescms.ui.viewmodels.AddDefaultsViewModel
 

@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.ui.viewmodels
 
 import com.jonpeps.gamescms.data.DataConstants
-import com.jonpeps.gamescms.ui.main.builders.Screen
+import com.jonpeps.gamescms.ui.main.builders.core.Screen
 
 class MainFlowViewModel: BaseScreenFlowViewModel<Screen>(), IScreenFlowViewModel<Screen>  {
     override fun reInit() {
