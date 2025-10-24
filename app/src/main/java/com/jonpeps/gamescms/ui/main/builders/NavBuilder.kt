@@ -1,6 +1,7 @@
 package com.jonpeps.gamescms.ui.main.builders
 
 import android.content.Context
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -15,10 +16,10 @@ import com.jonpeps.gamescms.ui.viewmodels.IScreenFlowViewModel
 class NavBuilder private constructor() {
     data class Builder<K: Any>(val context: Context, val viewModel: IScreenFlowViewModel<K>) {
         private lateinit var entryProvider: (key: K) -> NavEntry<K>
-        private lateinit var onEndOfBackstack: () -> Unit
+        private lateinit var onBack: () -> Unit?
 
-        fun setEndOfBackstack(onEnd: () -> Unit) = apply {
-            this.onEndOfBackstack = onEnd
+        fun setOnBack(onBack: () -> Unit) = apply {
+            this.onBack = onBack
         }
 
         fun navContent(entryProvider: (key: K) -> NavEntry<K>) = apply {
@@ -27,11 +28,16 @@ class NavBuilder private constructor() {
 
         @Composable
         fun Build() {
+            BackHandler(enabled = true) {
+                if (!viewModel.popBackStack()) {
+                    onBack()
+                }
+            }
             NavDisplay(
                 backStack = viewModel.getBackstack(),
                 onBack = {
                     viewModel.popBackStack()
-                         },
+                },
                 entryDecorators = listOf(
                     rememberSceneSetupNavEntryDecorator(),
                     rememberSavedStateNavEntryDecorator(),

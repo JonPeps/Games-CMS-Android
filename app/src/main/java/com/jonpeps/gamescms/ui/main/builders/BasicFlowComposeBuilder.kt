@@ -15,7 +15,7 @@ class BasicFlowComposeBuilder private constructor() {
 
         private var showBackIcon = false
         private var showMenuItems = true
-        private lateinit var onEndOfBackstack: () -> Unit
+        private lateinit var onBack: () -> Unit
         val screenFlowBuilder = ScreenFlowBuilder.Builder()
 
         fun addDropdownMenuItem(
@@ -36,8 +36,8 @@ class BasicFlowComposeBuilder private constructor() {
             showBackIcon = show
         }
 
-        fun setEndOfBackstack(onEnd: () -> Unit) = apply {
-            this.onEndOfBackstack = onEnd
+        fun onBack(onBack: () -> Unit) = apply {
+            this.onBack = onBack
         }
 
         @Composable
@@ -62,15 +62,11 @@ class BasicFlowComposeBuilder private constructor() {
             mainFlowWithNavBarBuilder.setContent {
                 NavBuilder
                     .Builder(context, viewModel)
-                    .setEndOfBackstack {
-                        onEndOfBackstack
+                    .setOnBack {
+                        onBack()
                     }
                     .navContent(screenFlowBuilder.build()).Build()
             }.Build()
         }
-    }
-
-    companion object {
-        const val BUNDLE_ITEM_CLICKED_ID = "bundle_id_str_item"
     }
 }

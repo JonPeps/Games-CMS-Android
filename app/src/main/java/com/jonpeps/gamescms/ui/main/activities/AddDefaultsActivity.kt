@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
@@ -11,9 +12,10 @@ import com.jonpeps.gamescms.data.DataConstants
 import com.jonpeps.gamescms.ui.applevel.CustomColours
 import com.jonpeps.gamescms.ui.main.builders.NavBarBuilder
 import com.jonpeps.gamescms.ui.main.composables.CommonStringListView
+import com.jonpeps.gamescms.ui.viewmodels.AddDefaultsViewModel
 
 class AddDefaultsActivity: ComponentActivity() {
-
+    private val viewModel: AddDefaultsViewModel by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {

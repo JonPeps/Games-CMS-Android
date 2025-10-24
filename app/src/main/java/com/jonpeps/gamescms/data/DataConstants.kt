@@ -12,6 +12,7 @@ class DataConstants {
 
     class KnownScreens {
         companion object {
+            
             const val START = "Start"
             const val PROJECTS = "Projects"
             const val TABLE_TEMPLATES = "Table Templates"

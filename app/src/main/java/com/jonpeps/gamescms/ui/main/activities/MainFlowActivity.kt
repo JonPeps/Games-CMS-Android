@@ -46,9 +46,6 @@ class MainFlowActivity : ComponentActivity() {
 
                 val basicFlowComposeBuilder = BasicFlowComposeBuilder
                 .Builder(context, viewModel, customColours)
-                .setEndOfBackstack(
-                    onEnd = { finish() }
-                )
                 .addScreenItem(START, {
                     Box(modifier = Modifier.fillMaxHeight().fillMaxWidth().background(customColours.background)) {
                         CommonStringListView(
@@ -61,8 +58,11 @@ class MainFlowActivity : ComponentActivity() {
                             }
                         }
                     }
+                }).onBack(onBack = {
+                    finish()
                 })
-                BuildStrListViewFromFile.Builder(
+
+                val buildStrListViewFromFile = BuildStrListViewFromFile.Builder(
                     context,
                     viewModel,
                     basicFlowComposeBuilder.screenFlowBuilder,
@@ -79,7 +79,8 @@ class MainFlowActivity : ComponentActivity() {
                     listOf(TEMPLATES_DIR),
                     TEMPLATES_LIST_CACHE_NAME,
                     ""
-                ).Build()
+                )
+                buildStrListViewFromFile.Build()
 
                 val isOnFirstScreen by viewModel.isOnFirstScreen.collectAsState(true)
 
