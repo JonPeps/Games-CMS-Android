@@ -46,8 +46,12 @@ class BasicFlowComposeBuilder private constructor() {
                 NavBarBuilder.Builder(context, customColours)
 
             if (showBackIcon) {
-                mainFlowWithNavBarBuilder.showBackIcon(true).onIconBack {
-                    viewModel.popBackStack()
+                mainFlowWithNavBarBuilder
+                    .showBackIcon(true)
+                    .onIconBack {
+                        if (!viewModel.popBackStack()) {
+                            onBack()
+                        }
                 }
             }
             if (showMenuItems) {
@@ -63,7 +67,9 @@ class BasicFlowComposeBuilder private constructor() {
                 NavBuilder
                     .Builder(context, viewModel)
                     .setOnBack {
-                        onBack()
+                        if (!viewModel.popBackStack()) {
+                            onBack()
+                        }
                     }
                     .navContent(screenFlowBuilder.build()).Build()
             }.Build()

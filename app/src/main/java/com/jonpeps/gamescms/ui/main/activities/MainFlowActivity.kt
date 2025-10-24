@@ -91,6 +91,7 @@ class MainFlowActivity : ComponentActivity() {
                         customColours.primary,
                         FontStyle.Normal), enabled = true
                     ) {
+                        finish()
                         val intent = Intent(this, AddDefaultsActivity::class.java)
                         startActivity(intent)
                     }

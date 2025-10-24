@@ -4,7 +4,12 @@ import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.ADD_DEFAUL
 import com.jonpeps.gamescms.ui.main.builders.Screen
 
 class AddDefaultsViewModel: BaseScreenFlowViewModel<Screen>(), IScreenFlowViewModel<Screen> {
-    init {
+    override fun reInit() {
+        backStack.clear()
         backStack.add(Screen(ADD_DEFAULTS))
+    }
+
+    init {
+        reInit()
     }
 }
