@@ -9,7 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jonpeps.gamescms.R
-import com.jonpeps.gamescms.data.viewmodels.StartFlowStringListViewModel
+import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel
 import com.jonpeps.gamescms.data.viewmodels.factories.StartFlowStringListViewModelFactory
 import com.jonpeps.gamescms.ui.applevel.CustomColours
 import com.jonpeps.gamescms.ui.main.composables.CommonLoadingScreen
@@ -22,25 +22,23 @@ class BasicStrListBuilder private constructor() {
         private lateinit var onClick: (String) -> Unit
         private lateinit var onError: @Composable (String, String?) -> Unit
 
-        fun setStoragePath(storagePath: String) = apply { this.storagePath = storagePath }
-        fun setCachedName(cachedName: String) = apply { this.cachedName = cachedName }
-        fun setOnClick(onClick: (String) -> Unit) = apply { this.onClick = onClick }
-        fun setOnError(onError: @Composable (String, String?) -> Unit) = apply { this.onError = onError }
-
-        @Composable
-        fun Build() {
-            ShowStrList(context, storagePath, cachedName, customColours, onClick, onError)
+        fun setStoragePath(storagePath: String) = apply {
+            this.storagePath = storagePath
+        }
+        fun setCachedName(cachedName: String) = apply {
+            this.cachedName = cachedName
+        }
+        fun setOnClick(onClick: (String) -> Unit) = apply {
+            this.onClick = onClick
+        }
+        fun setOnError(onError: @Composable (String, String?) -> Unit) = apply {
+            this.onError = onError
         }
 
         @Composable
-        private fun ShowStrList(context: Context,
-                                storagePath: String,
-                                cachedName: String,
-                                customColours: CustomColours,
-                                onClick: (String) -> Unit,
-                                onError: @Composable (String, String?) -> Unit) {
+        fun Build() {
             val viewModel =
-                hiltViewModel<StartFlowStringListViewModel,
+                hiltViewModel<BasicStringListViewModel,
                         StartFlowStringListViewModelFactory.IStartFlowStringListViewModelFactory>(
                     creationCallback = {
                         it.create(storagePath, cachedName)

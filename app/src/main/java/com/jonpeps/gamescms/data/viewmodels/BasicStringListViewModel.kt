@@ -9,6 +9,7 @@ import com.jonpeps.gamescms.data.serialization.StringListStatus
 import com.jonpeps.gamescms.data.serialization.SubDeleteFlag
 import com.jonpeps.gamescms.data.viewmodels.factories.StartFlowStringListViewModelFactory
 import com.jonpeps.gamescms.data.helpers.IStringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel.Companion.NO_CACHE_NAME
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,15 +17,15 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import java.io.File
 
-interface IStartFlowStringListViewModel {
-    fun load(cacheName: String, loadFromCacheIfExists: Boolean = true)
+interface IBasicStringListViewModel {
+    fun load(cacheName: String = NO_CACHE_NAME, loadFromCacheIfExists: Boolean = true)
     fun add(name: String)
     fun delete(name: String, subDeleteFlag: SubDeleteFlag = SubDeleteFlag.NONE)
     fun deleteAll()
 }
 
 @HiltViewModel(assistedFactory = StartFlowStringListViewModelFactory.IStartFlowStringListViewModelFactory::class)
-class StartFlowStringListViewModel
+class BasicStringListViewModel
 @AssistedInject constructor(
     @Assisted("param1") private val directory: String,
     @Assisted("param2") private val fileName: String,
@@ -33,7 +34,7 @@ class StartFlowStringListViewModel
     private val listItemsVmChangesCache: IStringListItemsVmChangesCache,
     private val commonDeleteFileHelper: ICommonDeleteFileHelper,
     private val coroutineDispatcher: CoroutineDispatcher
-): BaseStringListViewModel(), IStartFlowStringListViewModel {
+): BaseStringListViewModel(), IBasicStringListViewModel {
     private var cacheName = ""
 
     override fun load(cacheName: String, loadFromCacheIfExists: Boolean) {
@@ -65,7 +66,7 @@ class StartFlowStringListViewModel
                     errorMessage = ex.message.toString()
                     success = false
                 }
-                if (success) {
+                if (cacheName != NO_CACHE_NAME && success) {
                     listItemsVmChangesCache.set(cacheName, items)
                 }
             }
@@ -145,6 +146,7 @@ class StartFlowStringListViewModel
 
     companion object {
         const val FILE_EXTENSION = ".json"
+        const val NO_CACHE_NAME = ""
         const val FAILED_TO_LOAD_FILE = "Failed to load file: "
         const val FAILED_TO_DELETE_FILE = "Failed to delete file: "
         const val FAILED_TO_DELETE_FILE_OR_DIRECTORY = "Failed to delete file/directory: "

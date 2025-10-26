@@ -15,7 +15,7 @@ import java.io.InputStream
 class InputStreamTableTemplateVm @AssistedInject constructor(
     @Assisted("param1") private val inputStream: InputStream,
     @Assisted("param2") private val directory: String,
-    @Assisted("param3") private val moshiTableTemplateRepository: IMoshiTableTemplateRepository,
+    moshiTableTemplateRepository: IMoshiTableTemplateRepository,
     commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     inputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper,
     coroutineDispatcher: CoroutineDispatcher)

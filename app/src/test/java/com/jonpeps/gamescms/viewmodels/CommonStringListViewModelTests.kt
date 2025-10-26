@@ -4,11 +4,11 @@ import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.ICommonDeleteFileHelper
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
-import com.jonpeps.gamescms.data.viewmodels.StartFlowStringListViewModel
-import com.jonpeps.gamescms.data.viewmodels.StartFlowStringListViewModel.Companion.FAILED_TO_DELETE_FILE
-import com.jonpeps.gamescms.data.viewmodels.StartFlowStringListViewModel.Companion.FAILED_TO_DELETE_FILE_OR_DIRECTORY
-import com.jonpeps.gamescms.data.viewmodels.StartFlowStringListViewModel.Companion.FAILED_TO_LOAD_FILE
-import com.jonpeps.gamescms.data.viewmodels.StartFlowStringListViewModel.Companion.FAILED_TO_SAVE_FILE
+import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel
+import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel.Companion.FAILED_TO_DELETE_FILE
+import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel.Companion.FAILED_TO_DELETE_FILE_OR_DIRECTORY
+import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel.Companion.FAILED_TO_LOAD_FILE
+import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel.Companion.FAILED_TO_SAVE_FILE
 import com.jonpeps.gamescms.data.helpers.IStringListItemsVmChangesCache
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -33,7 +33,7 @@ class CommonStringListViewModelTests {
     @MockK
     private lateinit var commonDeleteFileHelper: ICommonDeleteFileHelper
 
-    private lateinit var viewModel: StartFlowStringListViewModel
+    private lateinit var viewModel: BasicStringListViewModel
 
     private val dummyListData = arrayListOf("item1", "item2")
     private val dummyData = StringListMoshi(dummyListData)
@@ -46,7 +46,7 @@ class CommonStringListViewModelTests {
     fun setup() {
         MockKAnnotations.init(this)
 
-        viewModel = StartFlowStringListViewModel(
+        viewModel = BasicStringListViewModel(
             filesDirectoryPath,
             filesListPath,
             moshiStringListRepository,

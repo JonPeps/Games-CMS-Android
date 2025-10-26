@@ -32,10 +32,10 @@ open class InputStreamToJsonTypeToStorageVm<T>(
     private val inputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper,
     private val coroutineDispatcher: CoroutineDispatcher
 ): ViewModel(), IInputStreamToJsonTypeToStorageVm {
-    var status =
+    var _status =
         MutableStateFlow(InputStreamToJsonStorageStatus<T>(true, null, "", null))
 
-    val savedStatus: StateFlow<InputStreamToJsonStorageStatus<T>> = status
+    val status: StateFlow<InputStreamToJsonStorageStatus<T>> = _status
 
     var exception: Exception? = null
     private var item: T? = null
@@ -88,7 +88,7 @@ open class InputStreamToJsonTypeToStorageVm<T>(
                     success = false
                 }
             }
-            status.value = InputStreamToJsonStorageStatus(success, item, errorMessage, exception)
+            _status.value = InputStreamToJsonStorageStatus(success, item, errorMessage, exception)
         }
     }
 

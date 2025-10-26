@@ -2,7 +2,6 @@ package com.jonpeps.gamescms.data.viewmodels.factories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -13,8 +12,7 @@ class InputStreamStringListViewModelFactory {
     @AssistedFactory
     interface IInputStreamToStringListVmFactory {
         fun create(@Assisted("param1") inputStream: InputStream,
-                   @Assisted("param2") directory: String,
-                   @Assisted("param3") moshiStringListRepository: IMoshiStringListRepository
+                   @Assisted("param2") directory: String
         ): InputStreamStringListViewModel
     }
 
@@ -22,11 +20,10 @@ class InputStreamStringListViewModelFactory {
         fun provide(
             inputStream: InputStream,
             directory: String,
-            moshiStringListRepository: IMoshiStringListRepository,
             assistedFactory: IInputStreamToStringListVmFactory
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(inputStream, directory, moshiStringListRepository) as T
+                return assistedFactory.create(inputStream, directory) as T
             }
         }
     }

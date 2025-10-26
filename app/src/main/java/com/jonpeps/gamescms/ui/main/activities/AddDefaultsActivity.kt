@@ -50,6 +50,4 @@ class AddDefaultsActivity: ComponentActivity() {
             }
         }
     }
-
-
 }

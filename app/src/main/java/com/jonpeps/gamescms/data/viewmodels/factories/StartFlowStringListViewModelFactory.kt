@@ -2,7 +2,7 @@ package com.jonpeps.gamescms.data.viewmodels.factories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.jonpeps.gamescms.data.viewmodels.StartFlowStringListViewModel
+import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 
@@ -10,7 +10,7 @@ import dagger.assisted.AssistedFactory
 class StartFlowStringListViewModelFactory {
     @AssistedFactory
     interface IStartFlowStringListViewModelFactory {
-        fun create(@Assisted("param1") directoryPath: String, @Assisted("param2") listPath: String): StartFlowStringListViewModel
+        fun create(@Assisted("param1") directoryPath: String, @Assisted("param2") listPath: String): BasicStringListViewModel
     }
 
     companion object {
