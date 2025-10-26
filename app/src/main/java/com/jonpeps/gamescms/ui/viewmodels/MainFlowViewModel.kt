@@ -4,12 +4,7 @@ import com.jonpeps.gamescms.data.DataConstants
 import com.jonpeps.gamescms.ui.main.builders.core.Screen
 
 class MainFlowViewModel: BaseScreenFlowViewModel<Screen>(), IScreenFlowViewModel<Screen>  {
-    override fun reInit() {
-        backStack.clear()
-        backStack.add(Screen(DataConstants.KnownScreens.START))
-    }
-
     init {
-        reInit()
+        backStack.add(Screen(DataConstants.KnownScreens.START))
     }
 }

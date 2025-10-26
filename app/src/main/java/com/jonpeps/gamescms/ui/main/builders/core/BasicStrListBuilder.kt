@@ -54,9 +54,9 @@ class BasicStrListBuilder private constructor() {
                             .background(customColours.background)
                             .fillMaxHeight()
                     ) {
-                        CommonStringListView(viewModel.status.items, customColours, {
+                        CommonStringListView(viewModel.status.items, customColours) {
                             onClick(it)
-                        })
+                        }
                     }
                 } else {
                     onError(

@@ -46,12 +46,16 @@ class BuildStrListViewFromFile private constructor() {
                             Bundle().apply { putString(BUNDLE_ITEM_CLICKED_ID, it) })
                     }
                     .setOnError { header, value -> @Composable {
-                        BasicError(customColours, header, value, context.getString(R.string.cta_dismiss), {
-                            (context as MainFlowActivity).finish()
-                            context.startActivity(
-                                Intent(context,
-                                    MainFlowActivity::class.java))
-                        }) }
+                            BasicError(customColours, header, value, context.getString(R.string.cta_dismiss)) {
+                                (context as MainFlowActivity).finish()
+                                context.startActivity(
+                                    Intent(
+                                        context,
+                                        MainFlowActivity::class.java
+                                    )
+                                )
+                            }
+                        }
                     }
                 screenFlowBuilder.add(item.screenName, { builder.Build() })
             }

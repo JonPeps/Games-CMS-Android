@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 interface IScreenFlowViewModel<T> {
-    fun reInit()
     fun navigateTo(route: T, bundleId: String? = "", bundle: Bundle? = null)
     fun navigateToClearBackstack(route: T, bundleId: String? = "", bundle: Bundle? = null)
     fun getCurrentScreen(): T
