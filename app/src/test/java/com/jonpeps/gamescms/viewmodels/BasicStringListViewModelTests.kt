@@ -1,15 +1,13 @@
 package com.jonpeps.gamescms.viewmodels
 
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
-import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.ICommonDeleteFileHelper
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel
-import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel.Companion.FAILED_TO_DELETE_FILE
-import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel.Companion.FAILED_TO_DELETE_FILE_OR_DIRECTORY
 import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel.Companion.FAILED_TO_LOAD_FILE
-import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel.Companion.FAILED_TO_SAVE_FILE
 import com.jonpeps.gamescms.data.helpers.IStringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.repositories.ICachedMoshiStringListRepository
+import com.jonpeps.gamescms.data.serialization.SubDeleteFlag
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -22,10 +20,10 @@ import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CommonStringListViewModelTests {
+class BasicStringListViewModelTests {
     private val dispatcher = UnconfinedTestDispatcher()
     @MockK
-    private lateinit var moshiStringListRepository: IMoshiStringListRepository
+    private lateinit var moshiStringListRepository: ICachedMoshiStringListRepository
     @MockK
     private lateinit var commonSerializationRepoHelper: ICommonSerializationRepoHelper
     @MockK
@@ -185,21 +183,6 @@ class CommonStringListViewModelTests {
     }
 
     @Test
-    fun `add string list FAILURE WHEN IO files are VALID and save to repository RETURNS FALSE`() {
-        setupForWritingFiles()
-        setupCommonFiles()
-
-        coEvery { moshiStringListRepository.save(any(), any()) } returns false
-
-        viewModel.add("test")
-
-        assert(!viewModel.status.success)
-        assert(viewModel.status.message == FAILED_TO_SAVE_FILE + "test")
-        assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.isEmpty())
-    }
-
-    @Test
     fun `delete string SUCCESS WHEN IO files are VALID AND DELETE file RETURNS TRUE as well as SAVE files RETURNS TRUE`() {
         setupForWritingFiles()
         setupCommonFiles()
@@ -209,77 +192,10 @@ class CommonStringListViewModelTests {
         every { commonDeleteFileHelper.deleteFile(any(), any()) } returns true
         coEvery { moshiStringListRepository.delete(any(), any()) } returns true
 
-        viewModel.delete("test")
+        viewModel.delete("test", "dir", SubDeleteFlag.DIRECTORY_AND_FILES)
 
         assert(viewModel.status.success)
         assert(viewModel.status.message == "")
-        assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.isEmpty())
-    }
-
-    @Test
-    fun `delete string SUCCESS WHEN IO files are VALID AND DELETE file returns TRUE AND SAVE REPO returns TRUE AND DELETE file SUCCESS`() {
-        setupForWritingFiles()
-        setupCommonFiles()
-        coEvery { moshiStringListRepository.delete(any(), any()) } returns true
-        coEvery { moshiStringListRepository.save(any(), any()) } returns true
-        every { commonDeleteFileHelper.onSubDelete(any(), any(), any()) } returns true
-
-        viewModel.delete("test")
-
-        verify { listItemsVmChangesCache.set(any(), any()) }
-
-        assert(viewModel.status.success)
-        assert(viewModel.status.message == "")
-        assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.isEmpty())
-    }
-
-    @Test
-    fun `delete string FAILURE WHEN IO files are VALID AND DELETE file returns TRUE BUT SAVE to repo FAILS`() {
-        setupForWritingFiles()
-        setupCommonFiles()
-        coEvery { moshiStringListRepository.delete(any(), any()) } returns true
-        every { commonDeleteFileHelper.deleteFile(any(), any()) } returns true
-        coEvery { moshiStringListRepository.delete(any(), any()) } returns true
-        every { commonDeleteFileHelper.deleteFile(any(), any()) } returns true
-        coEvery { moshiStringListRepository.delete(any(), any()) } returns true
-        coEvery { moshiStringListRepository.save(any(), any()) } returns false
-
-        viewModel.delete("test")
-
-        assert(!viewModel.status.success)
-        assert(viewModel.status.message == FAILED_TO_SAVE_FILE + "test")
-        assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.isEmpty())
-    }
-
-    @Test
-    fun `delete string FAILURE WHEN IO files are VALID AND DELETE file returns FALSE`() {
-        setupForWritingFiles()
-        setupCommonFiles()
-        coEvery { moshiStringListRepository.delete(any(), any()) } returns false
-
-        viewModel.delete("test")
-
-        assert(!viewModel.status.success)
-        assert(viewModel.status.message == FAILED_TO_DELETE_FILE + "test")
-        assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.isEmpty())
-    }
-
-    @Test
-    fun `delete string FAILURE WHEN IO files are VALID AND DELETE file returns TRUE AND SAVE REPO returns TRUE BUT DELETE file FAILS`() {
-        setupForWritingFiles()
-        setupCommonFiles()
-        coEvery { moshiStringListRepository.delete(any(), any()) } returns true
-        coEvery { moshiStringListRepository.save(any(), any()) } returns true
-        every { commonDeleteFileHelper.onSubDelete(any(), any(), any()) } returns false
-
-        viewModel.delete("test")
-
-        assert(!viewModel.status.success)
-        assert(viewModel.status.message == FAILED_TO_DELETE_FILE_OR_DIRECTORY + "test")
         assert(viewModel.status.ex == null)
         assert(viewModel.status.items.isEmpty())
     }

@@ -7,7 +7,7 @@ import com.jonpeps.gamescms.data.serialization.ICommonDeleteFileHelper
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.StringListStatus
 import com.jonpeps.gamescms.data.serialization.SubDeleteFlag
-import com.jonpeps.gamescms.data.viewmodels.factories.StartFlowStringListViewModelFactory
+import com.jonpeps.gamescms.data.viewmodels.factories.BasicStringListViewModelFactory
 import com.jonpeps.gamescms.data.helpers.IStringListItemsVmChangesCache
 import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel.Companion.NO_CACHE_NAME
 import dagger.assisted.Assisted
@@ -15,16 +15,14 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
-import java.io.File
 
 interface IBasicStringListViewModel {
     fun load(cacheName: String = NO_CACHE_NAME, loadFromCacheIfExists: Boolean = true)
     fun add(name: String)
-    fun delete(name: String, subDeleteFlag: SubDeleteFlag = SubDeleteFlag.NONE)
-    fun deleteAll()
+    fun delete(name: String, directory: String, subDeleteFlag: SubDeleteFlag = SubDeleteFlag.NONE)
 }
 
-@HiltViewModel(assistedFactory = StartFlowStringListViewModelFactory.IStartFlowStringListViewModelFactory::class)
+@HiltViewModel(assistedFactory = BasicStringListViewModelFactory.IBasicStringListViewModelFactory::class)
 class BasicStringListViewModel
 @AssistedInject constructor(
     @Assisted("param1") private val directory: String,
@@ -38,6 +36,7 @@ class BasicStringListViewModel
     private var cacheName = ""
 
     override fun load(cacheName: String, loadFromCacheIfExists: Boolean) {
+        isProcessing.value = true
         this.cacheName = cacheName
         viewModelScope.launch(coroutineDispatcher) {
             items.clear()
@@ -70,57 +69,46 @@ class BasicStringListViewModel
                     listItemsVmChangesCache.set(cacheName, items)
                 }
             }
-            baseHasFinishedObtainingData.value = true
+            isProcessing.value = false
             status = StringListStatus(success, items, errorMessage, exception)
         }
     }
 
     override fun add(name: String) {
+        if (items.contains(name)) return
+        isProcessing.value = true
+        items.add(name)
+        listItemsVmChangesCache.set(cacheName, items)
         viewModelScope.launch(coroutineDispatcher) {
-            baseHasFinishedObtainingData.value = false
-            initWriteFiles(name)
-            items.add(name)
-            var success = true
-            if (moshiStringListRepository.save(cacheName, StringListMoshi(items))) {
-                listItemsVmChangesCache.set(cacheName, items)
-            } else {
-                success = false
-                items.remove(name)
-            }
-            status = StringListStatus(success, items, if (success) "" else FAILED_TO_SAVE_FILE + name, null)
+            initWriteFiles(fileName)
+            val success =
+                moshiStringListRepository.save(
+                    cacheName, StringListMoshi(items))
+            status = StringListStatus(
+                success,
+                items,
+                if (success) "" else FAILED_TO_SAVE_FILE + fileName,
+                null
+            )
+            isProcessing.value = false
         }
     }
 
-    override fun delete(name: String, subDeleteFlag: SubDeleteFlag) {
+    override fun delete(name: String, directory: String, subDeleteFlag: SubDeleteFlag) {
+        isProcessing.value = true
         viewModelScope.launch(coroutineDispatcher) {
-            baseHasFinishedObtainingData.value = false
-            initWriteFiles(name)
             items.remove(name)
-            var success = true
-            var message = ""
-            if (moshiStringListRepository.delete(fileName, name)) {
-                if (moshiStringListRepository.save(cacheName, StringListMoshi(items))) {
-                    if (commonDeleteFileHelper.onSubDelete(directory, name, subDeleteFlag)) {
-                        listItemsVmChangesCache.set(cacheName, items)
-                    } else {
-                        success = false
-                        message = FAILED_TO_DELETE_FILE_OR_DIRECTORY + name
-                    }
-                } else {
-                    success = false
-                    message = FAILED_TO_SAVE_FILE + name
+            when (subDeleteFlag) {
+                SubDeleteFlag.DIRECTORY_AND_FILES -> {
+                    commonDeleteFileHelper.deleteDirectory(directory)
                 }
-            } else {
-                success = false
-                message = FAILED_TO_DELETE_FILE + name
+                SubDeleteFlag.FILE -> {
+                    commonDeleteFileHelper.deleteFile(directory, name)
+                }
+                SubDeleteFlag.NONE -> {}
             }
-            status = StringListStatus(success, items, message, null)
-        }
-    }
-
-    override fun deleteAll() {
-        viewModelScope.launch(coroutineDispatcher) {
-            commonDeleteFileHelper.deleteDirectory(File(directory))
+            listItemsVmChangesCache.set(cacheName, items)
+            isProcessing.value = false
         }
     }
 

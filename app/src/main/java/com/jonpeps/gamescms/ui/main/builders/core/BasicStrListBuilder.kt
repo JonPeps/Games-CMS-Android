@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jonpeps.gamescms.R
 import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel
-import com.jonpeps.gamescms.data.viewmodels.factories.StartFlowStringListViewModelFactory
+import com.jonpeps.gamescms.data.viewmodels.factories.BasicStringListViewModelFactory
 import com.jonpeps.gamescms.ui.applevel.CustomColours
 import com.jonpeps.gamescms.ui.main.composables.CommonLoadingScreen
 import com.jonpeps.gamescms.ui.main.composables.CommonStringListView
@@ -39,7 +39,7 @@ class BasicStrListBuilder private constructor() {
         fun Build() {
             val viewModel =
                 hiltViewModel<BasicStringListViewModel,
-                        StartFlowStringListViewModelFactory.IStartFlowStringListViewModelFactory>(
+                        BasicStringListViewModelFactory.IBasicStringListViewModelFactory>(
                     creationCallback = {
                         it.create(storagePath, cachedName)
                     })

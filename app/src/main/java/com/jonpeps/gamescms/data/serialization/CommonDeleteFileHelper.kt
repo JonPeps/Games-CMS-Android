@@ -10,7 +10,7 @@ enum class SubDeleteFlag {
 
 interface ICommonDeleteFileHelper {
     fun deleteFile(path: String, name: String): Boolean
-    fun deleteDirectory(directory: File)
+    fun deleteDirectory(directory: String)
     fun onSubDelete(path: String, name: String, subDeleteFlag: SubDeleteFlag): Boolean
 }
 
@@ -23,18 +23,19 @@ class CommonDeleteFileHelper : ICommonDeleteFileHelper {
         }
     }
 
-    override fun deleteDirectory(directory: File) {
-        if (directory.exists() && directory.isDirectory) {
-            directory.listFiles()?.forEach { file ->
+    override fun deleteDirectory(directory: String) {
+        val fileOrDir = File(directory)
+        if (fileOrDir.exists() && fileOrDir.isDirectory) {
+            fileOrDir.listFiles()?.forEach { file ->
                 if (file.isDirectory) {
-                    deleteDirectory(file)
+                    deleteDirectory(directory)
                 } else {
                     file.delete()
                 }
             }
-            directory.delete()
+            fileOrDir.delete()
         } else {
-            directory.delete()
+            fileOrDir.delete()
         }
     }
 
@@ -47,7 +48,7 @@ class CommonDeleteFileHelper : ICommonDeleteFileHelper {
             SubDeleteFlag.DIRECTORY_AND_FILES -> {
                 val file = File(path)
                 return if (file.exists()) {
-                    deleteDirectory(file)
+                    deleteDirectory(path + name)
                     true
                 } else {
                     false

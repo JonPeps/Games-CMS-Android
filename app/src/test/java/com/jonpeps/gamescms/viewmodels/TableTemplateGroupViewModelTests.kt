@@ -5,10 +5,10 @@ import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
 import com.jonpeps.gamescms.data.dataclasses.mappers.TableItemFinalMapper
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
+import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel.Companion.JSON_ITEM_TO_SAVE_IS_NULL
-import com.jonpeps.gamescms.data.repositories.ITableTemplateFileRepository
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmChangesCache
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel.Companion.JSON_ITEM_TO_LOAD_IS_NULL
 import io.mockk.MockKAnnotations
@@ -26,7 +26,7 @@ import org.junit.Test
 class TableTemplateGroupViewModelTests {
     private val dispatcher = UnconfinedTestDispatcher()
     @MockK
-    private lateinit var tableTemplateRepository: ITableTemplateFileRepository
+    private lateinit var tableTemplateRepository: IMoshiTableTemplateRepository
     @MockK
     private lateinit var tableTemplateGroupVmRepoHelper: ICommonSerializationRepoHelper
     @MockK
@@ -67,8 +67,8 @@ class TableTemplateGroupViewModelTests {
         every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
         every { tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName) } returns mockk()
         every { tableTemplateGroupVmChangesCache.isPopulated() } returns false
-        every { tableTemplateRepository.getItem(templateName) } returns dummyData
-        coEvery { tableTemplateRepository.load(templateName) } returns true
+        every { tableTemplateRepository.getItem() } returns dummyData
+        coEvery { tableTemplateRepository.load() } returns true
 
         viewModel.load(templateName, false)
 
@@ -86,7 +86,7 @@ class TableTemplateGroupViewModelTests {
         every { tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName) } returns mockk()
         every { tableTemplateGroupVmChangesCache.isPopulated() } returns false
         every { tableTemplateRepository.getErrorMsg() } returns "An error occurred!"
-        coEvery { tableTemplateRepository.load(templateName) } returns false
+        coEvery { tableTemplateRepository.load() } returns false
 
         viewModel.load(templateName)
 
@@ -127,8 +127,8 @@ class TableTemplateGroupViewModelTests {
         setupForReadingFiles()
         every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
         every { tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName) } returns mockk()
-        coEvery { tableTemplateRepository.load(templateName) } returns true
-        every { tableTemplateRepository.getItem(templateName) } returns null
+        coEvery { tableTemplateRepository.load() } returns true
+        every { tableTemplateRepository.getItem() } returns null
 
         viewModel.load(templateName, false)
 
@@ -161,8 +161,8 @@ class TableTemplateGroupViewModelTests {
         every { tableTemplateGroupVmRepoHelper.getMainFile(templateName) } returns mockk()
         every { tableTemplateGroupVmRepoHelper.getDirectoryFile(path) } returns mockk()
         every { tableTemplateGroupVmRepoHelper.getFileWriter(path, templateName) } returns mockk()
-        every { tableTemplateRepository.getItem(templateName) } returns dummyData
-        coEvery { tableTemplateRepository.save(templateName, dummyData) } returns true
+        every { tableTemplateRepository.getItem() } returns dummyData
+        coEvery { tableTemplateRepository.save(dummyData) } returns true
 
         viewModel.save(templateName)
 
@@ -179,7 +179,7 @@ class TableTemplateGroupViewModelTests {
         every { tableTemplateGroupVmRepoHelper.getMainFile(templateName) } returns mockk()
         every { tableTemplateGroupVmRepoHelper.getDirectoryFile(path) } returns mockk()
         every { tableTemplateGroupVmRepoHelper.getFileWriter(path, templateName) } returns mockk()
-        every { tableTemplateRepository.getItem(templateName) } returns null
+        every { tableTemplateRepository.getItem() } returns null
 
         viewModel.save(templateName)
 
@@ -222,9 +222,9 @@ class TableTemplateGroupViewModelTests {
         every { tableTemplateGroupVmRepoHelper.getMainFile(templateName) } returns mockk()
         every { tableTemplateGroupVmRepoHelper.getDirectoryFile(path) } returns mockk()
         every { tableTemplateGroupVmRepoHelper.getFileWriter(path, templateName) } returns mockk()
-        every { tableTemplateRepository.getItem(templateName) } returns dummyData
+        every { tableTemplateRepository.getItem() } returns dummyData
         every { tableTemplateRepository.getErrorMsg() } returns "An error occurred!"
-        coEvery { tableTemplateRepository.save(templateName, dummyData) } returns false
+        coEvery { tableTemplateRepository.save(dummyData) } returns false
 
         viewModel.save(templateName)
 
@@ -578,6 +578,6 @@ class TableTemplateGroupViewModelTests {
         every { tableTemplateRepository.assignDirectoryFile(any()) } returns Unit
         every { tableTemplateRepository.setFileWriter(any()) } returns Unit
         every { tableTemplateRepository.setFile(any()) } returns Unit
-        every { tableTemplateRepository.setItem(templateName, any()) } returns Unit
+        every { tableTemplateRepository.setItem(any()) } returns Unit
     }
 }
