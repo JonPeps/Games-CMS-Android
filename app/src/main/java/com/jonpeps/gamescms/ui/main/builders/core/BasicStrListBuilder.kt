@@ -44,7 +44,7 @@ class BasicStrListBuilder private constructor() {
                         it.create(storagePath, cachedName)
                     })
 
-            val shouldPostToUI = viewModel.hasFinishedObtainingData.collectAsState()
+            val shouldPostToUI = viewModel.isProcessing.collectAsState()
             if (shouldPostToUI.value) {
                 if (viewModel.status.success) {
                     Column(

@@ -8,6 +8,8 @@ import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel.Companion.F
 import com.jonpeps.gamescms.data.helpers.IStringListItemsVmChangesCache
 import com.jonpeps.gamescms.data.repositories.ICachedMoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.SubDeleteFlag
+import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel.Companion.FAILED_TO_SAVE_FILE
+import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel.Companion.NO_CACHE_NAME
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -67,10 +69,30 @@ class BasicStringListViewModelTests {
         coEvery { moshiStringListRepository.load(cachedListName) } returns true
         every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
         every { moshiStringListRepository.getErrorMsg() } returns ""
+        every { listItemsVmChangesCache.get(cachedListName) } returns dummyListData
 
         viewModel.load(cachedListName, false)
 
-        verify { listItemsVmChangesCache.set(any(), any()) }
+        verify { listItemsVmChangesCache.set(cachedListName, dummyListData) }
+
+        assert(viewModel.status.success)
+        assert(viewModel.status.message == "")
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 2)
+    }
+
+    @Test
+    fun `load string list SUCCESS WHEN IO files are VALID and load from repository RETURNS TRUE and no cached items`() {
+        setupForReadingFiles()
+        every { commonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { commonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
+
+        every { listItemsVmChangesCache.isPopulated() } returns false
+        coEvery { moshiStringListRepository.load(NO_CACHE_NAME) } returns true
+        every { moshiStringListRepository.getItem(NO_CACHE_NAME) } returns dummyData
+        every { moshiStringListRepository.getErrorMsg() } returns ""
+
+        viewModel.load(NO_CACHE_NAME, false)
 
         assert(viewModel.status.success)
         assert(viewModel.status.message == "")
@@ -121,8 +143,6 @@ class BasicStringListViewModelTests {
 
         every { listItemsVmChangesCache.isPopulated() } returns false
         coEvery { moshiStringListRepository.load(cachedListName) } returns false
-        every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
-        every { moshiStringListRepository.getErrorMsg() } returns ""
 
         viewModel.load(cachedListName, false)
 
@@ -141,7 +161,6 @@ class BasicStringListViewModelTests {
         every { listItemsVmChangesCache.isPopulated() } returns false
         coEvery { moshiStringListRepository.load(cachedListName) } returns true
         every { moshiStringListRepository.getItem(cachedListName) } returns null
-        every { moshiStringListRepository.getErrorMsg() } returns ""
 
         viewModel.load(cachedListName, false)
 
@@ -166,6 +185,39 @@ class BasicStringListViewModelTests {
     }
 
     @Test
+    fun `add string list EXITS due to ITEM ALREADY EXISTS`() {
+        setupForWritingFiles()
+        setupCommonFiles()
+
+        coEvery { moshiStringListRepository.save(any(), any()) } returns true
+        every { listItemsVmChangesCache.set(any(), any()) } returns Unit
+
+        viewModel.add("test")
+        viewModel.add("test")
+
+        assert(viewModel.status.success)
+        assert(viewModel.status.message == "")
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.size == 1)
+    }
+
+    @Test
+    fun `add string FAILS due to SAVE TO REPO FAILS`() {
+        setupForWritingFiles()
+        setupCommonFiles()
+
+        coEvery { moshiStringListRepository.save(any(), any()) } returns false
+        every { listItemsVmChangesCache.set(any(), any()) } returns Unit
+
+        viewModel.add("test")
+
+        assert(!viewModel.status.success)
+        assert(viewModel.status.message == FAILED_TO_SAVE_FILE + filesListPath)
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.isEmpty())
+    }
+
+    @Test
     fun `add string list SUCCESS WHEN IO files are VALID and save to repository RETURNS TRUE`() {
         setupForWritingFiles()
         setupCommonFiles()
@@ -186,13 +238,43 @@ class BasicStringListViewModelTests {
     fun `delete string SUCCESS WHEN IO files are VALID AND DELETE file RETURNS TRUE as well as SAVE files RETURNS TRUE`() {
         setupForWritingFiles()
         setupCommonFiles()
-        coEvery { moshiStringListRepository.delete(any(), any()) } returns true
         every { commonDeleteFileHelper.deleteFile(any(), any()) } returns true
-        coEvery { moshiStringListRepository.delete(any(), any()) } returns true
-        every { commonDeleteFileHelper.deleteFile(any(), any()) } returns true
-        coEvery { moshiStringListRepository.delete(any(), any()) } returns true
+        every { commonDeleteFileHelper.deleteDirectory(any()) } returns Unit
+        every { listItemsVmChangesCache.set(any(), any()) } returns Unit
+
+        viewModel.delete("test", "dir", SubDeleteFlag.FILE)
+
+        assert(viewModel.status.success)
+        assert(viewModel.status.message == "")
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.isEmpty())
+
+        verify { listItemsVmChangesCache.set(any(), any()) }
+    }
+
+    @Test
+    fun `delete string SUCCESS WHEN IO files are VALID AND DELETE file AND DIRECTORY RETURNS TRUE as well as SAVE files RETURNS TRUE`() {
+        setupForWritingFiles()
+        setupCommonFiles()
+        every { commonDeleteFileHelper.deleteDirectory(any()) } returns Unit
+        every { listItemsVmChangesCache.set(any(), any()) } returns Unit
 
         viewModel.delete("test", "dir", SubDeleteFlag.DIRECTORY_AND_FILES)
+
+        assert(viewModel.status.success)
+        assert(viewModel.status.message == "")
+        assert(viewModel.status.ex == null)
+        assert(viewModel.status.items.isEmpty())
+    }
+
+    @Test
+    fun `delete string SUCCESS`() {
+        setupForWritingFiles()
+        setupCommonFiles()
+        every { commonDeleteFileHelper.deleteDirectory(any()) } returns Unit
+        every { listItemsVmChangesCache.set(any(), any()) } returns Unit
+
+        viewModel.delete("test", "dir", SubDeleteFlag.NONE)
 
         assert(viewModel.status.success)
         assert(viewModel.status.message == "")

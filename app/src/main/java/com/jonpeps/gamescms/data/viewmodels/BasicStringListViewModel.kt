@@ -36,7 +36,7 @@ class BasicStringListViewModel
     private var cacheName = ""
 
     override fun load(cacheName: String, loadFromCacheIfExists: Boolean) {
-        isProcessing.value = true
+        _isProcessing.value = true
         this.cacheName = cacheName
         viewModelScope.launch(coroutineDispatcher) {
             items.clear()
@@ -69,33 +69,35 @@ class BasicStringListViewModel
                     listItemsVmChangesCache.set(cacheName, items)
                 }
             }
-            isProcessing.value = false
             status = StringListStatus(success, items, errorMessage, exception)
+            _isProcessing.value = false
         }
     }
 
     override fun add(name: String) {
         if (items.contains(name)) return
-        isProcessing.value = true
-        items.add(name)
-        listItemsVmChangesCache.set(cacheName, items)
+        _isProcessing.value = true
         viewModelScope.launch(coroutineDispatcher) {
+            listItemsVmChangesCache.set(cacheName, items)
             initWriteFiles(fileName)
             val success =
                 moshiStringListRepository.save(
                     cacheName, StringListMoshi(items))
+            if (success) {
+                items.add(name)
+            }
+            _isProcessing.value = false
             status = StringListStatus(
                 success,
                 items,
                 if (success) "" else FAILED_TO_SAVE_FILE + fileName,
                 null
             )
-            isProcessing.value = false
         }
     }
 
     override fun delete(name: String, directory: String, subDeleteFlag: SubDeleteFlag) {
-        isProcessing.value = true
+        _isProcessing.value = true
         viewModelScope.launch(coroutineDispatcher) {
             items.remove(name)
             when (subDeleteFlag) {
@@ -108,7 +110,7 @@ class BasicStringListViewModel
                 SubDeleteFlag.NONE -> {}
             }
             listItemsVmChangesCache.set(cacheName, items)
-            isProcessing.value = false
+            _isProcessing.value = false
         }
     }
 
@@ -136,8 +138,6 @@ class BasicStringListViewModel
         const val FILE_EXTENSION = ".json"
         const val NO_CACHE_NAME = ""
         const val FAILED_TO_LOAD_FILE = "Failed to load file: "
-        const val FAILED_TO_DELETE_FILE = "Failed to delete file: "
-        const val FAILED_TO_DELETE_FILE_OR_DIRECTORY = "Failed to delete file/directory: "
         const val FAILED_TO_SAVE_FILE = "Failed to save file: "
     }
 }
