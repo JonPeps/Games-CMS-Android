@@ -25,13 +25,13 @@ import org.junit.Test
 class BasicStringListViewModelTests {
     private val dispatcher = UnconfinedTestDispatcher()
     @MockK
-    private lateinit var moshiStringListRepository: ICachedMoshiStringListRepository
+    private lateinit var mockMoshiStringListRepository: ICachedMoshiStringListRepository
     @MockK
-    private lateinit var commonSerializationRepoHelper: ICommonSerializationRepoHelper
+    private lateinit var mockCommonSerializationRepoHelper: ICommonSerializationRepoHelper
     @MockK
-    private lateinit var listItemsVmChangesCache: IStringListItemsVmChangesCache
+    private lateinit var mockListItemsVmChangesCache: IStringListItemsVmChangesCache
     @MockK
-    private lateinit var commonDeleteFileHelper: ICommonDeleteFileHelper
+    private lateinit var mockCommonDeleteFileHelper: ICommonDeleteFileHelper
 
     private lateinit var viewModel: BasicStringListViewModel
 
@@ -49,31 +49,31 @@ class BasicStringListViewModelTests {
         viewModel = BasicStringListViewModel(
             filesDirectoryPath,
             filesListPath,
-            moshiStringListRepository,
-            commonSerializationRepoHelper,
-            listItemsVmChangesCache,
-            commonDeleteFileHelper,
+            mockMoshiStringListRepository,
+            mockCommonSerializationRepoHelper,
+            mockListItemsVmChangesCache,
+            mockCommonDeleteFileHelper,
             dispatcher
         )
 
-        every { listItemsVmChangesCache.set(any(), any()) } returns Unit
+        every { mockListItemsVmChangesCache.set(any(), any()) } returns Unit
     }
 
     @Test
     fun `load string list SUCCESS WHEN IO files are VALID and load from repository RETURNS TRUE`() {
         setupForReadingFiles()
-        every { commonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
-        every { commonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
+        every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
 
-        every { listItemsVmChangesCache.isPopulated() } returns false
-        coEvery { moshiStringListRepository.load(cachedListName) } returns true
-        every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
-        every { moshiStringListRepository.getErrorMsg() } returns ""
-        every { listItemsVmChangesCache.get(cachedListName) } returns dummyListData
+        every { mockListItemsVmChangesCache.isPopulated() } returns false
+        coEvery { mockMoshiStringListRepository.load(cachedListName) } returns true
+        every { mockMoshiStringListRepository.getItem(cachedListName) } returns dummyData
+        every { mockMoshiStringListRepository.getErrorMsg() } returns ""
+        every { mockListItemsVmChangesCache.get(cachedListName) } returns dummyListData
 
         viewModel.load(cachedListName, false)
 
-        verify { listItemsVmChangesCache.set(cachedListName, dummyListData) }
+        verify { mockListItemsVmChangesCache.set(cachedListName, dummyListData) }
 
         assert(viewModel.status.success)
         assert(viewModel.status.message == "")
@@ -84,13 +84,13 @@ class BasicStringListViewModelTests {
     @Test
     fun `load string list SUCCESS WHEN IO files are VALID and load from repository RETURNS TRUE and no cached items`() {
         setupForReadingFiles()
-        every { commonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
-        every { commonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
+        every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
 
-        every { listItemsVmChangesCache.isPopulated() } returns false
-        coEvery { moshiStringListRepository.load(NO_CACHE_NAME) } returns true
-        every { moshiStringListRepository.getItem(NO_CACHE_NAME) } returns dummyData
-        every { moshiStringListRepository.getErrorMsg() } returns ""
+        every { mockListItemsVmChangesCache.isPopulated() } returns false
+        coEvery { mockMoshiStringListRepository.load(NO_CACHE_NAME) } returns true
+        every { mockMoshiStringListRepository.getItem(NO_CACHE_NAME) } returns dummyData
+        every { mockMoshiStringListRepository.getErrorMsg() } returns ""
 
         viewModel.load(NO_CACHE_NAME, false)
 
@@ -103,17 +103,17 @@ class BasicStringListViewModelTests {
     @Test
     fun `load string list SUCCESS WHEN IO files are VALID and load from repository RETURNS TRUE WHEN no cached items should be polled`() {
         setupForReadingFiles()
-        every { commonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
-        every { commonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
+        every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
 
-        every { listItemsVmChangesCache.isPopulated() } returns false
-        coEvery { moshiStringListRepository.load(cachedListName) } returns true
-        every { moshiStringListRepository.getItem(cachedListName) } returns dummyData
-        every { moshiStringListRepository.getErrorMsg() } returns ""
+        every { mockListItemsVmChangesCache.isPopulated() } returns false
+        coEvery { mockMoshiStringListRepository.load(cachedListName) } returns true
+        every { mockMoshiStringListRepository.getItem(cachedListName) } returns dummyData
+        every { mockMoshiStringListRepository.getErrorMsg() } returns ""
 
         viewModel.load(cachedListName, true)
 
-        verify { listItemsVmChangesCache.set(any(), any()) }
+        verify { mockListItemsVmChangesCache.set(any(), any()) }
 
         assert(viewModel.status.success)
         assert(viewModel.status.message == "")
@@ -123,9 +123,9 @@ class BasicStringListViewModelTests {
 
     @Test
     fun `load string list SUCCESS WHEN items are cached`() {
-        every { listItemsVmChangesCache.isPopulated() } returns true
-        every { listItemsVmChangesCache.get(cachedListName) } returns dummyListData
-        coEvery { moshiStringListRepository.load(cachedListName) } returns true
+        every { mockListItemsVmChangesCache.isPopulated() } returns true
+        every { mockListItemsVmChangesCache.get(cachedListName) } returns dummyListData
+        coEvery { mockMoshiStringListRepository.load(cachedListName) } returns true
 
         viewModel.load(cachedListName, true)
 
@@ -138,11 +138,11 @@ class BasicStringListViewModelTests {
     @Test
     fun `load string list FAILS WHEN IO files are VALID and load from repository RETURNS FALSE`() {
         setupForReadingFiles()
-        every { commonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
-        every { commonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
+        every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
 
-        every { listItemsVmChangesCache.isPopulated() } returns false
-        coEvery { moshiStringListRepository.load(cachedListName) } returns false
+        every { mockListItemsVmChangesCache.isPopulated() } returns false
+        coEvery { mockMoshiStringListRepository.load(cachedListName) } returns false
 
         viewModel.load(cachedListName, false)
 
@@ -155,12 +155,12 @@ class BasicStringListViewModelTests {
     @Test
     fun `load string list FAILS WHEN IO files are VALID and load from repository RETURNS TRUE AND get item RETURNS NULL`() {
         setupForReadingFiles()
-        every { commonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
-        every { commonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
+        every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
 
-        every { listItemsVmChangesCache.isPopulated() } returns false
-        coEvery { moshiStringListRepository.load(cachedListName) } returns true
-        every { moshiStringListRepository.getItem(cachedListName) } returns null
+        every { mockListItemsVmChangesCache.isPopulated() } returns false
+        coEvery { mockMoshiStringListRepository.load(cachedListName) } returns true
+        every { mockMoshiStringListRepository.getItem(cachedListName) } returns null
 
         viewModel.load(cachedListName, false)
 
@@ -173,8 +173,8 @@ class BasicStringListViewModelTests {
     @Test
     fun `load string list FAILS WHEN IO files THROWS EXCEPTION` () {
         setupForReadingFiles()
-        every { commonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
-        every { commonSerializationRepoHelper.getAbsoluteFile(any(), any()) } throws Exception("Runtime error!")
+        every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
+        every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } throws Exception("Runtime error!")
 
         viewModel.load(cachedListName, false)
 
@@ -189,8 +189,8 @@ class BasicStringListViewModelTests {
         setupForWritingFiles()
         setupCommonFiles()
 
-        coEvery { moshiStringListRepository.save(any(), any()) } returns true
-        every { listItemsVmChangesCache.set(any(), any()) } returns Unit
+        coEvery { mockMoshiStringListRepository.save(any(), any()) } returns true
+        every { mockListItemsVmChangesCache.set(any(), any()) } returns Unit
 
         viewModel.add("test")
         viewModel.add("test")
@@ -206,8 +206,8 @@ class BasicStringListViewModelTests {
         setupForWritingFiles()
         setupCommonFiles()
 
-        coEvery { moshiStringListRepository.save(any(), any()) } returns false
-        every { listItemsVmChangesCache.set(any(), any()) } returns Unit
+        coEvery { mockMoshiStringListRepository.save(any(), any()) } returns false
+        every { mockListItemsVmChangesCache.set(any(), any()) } returns Unit
 
         viewModel.add("test")
 
@@ -222,11 +222,11 @@ class BasicStringListViewModelTests {
         setupForWritingFiles()
         setupCommonFiles()
 
-        coEvery { moshiStringListRepository.save(any(), any()) } returns true
+        coEvery { mockMoshiStringListRepository.save(any(), any()) } returns true
 
         viewModel.add("test")
 
-        verify { listItemsVmChangesCache.set(any(), any()) }
+        verify { mockListItemsVmChangesCache.set(any(), any()) }
 
         assert(viewModel.status.success)
         assert(viewModel.status.message == "")
@@ -238,9 +238,9 @@ class BasicStringListViewModelTests {
     fun `delete string SUCCESS WHEN IO files are VALID AND DELETE file RETURNS TRUE as well as SAVE files RETURNS TRUE`() {
         setupForWritingFiles()
         setupCommonFiles()
-        every { commonDeleteFileHelper.deleteFile(any(), any()) } returns true
-        every { commonDeleteFileHelper.deleteDirectory(any()) } returns Unit
-        every { listItemsVmChangesCache.set(any(), any()) } returns Unit
+        every { mockCommonDeleteFileHelper.deleteFile(any(), any()) } returns true
+        every { mockCommonDeleteFileHelper.deleteDirectory(any()) } returns Unit
+        every { mockListItemsVmChangesCache.set(any(), any()) } returns Unit
 
         viewModel.delete("test", "dir", SubDeleteFlag.FILE)
 
@@ -249,15 +249,15 @@ class BasicStringListViewModelTests {
         assert(viewModel.status.ex == null)
         assert(viewModel.status.items.isEmpty())
 
-        verify { listItemsVmChangesCache.set(any(), any()) }
+        verify { mockListItemsVmChangesCache.set(any(), any()) }
     }
 
     @Test
     fun `delete string SUCCESS WHEN IO files are VALID AND DELETE file AND DIRECTORY RETURNS TRUE as well as SAVE files RETURNS TRUE`() {
         setupForWritingFiles()
         setupCommonFiles()
-        every { commonDeleteFileHelper.deleteDirectory(any()) } returns Unit
-        every { listItemsVmChangesCache.set(any(), any()) } returns Unit
+        every { mockCommonDeleteFileHelper.deleteDirectory(any()) } returns Unit
+        every { mockListItemsVmChangesCache.set(any(), any()) } returns Unit
 
         viewModel.delete("test", "dir", SubDeleteFlag.DIRECTORY_AND_FILES)
 
@@ -271,8 +271,8 @@ class BasicStringListViewModelTests {
     fun `delete string SUCCESS`() {
         setupForWritingFiles()
         setupCommonFiles()
-        every { commonDeleteFileHelper.deleteDirectory(any()) } returns Unit
-        every { listItemsVmChangesCache.set(any(), any()) } returns Unit
+        every { mockCommonDeleteFileHelper.deleteDirectory(any()) } returns Unit
+        every { mockListItemsVmChangesCache.set(any(), any()) } returns Unit
 
         viewModel.delete("test", "dir", SubDeleteFlag.NONE)
 
@@ -283,22 +283,22 @@ class BasicStringListViewModelTests {
     }
 
     private fun setupForReadingFiles() {
-        every { moshiStringListRepository.setAbsoluteFile(any()) } returns Unit
-        every { moshiStringListRepository.setBufferReader(any()) } returns Unit
+        every { mockMoshiStringListRepository.setAbsoluteFile(any()) } returns Unit
+        every { mockMoshiStringListRepository.setBufferReader(any()) } returns Unit
     }
 
     private fun setupForWritingFiles() {
-        every { moshiStringListRepository.setAbsoluteFile(any()) } returns Unit
-        every { moshiStringListRepository.assignDirectoryFile(any()) } returns Unit
-        every { moshiStringListRepository.setFile(any()) } returns Unit
-        every { moshiStringListRepository.setFileWriter(any()) } returns Unit
-        every { moshiStringListRepository.setItem(any(), any()) } returns Unit
+        every { mockMoshiStringListRepository.setAbsoluteFile(any()) } returns Unit
+        every { mockMoshiStringListRepository.assignDirectoryFile(any()) } returns Unit
+        every { mockMoshiStringListRepository.setFile(any()) } returns Unit
+        every { mockMoshiStringListRepository.setFileWriter(any()) } returns Unit
+        every { mockMoshiStringListRepository.setItem(any(), any()) } returns Unit
     }
 
     private fun setupCommonFiles() {
-        every { commonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
-        every { commonSerializationRepoHelper.getFileWriter(any(), any()) } returns mockk()
-        every { commonSerializationRepoHelper.getDirectoryFile(any()) } returns mockk()
-        every { commonSerializationRepoHelper.getMainFile(any()) } returns mockk()
+        every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { mockCommonSerializationRepoHelper.getFileWriter(any(), any()) } returns mockk()
+        every { mockCommonSerializationRepoHelper.getDirectoryFile(any()) } returns mockk()
+        every { mockCommonSerializationRepoHelper.getMainFile(any()) } returns mockk()
     }
 }

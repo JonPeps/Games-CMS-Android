@@ -34,13 +34,16 @@ open class InputStreamToJsonTypeToStorageVm<T>(
 ): ViewModel(), IInputStreamToJsonTypeToStorageVm {
     var _status =
         MutableStateFlow(InputStreamToJsonStorageStatus<T>(true, null, "", null))
-
     val status: StateFlow<InputStreamToJsonStorageStatus<T>> = _status
+
+    var _isProcessing = MutableStateFlow(false)
+    val isProcessing: StateFlow<Boolean> = _isProcessing
 
     var exception: Exception? = null
     private var item: T? = null
 
     override fun process(fileName: String) {
+        _isProcessing.value = true
         viewModelScope.launch(coroutineDispatcher) {
             exception = null
             var errorMessage = ""
@@ -88,8 +91,13 @@ open class InputStreamToJsonTypeToStorageVm<T>(
                     success = false
                 }
             }
+            onItem(item)
+            _isProcessing.value = false
             _status.value = InputStreamToJsonStorageStatus(success, item, errorMessage, exception)
         }
+    }
+
+    open fun onItem(item: T?) {
     }
 
     private fun initReadFiles(inputStream: InputStream) {

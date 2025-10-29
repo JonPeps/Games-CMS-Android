@@ -13,4 +13,6 @@ abstract class BaseStringListViewModel: ViewModel(), IBasicStringListViewModel {
 
     protected var items = arrayListOf<String>()
     protected var exception: Exception? = null
+
+
 }

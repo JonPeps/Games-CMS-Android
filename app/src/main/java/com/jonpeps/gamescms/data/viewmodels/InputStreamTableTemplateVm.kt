@@ -25,5 +25,4 @@ class InputStreamTableTemplateVm @AssistedInject constructor(
     commonSerializationRepoHelper,
     inputStreamSerializationRepoHelper,
     coroutineDispatcher) {
-
 }

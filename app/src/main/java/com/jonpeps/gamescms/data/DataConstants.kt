@@ -8,6 +8,7 @@ class DataConstants {
         const val TEMPLATES_DIR = "templates/"
         const val TEMPLATES_LIST_CACHE_NAME = "template_list"
         const val PROJECT_LIST_CACHE_NAME = "project_list"
+        const val COMMON_SPLIT_PER_STRING_ITEM = ":"
     }
 
     class KnownScreens {
