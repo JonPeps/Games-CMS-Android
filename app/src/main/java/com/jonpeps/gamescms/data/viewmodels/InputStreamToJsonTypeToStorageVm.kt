@@ -72,15 +72,10 @@ open class InputStreamToJsonTypeToStorageVm<T>(
                         errorMessage = FAILED_TO_CREATE_DIR + directory
                     } else {
                         initWriteFiles(fileName)
-                        item?.let {
-                            if (singleItemMoshiJsonRepository.save(it)) {
-                                success = true
-                                errorMessage = ""
-                            } else {
-                                success = false
-                                errorMessage = FAILED_TO_WRITE_FILE
-                            }
-                        }?:run {
+                        if (singleItemMoshiJsonRepository.save(item!!)) {
+                            success = true
+                            errorMessage = ""
+                        } else {
                             success = false
                             errorMessage = FAILED_TO_WRITE_FILE
                         }
@@ -91,13 +86,9 @@ open class InputStreamToJsonTypeToStorageVm<T>(
                     success = false
                 }
             }
-            onItem(item)
             _isProcessing.value = false
             _status.value = InputStreamToJsonStorageStatus(success, item, errorMessage, exception)
         }
-    }
-
-    open fun onItem(item: T?) {
     }
 
     private fun initReadFiles(inputStream: InputStream) {

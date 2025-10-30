@@ -56,12 +56,15 @@ class BasicStringListViewModelTests {
             dispatcher
         )
 
+        setupCommonFiles()
+        setupForReadingFiles()
+        setupForWritingFiles()
+
         every { mockListItemsVmChangesCache.set(any(), any()) } returns Unit
     }
 
     @Test
     fun `load string list SUCCESS WHEN IO files are VALID and load from repository RETURNS TRUE`() {
-        setupForReadingFiles()
         every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
         every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
 
@@ -83,7 +86,6 @@ class BasicStringListViewModelTests {
 
     @Test
     fun `load string list SUCCESS WHEN IO files are VALID and load from repository RETURNS TRUE and no cached items`() {
-        setupForReadingFiles()
         every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
         every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
 
@@ -102,7 +104,6 @@ class BasicStringListViewModelTests {
 
     @Test
     fun `load string list SUCCESS WHEN IO files are VALID and load from repository RETURNS TRUE WHEN no cached items should be polled`() {
-        setupForReadingFiles()
         every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
         every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
 
@@ -137,7 +138,6 @@ class BasicStringListViewModelTests {
 
     @Test
     fun `load string list FAILS WHEN IO files are VALID and load from repository RETURNS FALSE`() {
-        setupForReadingFiles()
         every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
         every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
 
@@ -154,7 +154,6 @@ class BasicStringListViewModelTests {
 
     @Test
     fun `load string list FAILS WHEN IO files are VALID and load from repository RETURNS TRUE AND get item RETURNS NULL`() {
-        setupForReadingFiles()
         every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
         every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
 
@@ -172,7 +171,6 @@ class BasicStringListViewModelTests {
 
     @Test
     fun `load string list FAILS WHEN IO files THROWS EXCEPTION` () {
-        setupForReadingFiles()
         every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
         every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } throws Exception("Runtime error!")
 
@@ -186,9 +184,6 @@ class BasicStringListViewModelTests {
 
     @Test
     fun `add string list EXITS due to ITEM ALREADY EXISTS`() {
-        setupForWritingFiles()
-        setupCommonFiles()
-
         coEvery { mockMoshiStringListRepository.save(any(), any()) } returns true
         every { mockListItemsVmChangesCache.set(any(), any()) } returns Unit
 
@@ -203,9 +198,6 @@ class BasicStringListViewModelTests {
 
     @Test
     fun `add string FAILS due to SAVE TO REPO FAILS`() {
-        setupForWritingFiles()
-        setupCommonFiles()
-
         coEvery { mockMoshiStringListRepository.save(any(), any()) } returns false
         every { mockListItemsVmChangesCache.set(any(), any()) } returns Unit
 
@@ -219,9 +211,6 @@ class BasicStringListViewModelTests {
 
     @Test
     fun `add string list SUCCESS WHEN IO files are VALID and save to repository RETURNS TRUE`() {
-        setupForWritingFiles()
-        setupCommonFiles()
-
         coEvery { mockMoshiStringListRepository.save(any(), any()) } returns true
 
         viewModel.add("test")
@@ -236,8 +225,6 @@ class BasicStringListViewModelTests {
 
     @Test
     fun `delete string SUCCESS WHEN IO files are VALID AND DELETE file RETURNS TRUE as well as SAVE files RETURNS TRUE`() {
-        setupForWritingFiles()
-        setupCommonFiles()
         every { mockCommonDeleteFileHelper.deleteFile(any(), any()) } returns true
         every { mockCommonDeleteFileHelper.deleteDirectory(any()) } returns Unit
         every { mockListItemsVmChangesCache.set(any(), any()) } returns Unit
@@ -254,8 +241,6 @@ class BasicStringListViewModelTests {
 
     @Test
     fun `delete string SUCCESS WHEN IO files are VALID AND DELETE file AND DIRECTORY RETURNS TRUE as well as SAVE files RETURNS TRUE`() {
-        setupForWritingFiles()
-        setupCommonFiles()
         every { mockCommonDeleteFileHelper.deleteDirectory(any()) } returns Unit
         every { mockListItemsVmChangesCache.set(any(), any()) } returns Unit
 
@@ -269,8 +254,6 @@ class BasicStringListViewModelTests {
 
     @Test
     fun `delete string SUCCESS`() {
-        setupForWritingFiles()
-        setupCommonFiles()
         every { mockCommonDeleteFileHelper.deleteDirectory(any()) } returns Unit
         every { mockListItemsVmChangesCache.set(any(), any()) } returns Unit
 
