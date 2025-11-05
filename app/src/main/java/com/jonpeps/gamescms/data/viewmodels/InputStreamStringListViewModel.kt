@@ -15,6 +15,7 @@ import java.io.InputStream
 class InputStreamStringListViewModel @AssistedInject constructor(
     @Assisted("param1") private val inputStream: InputStream,
     @Assisted("param2") private val directory: String,
+    @Assisted("param3") private val fileName: String,
     moshiStringListRepository: IMoshiStringListRepository,
     commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     inputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper,
@@ -22,6 +23,7 @@ class InputStreamStringListViewModel @AssistedInject constructor(
 ): InputStreamToJsonTypeToStorageVm<StringListMoshi>(
     inputStream,
     directory,
+    fileName,
     moshiStringListRepository,
     commonSerializationRepoHelper,
     inputStreamSerializationRepoHelper,

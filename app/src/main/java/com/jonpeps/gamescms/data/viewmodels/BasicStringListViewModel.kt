@@ -79,20 +79,7 @@ class BasicStringListViewModel
         _isProcessing.value = true
         viewModelScope.launch(coroutineDispatcher) {
             listItemsVmChangesCache.set(cacheName, items)
-            initWriteFiles(fileName)
-            val success =
-                moshiStringListRepository.save(
-                    cacheName, StringListMoshi(items))
-            if (success) {
-                items.add(name)
-            }
-            _isProcessing.value = false
-            status = StringListStatus(
-                success,
-                items,
-                if (success) "" else FAILED_TO_SAVE_FILE + fileName,
-                null
-            )
+            save()
         }
     }
 
@@ -109,9 +96,24 @@ class BasicStringListViewModel
                 }
                 SubDeleteFlag.NONE -> {}
             }
+            save()
             listItemsVmChangesCache.set(cacheName, items)
             _isProcessing.value = false
         }
+    }
+
+    private suspend fun save() {
+            initWriteFiles(fileName)
+            val success =
+                moshiStringListRepository.save(
+                    cacheName, StringListMoshi(items))
+            _isProcessing.value = false
+            status = StringListStatus(
+                success,
+                items,
+                if (success) "" else FAILED_TO_SAVE_FILE + fileName,
+                null
+            )
     }
 
     private fun initReadFiles() {

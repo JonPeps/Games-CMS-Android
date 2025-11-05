@@ -12,7 +12,8 @@ class InputStreamStringListViewModelFactory {
     @AssistedFactory
     interface IInputStreamToStringListVmFactory {
         fun create(@Assisted("param1") inputStream: InputStream,
-                   @Assisted("param2") directory: String
+                   @Assisted("param2") directory: String,
+                   @Assisted("param3") fileName: String,
         ): InputStreamStringListViewModel
     }
 
@@ -20,10 +21,11 @@ class InputStreamStringListViewModelFactory {
         fun provide(
             inputStream: InputStream,
             directory: String,
+            fileName: String,
             assistedFactory: IInputStreamToStringListVmFactory
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(inputStream, directory) as T
+                return assistedFactory.create(inputStream, directory, fileName) as T
             }
         }
     }

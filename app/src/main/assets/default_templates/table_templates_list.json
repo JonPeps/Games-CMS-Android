@@ -1,7 +1,7 @@
 {
   "items": [
-    "App Start",
-    "Comp Info",
-    "Comp Leaderboard"
+    "App Start:app_start_db.json",
+    "Comp Info:comp_info_db.json",
+    "Comp Leaderboard:comp_leaderboard_db.json"
   ]
 }

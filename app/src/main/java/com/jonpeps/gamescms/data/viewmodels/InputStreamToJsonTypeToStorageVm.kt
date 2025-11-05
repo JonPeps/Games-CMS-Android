@@ -21,74 +21,79 @@ data class InputStreamToJsonStorageStatus<T>(
 )
 
 interface IInputStreamToJsonTypeToStorageVm {
-    fun process(fileName: String)
+    fun process()
+    suspend fun processSuspend()
 }
 
 open class InputStreamToJsonTypeToStorageVm<T>(
     private val inputStream: InputStream,
     private val directory: String,
+    private val fileName: String,
     private val singleItemMoshiJsonRepository: IBaseSingleItemMoshiJsonRepository<T>,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val inputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper,
     private val coroutineDispatcher: CoroutineDispatcher
 ): ViewModel(), IInputStreamToJsonTypeToStorageVm {
-    var _status =
+    private var _status =
         MutableStateFlow(InputStreamToJsonStorageStatus<T>(true, null, "", null))
     val status: StateFlow<InputStreamToJsonStorageStatus<T>> = _status
 
-    var _isProcessing = MutableStateFlow(false)
+    private var _isProcessing = MutableStateFlow(false)
     val isProcessing: StateFlow<Boolean> = _isProcessing
 
     var exception: Exception? = null
     private var item: T? = null
 
-    override fun process(fileName: String) {
+    override fun process() {
         _isProcessing.value = true
         viewModelScope.launch(coroutineDispatcher) {
-            exception = null
-            var errorMessage = ""
-            var success = true
-            try {
-                initReadFiles(inputStream)
-                if (singleItemMoshiJsonRepository.serialize(commonSerializationRepoHelper.readAll(inputStream))) {
-                    item = singleItemMoshiJsonRepository.getItem()
-                    if (item == null) {
-                        success = false
-                        errorMessage = FAILED_TO_LOAD_FILE
-                    }
-                } else {
+            processSuspend()
+        }
+    }
+
+    override suspend fun processSuspend() {
+        exception = null
+        var errorMessage = ""
+        var success = true
+        try {
+            initReadFiles(inputStream)
+            if (singleItemMoshiJsonRepository.serialize(commonSerializationRepoHelper.readAll(inputStream))) {
+                item = singleItemMoshiJsonRepository.getItem()
+                if (item == null) {
                     success = false
                     errorMessage = FAILED_TO_LOAD_FILE
+                }
+            } else {
+                success = false
+                errorMessage = FAILED_TO_LOAD_FILE
+            }
+        } catch (ex: Exception) {
+            exception = ex
+            success = false
+        }
+        if (success) {
+            try {
+                if (!commonSerializationRepoHelper.createDirectory(directory)) {
+                    success = false
+                    errorMessage = FAILED_TO_CREATE_DIR + directory
+                } else {
+                    initWriteFiles(fileName)
+                    if (singleItemMoshiJsonRepository.save(item!!)) {
+                        success = true
+                        errorMessage = ""
+                    } else {
+                        success = false
+                        errorMessage = FAILED_TO_WRITE_FILE
+                    }
                 }
             } catch (ex: Exception) {
                 exception = ex
                 errorMessage = ex.message.toString()
                 success = false
             }
-            if (success) {
-                try {
-                    if (!commonSerializationRepoHelper.createDirectory(directory)) {
-                        success = false
-                        errorMessage = FAILED_TO_CREATE_DIR + directory
-                    } else {
-                        initWriteFiles(fileName)
-                        if (singleItemMoshiJsonRepository.save(item!!)) {
-                            success = true
-                            errorMessage = ""
-                        } else {
-                            success = false
-                            errorMessage = FAILED_TO_WRITE_FILE
-                        }
-                    }
-                } catch (ex: Exception) {
-                    exception = ex
-                    errorMessage = ex.message.toString()
-                    success = false
-                }
-            }
-            _isProcessing.value = false
-            _status.value = InputStreamToJsonStorageStatus(success, item, errorMessage, exception)
         }
+        _isProcessing.value = false
+        _status.value = InputStreamToJsonStorageStatus(success, item, errorMessage, exception)
     }
 
     private fun initReadFiles(inputStream: InputStream) {

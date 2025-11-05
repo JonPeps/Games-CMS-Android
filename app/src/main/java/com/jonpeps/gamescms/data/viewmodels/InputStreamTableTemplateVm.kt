@@ -15,12 +15,14 @@ import java.io.InputStream
 class InputStreamTableTemplateVm @AssistedInject constructor(
     @Assisted("param1") private val inputStream: InputStream,
     @Assisted("param2") private val directory: String,
+    @Assisted("param3") private val fileName: String,
     moshiTableTemplateRepository: IMoshiTableTemplateRepository,
     commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     inputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper,
     coroutineDispatcher: CoroutineDispatcher)
     : InputStreamToJsonTypeToStorageVm<TableTemplateItemListMoshi>(inputStream,
     directory,
+    fileName,
     moshiTableTemplateRepository,
     commonSerializationRepoHelper,
     inputStreamSerializationRepoHelper,
