@@ -3,9 +3,6 @@ package com.jonpeps.gamescms.ui.tabletemplates.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.helpers.JsonStringListWithFilenameHelper
-import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
-import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
-import com.jonpeps.gamescms.data.serialization.debug.IInputStreamSerializationRepoHelper
 import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -32,9 +29,7 @@ interface ITableTemplateListAssetToStorageVm {
 
 @HiltViewModel
 class TableTemplateListAssetToStorageVm@Inject constructor(
-    private val moshiStringListRepository: IMoshiStringListRepository,
-    private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
-    private val inputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper,
+    private val viewModel: InputStreamStringListViewModel,
     private val coroutineDispatcher: CoroutineDispatcher
 ) : ViewModel(), ITableTemplateListAssetToStorageVm {
     private val _status =
@@ -45,17 +40,6 @@ class TableTemplateListAssetToStorageVm@Inject constructor(
                       fileName: String,
                       inputStream: InputStream) {
         viewModelScope.launch(coroutineDispatcher) {
-            val viewModel =
-                InputStreamStringListViewModel(
-                    inputStream,
-                    directory,
-                    fileName,
-                    moshiStringListRepository,
-                    commonSerializationRepoHelper,
-                    inputStreamSerializationRepoHelper,
-                    coroutineDispatcher
-                )
-
             viewModel.processSuspend()
 
             var success = true
@@ -71,12 +55,20 @@ class TableTemplateListAssetToStorageVm@Inject constructor(
                     fileNames = result.fileNames
                 }?: run {
                     errorMessage = FAILED_TO_LOAD_FILE
+                    success = false
                 }
             } else {
                 errorMessage = viewModel.status.value.errorMessage
                 exception = viewModel.status.value.exception
                 success = false
             }
+            if (success) {
+                if (itemNames.size != fileNames.size) {
+                    errorMessage = ITEMS_NOT_EQUAL
+                    success = false
+                }
+            }
+
             _status.value = TableTemplateListAssetToStorageStatus(
                 success,
                 itemNames,
@@ -88,5 +80,6 @@ class TableTemplateListAssetToStorageVm@Inject constructor(
 
     companion object {
         const val FAILED_TO_LOAD_FILE = "Failed to load string list from assets!"
+        const val ITEMS_NOT_EQUAL = "Names and file names not equal!"
     }
 }

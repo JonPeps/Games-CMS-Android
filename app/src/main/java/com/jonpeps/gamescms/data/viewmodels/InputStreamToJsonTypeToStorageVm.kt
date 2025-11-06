@@ -21,19 +21,20 @@ data class InputStreamToJsonStorageStatus<T>(
 )
 
 interface IInputStreamToJsonTypeToStorageVm {
-    fun process()
+    fun process(inputStream: InputStream, directory: String, fileName: String)
     suspend fun processSuspend()
 }
 
 open class InputStreamToJsonTypeToStorageVm<T>(
-    private val inputStream: InputStream,
-    private val directory: String,
-    private val fileName: String,
     private val singleItemMoshiJsonRepository: IBaseSingleItemMoshiJsonRepository<T>,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val inputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper,
     private val coroutineDispatcher: CoroutineDispatcher
 ): ViewModel(), IInputStreamToJsonTypeToStorageVm {
+    private lateinit var inputStream: InputStream
+    private lateinit var directory: String
+    private lateinit var fileName: String
+
     private var _status =
         MutableStateFlow(InputStreamToJsonStorageStatus<T>(true, null, "", null))
     val status: StateFlow<InputStreamToJsonStorageStatus<T>> = _status
@@ -44,7 +45,10 @@ open class InputStreamToJsonTypeToStorageVm<T>(
     var exception: Exception? = null
     private var item: T? = null
 
-    override fun process() {
+    override fun process(inputStream: InputStream, directory: String, fileName: String) {
+        this.inputStream = inputStream
+        this.directory = directory
+        this.fileName = fileName
         _isProcessing.value = true
         viewModelScope.launch(coroutineDispatcher) {
             processSuspend()

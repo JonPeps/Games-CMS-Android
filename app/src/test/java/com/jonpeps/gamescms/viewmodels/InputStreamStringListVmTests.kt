@@ -41,9 +41,6 @@ class InputStreamStringListVmTests {
         MockKAnnotations.init(this)
 
         viewModel = InputStreamStringListViewModel(
-            mockInputStream,
-            directory,
-            fileName,
             mockMoshiStringListRepository,
             mockCommonSerializationRepoHelper,
             mockInputStreamSerializationRepoHelper,
@@ -62,7 +59,7 @@ class InputStreamStringListVmTests {
         every { mockCommonSerializationRepoHelper.createDirectory(any()) } returns true
         every { mockCommonSerializationRepoHelper.readAll(any()) } returns ""
 
-        viewModel.process()
+        viewModel.process(mockInputStream, directory, fileName)
 
         assert(viewModel.status.value.success)
         assert(viewModel.status.value.item != null)
@@ -75,7 +72,7 @@ class InputStreamStringListVmTests {
         coEvery { mockMoshiStringListRepository.serialize(any()) } returns false
         every { mockCommonSerializationRepoHelper.readAll(any()) } returns ""
 
-        viewModel.process()
+        viewModel.process(mockInputStream, directory, fileName)
 
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.item == null)
@@ -89,7 +86,7 @@ class InputStreamStringListVmTests {
         every { mockCommonSerializationRepoHelper.readAll(any()) } returns ""
         every { mockMoshiStringListRepository.getItem() } returns null
 
-        viewModel.process()
+        viewModel.process(mockInputStream, directory, fileName)
 
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.item == null)
@@ -102,7 +99,7 @@ class InputStreamStringListVmTests {
         coEvery { mockMoshiStringListRepository.serialize(any()) } returns false
         every { mockCommonSerializationRepoHelper.readAll(any()) } throws Exception("Runtime error!")
 
-        viewModel.process()
+        viewModel.process(mockInputStream, directory, fileName)
 
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.item == null)
@@ -118,7 +115,7 @@ class InputStreamStringListVmTests {
         every { mockCommonSerializationRepoHelper.readAll(any()) } returns ""
         every { mockCommonSerializationRepoHelper.createDirectory(any()) } returns false
 
-        viewModel.process()
+        viewModel.process(mockInputStream, directory, fileName)
 
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.errorMessage == FAILED_TO_CREATE_DIR + directory)
@@ -132,7 +129,7 @@ class InputStreamStringListVmTests {
         every { mockCommonSerializationRepoHelper.readAll(any()) } returns ""
         every { mockCommonSerializationRepoHelper.createDirectory(any()) } throws SecurityException("An error occurred!")
 
-        viewModel.process()
+        viewModel.process(mockInputStream, directory, fileName)
 
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.errorMessage == "An error occurred!")
@@ -147,7 +144,7 @@ class InputStreamStringListVmTests {
         every { mockCommonSerializationRepoHelper.readAll(any()) } returns ""
         every { mockCommonSerializationRepoHelper.createDirectory(any()) } returns true
 
-        viewModel.process()
+        viewModel.process(mockInputStream, directory, fileName)
 
         assert(!viewModel.status.value.success)
         assert(viewModel.status.value.errorMessage == FAILED_TO_WRITE_FILE)
