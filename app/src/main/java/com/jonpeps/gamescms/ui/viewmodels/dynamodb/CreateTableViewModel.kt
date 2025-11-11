@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.ui.viewmodels
+package com.jonpeps.gamescms.ui.viewmodels.dynamodb
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

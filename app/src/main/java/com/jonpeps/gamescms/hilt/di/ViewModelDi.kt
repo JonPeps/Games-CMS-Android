@@ -1,15 +1,16 @@
 package com.jonpeps.gamescms.hilt.di
 
+import com.jonpeps.gamescms.data.helpers.JsonStringListHelper
 import com.jonpeps.gamescms.data.repositories.MoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.CommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.debug.InputStreamSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.debug.IInputStreamSerializationRepoHelper
 import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel
-import com.jonpeps.gamescms.ui.viewmodels.CreateTableViewModel
+import com.jonpeps.gamescms.ui.viewmodels.dynamodb.CreateTableViewModel
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmChangesCache
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupVmChangesCache
-import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateListAssetToStorageVm
+import com.jonpeps.gamescms.ui.viewmodels.defaults.StringListToSplitItemListVm
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -41,9 +42,10 @@ class ViewModelDiProvider {
 
     @Provides
     fun provideTableTemplateListAssetToStorageVm(viewModel: InputStreamStringListViewModel,
+                                                 jsonStringListHelper: JsonStringListHelper,
                                                  coroutineDispatcher: CoroutineDispatcher)
-    : TableTemplateListAssetToStorageVm {
-        return TableTemplateListAssetToStorageVm(viewModel, coroutineDispatcher)
+    : StringListToSplitItemListVm {
+        return StringListToSplitItemListVm(viewModel, jsonStringListHelper, coroutineDispatcher)
     }
 }
 

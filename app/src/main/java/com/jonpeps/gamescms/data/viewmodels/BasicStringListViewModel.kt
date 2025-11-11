@@ -69,8 +69,8 @@ class BasicStringListViewModel
                     listItemsVmChangesCache.set(cacheName, items)
                 }
             }
-            status = StringListStatus(success, items, errorMessage, exception)
             _isProcessing.value = false
+            status = StringListStatus(success, items, errorMessage, exception)
         }
     }
 

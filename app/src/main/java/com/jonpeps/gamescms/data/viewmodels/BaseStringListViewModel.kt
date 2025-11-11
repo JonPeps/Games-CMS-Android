@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 abstract class BaseStringListViewModel: ViewModel(), IBasicStringListViewModel {
     var status: StringListStatus = StringListStatus(true, arrayListOf(), "", null)
 
-    protected var _isProcessing = MutableStateFlow(false)
+    protected var _isProcessing = MutableStateFlow(true)
     val isProcessing: StateFlow<Boolean> = _isProcessing
 
     protected var items = arrayListOf<String>()

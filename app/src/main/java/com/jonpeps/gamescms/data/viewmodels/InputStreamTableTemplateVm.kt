@@ -18,5 +18,4 @@ class InputStreamTableTemplateVm@Inject constructor(
     moshiTableTemplateRepository,
     commonSerializationRepoHelper,
     inputStreamSerializationRepoHelper,
-    coroutineDispatcher) {
-}
+    coroutineDispatcher)

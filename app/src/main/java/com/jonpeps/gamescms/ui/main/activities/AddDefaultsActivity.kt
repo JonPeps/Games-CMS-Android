@@ -13,7 +13,7 @@ import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.ADD_DEFAUL
 import com.jonpeps.gamescms.ui.applevel.CustomColours
 import com.jonpeps.gamescms.ui.main.builders.core.BasicFlowComposeBuilder
 import com.jonpeps.gamescms.ui.main.composables.CommonStringListView
-import com.jonpeps.gamescms.ui.viewmodels.AddDefaultsViewModel
+import com.jonpeps.gamescms.ui.viewmodels.defaults.AddDefaultsViewModel
 
 class AddDefaultsActivity: ComponentActivity() {
     private val viewModel: AddDefaultsViewModel by viewModels()

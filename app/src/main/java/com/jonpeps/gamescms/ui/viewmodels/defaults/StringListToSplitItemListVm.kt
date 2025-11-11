@@ -1,8 +1,8 @@
-package com.jonpeps.gamescms.ui.tabletemplates.viewmodels
+package com.jonpeps.gamescms.ui.viewmodels.defaults
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jonpeps.gamescms.data.helpers.JsonStringListWithFilenameHelper
+import com.jonpeps.gamescms.data.helpers.JsonStringListHelper
 import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -12,15 +12,7 @@ import kotlinx.coroutines.launch
 import java.io.InputStream
 import javax.inject.Inject
 
-data class TableTemplateListAssetToStorageStatus(
-    val success: Boolean,
-    val names: List<String>?,
-    val fileNames: List<String>?,
-    val errorMessage: String?,
-    val exception: Exception?
-)
-
-interface ITableTemplateListAssetToStorageVm {
+interface IStringListToSplitItemListVm {
     fun load(directory: String,
              fileName: String,
              inputStream: InputStream
@@ -28,13 +20,14 @@ interface ITableTemplateListAssetToStorageVm {
 }
 
 @HiltViewModel
-class TableTemplateListAssetToStorageVm@Inject constructor(
+class StringListToSplitItemListVm@Inject constructor(
     private val viewModel: InputStreamStringListViewModel,
+    private val jsonStringListHelper: JsonStringListHelper,
     private val coroutineDispatcher: CoroutineDispatcher
-) : ViewModel(), ITableTemplateListAssetToStorageVm {
+) : ViewModel(), IStringListToSplitItemListVm {
     private val _status =
-        MutableStateFlow(TableTemplateListAssetToStorageStatus(true, null, null, "", null))
-    val status: StateFlow<TableTemplateListAssetToStorageStatus> = _status
+        MutableStateFlow(StringListToSplitItemListData(true, null, null, "", null))
+    val status: StateFlow<StringListToSplitItemListData> = _status
 
     override fun load(directory: String,
                       fileName: String,
@@ -50,9 +43,13 @@ class TableTemplateListAssetToStorageVm@Inject constructor(
 
             if (viewModel.status.value.success) {
                 viewModel.status.value.item?.let {
-                    val result = JsonStringListWithFilenameHelper.splitItem(it)
+                    val result = jsonStringListHelper.splitItem(it)
                     itemNames = result.itemNames
                     fileNames = result.fileNames
+                    if (itemNames.size != fileNames.size) {
+                        errorMessage = ITEMS_NOT_EQUAL
+                        success = false
+                    }
                 }?: run {
                     errorMessage = FAILED_TO_LOAD_FILE
                     success = false
@@ -62,14 +59,7 @@ class TableTemplateListAssetToStorageVm@Inject constructor(
                 exception = viewModel.status.value.exception
                 success = false
             }
-            if (success) {
-                if (itemNames.size != fileNames.size) {
-                    errorMessage = ITEMS_NOT_EQUAL
-                    success = false
-                }
-            }
-
-            _status.value = TableTemplateListAssetToStorageStatus(
+            _status.value = StringListToSplitItemListData(
                 success,
                 itemNames,
                 fileNames,

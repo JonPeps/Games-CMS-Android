@@ -1,13 +1,14 @@
 package com.jonpeps.gamescms.data
 
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
-import com.jonpeps.gamescms.data.helpers.JsonStringListWithFilenameHelper
+import com.jonpeps.gamescms.data.helpers.JsonStringListHelper
 import org.junit.Test
 
 class JsonStringListWithFilenameHelperTests {
     @Test
     fun `test split item`() {
-        val result = JsonStringListWithFilenameHelper.splitItem(
+        val splitter = JsonStringListHelper()
+        val result = splitter.splitItem(
             StringListMoshi(
                 listOf(
                     "name1:file1",

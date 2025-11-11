@@ -96,7 +96,6 @@ open class InputStreamToJsonTypeToStorageVm<T>(
                 success = false
             }
         }
-        _isProcessing.value = false
         _status.value = InputStreamToJsonStorageStatus(success, item, errorMessage, exception)
     }
 

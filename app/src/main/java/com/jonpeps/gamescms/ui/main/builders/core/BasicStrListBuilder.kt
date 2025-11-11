@@ -44,8 +44,8 @@ class BasicStrListBuilder private constructor() {
                         it.create(storagePath, cachedName)
                     })
 
-            val shouldPostToUI = viewModel.isProcessing.collectAsState()
-            if (shouldPostToUI.value) {
+            val isProcessing = viewModel.isProcessing.collectAsState()
+            if (!isProcessing.value) {
                 if (viewModel.status.success) {
                     Column(
                         modifier = Modifier.Companion
@@ -63,8 +63,8 @@ class BasicStrListBuilder private constructor() {
                     )
                 }
             } else {
-                CommonLoadingScreen(customColours)
                 viewModel.load(cachedName)
+                CommonLoadingScreen(customColours)
             }
         }
     }
