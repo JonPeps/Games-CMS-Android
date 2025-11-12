@@ -3,16 +3,17 @@ package com.jonpeps.gamescms.viewmodels
 import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.debug.IInputStreamSerializationRepoHelper
-import com.jonpeps.gamescms.data.viewmodels.InputStreamStringListViewModel
-import com.jonpeps.gamescms.data.viewmodels.InputStreamToJsonTypeToStorageVm.Companion.FAILED_TO_CREATE_DIR
-import com.jonpeps.gamescms.data.viewmodels.InputStreamToJsonTypeToStorageVm.Companion.FAILED_TO_LOAD_FILE
-import com.jonpeps.gamescms.data.viewmodels.InputStreamToJsonTypeToStorageVm.Companion.FAILED_TO_WRITE_FILE
+import com.jonpeps.gamescms.data.viewmodels.InputStreamStringList
+import com.jonpeps.gamescms.data.viewmodels.InputStreamToJsonTypeToStorage.Companion.FAILED_TO_CREATE_DIR
+import com.jonpeps.gamescms.data.viewmodels.InputStreamToJsonTypeToStorage.Companion.FAILED_TO_LOAD_FILE
+import com.jonpeps.gamescms.data.viewmodels.InputStreamToJsonTypeToStorage.Companion.FAILED_TO_WRITE_FILE
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Before
 import org.junit.Test
@@ -30,7 +31,7 @@ class InputStreamStringListVmTests {
     @MockK
     private lateinit var mockInputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper
 
-    private lateinit var viewModel: InputStreamStringListViewModel
+    private lateinit var sut: InputStreamStringList
 
     private val directory = "directory"
     private val fileName = "fileName"
@@ -40,11 +41,10 @@ class InputStreamStringListVmTests {
     fun setup() {
         MockKAnnotations.init(this)
 
-        viewModel = InputStreamStringListViewModel(
+        sut = InputStreamStringList(
             mockMoshiStringListRepository,
             mockCommonSerializationRepoHelper,
-            mockInputStreamSerializationRepoHelper,
-            dispatcher
+            mockInputStreamSerializationRepoHelper
         )
 
         setupForReadingFiles()
@@ -52,102 +52,102 @@ class InputStreamStringListVmTests {
     }
 
     @Test
-    fun `process SUCCESS reading InputStream and saving to internal storage`() {
+    fun `process SUCCESS reading InputStream and saving to internal storage`() = runBlocking {
         coEvery { mockMoshiStringListRepository.serialize(any()) } returns true
         every { mockMoshiStringListRepository.getItem() } returns mockk()
         coEvery { mockMoshiStringListRepository.save(any()) } returns true
         every { mockCommonSerializationRepoHelper.createDirectory(any()) } returns true
         every { mockCommonSerializationRepoHelper.readAll(any()) } returns ""
 
-        viewModel.process(mockInputStream, directory, fileName)
+        sut.processSuspend(mockInputStream, directory, fileName)
 
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.item != null)
-        assert(viewModel.status.value.errorMessage == "")
-        assert(viewModel.status.value.exception == null)
+        assert(sut.status.success)
+        assert(sut.status.item != null)
+        assert(sut.status.errorMessage == "")
+        assert(sut.status.exception == null)
     }
 
     @Test
-    fun `process FAILURE reading InputStream and saving to internal storage due to SERIALIZE RETURNS FALSE `() {
+    fun `process FAILURE reading InputStream and saving to internal storage due to SERIALIZE RETURNS FALSE `() = runBlocking {
         coEvery { mockMoshiStringListRepository.serialize(any()) } returns false
         every { mockCommonSerializationRepoHelper.readAll(any()) } returns ""
 
-        viewModel.process(mockInputStream, directory, fileName)
+        sut.processSuspend(mockInputStream, directory, fileName)
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.item == null)
-        assert(viewModel.status.value.errorMessage == FAILED_TO_LOAD_FILE)
-        assert(viewModel.status.value.exception == null)
+        assert(!sut.status.success)
+        assert(sut.status.item == null)
+        assert(sut.status.errorMessage == FAILED_TO_LOAD_FILE)
+        assert(sut.status.exception == null)
     }
 
     @Test
-    fun `process FAILURE reading InputStream and saving to internal storage due to GET JSON ITEM IS NULL `() {
+    fun `process FAILURE reading InputStream and saving to internal storage due to GET JSON ITEM IS NULL `() = runBlocking {
         coEvery { mockMoshiStringListRepository.serialize(any()) } returns true
         every { mockCommonSerializationRepoHelper.readAll(any()) } returns ""
         every { mockMoshiStringListRepository.getItem() } returns null
 
-        viewModel.process(mockInputStream, directory, fileName)
+        sut.processSuspend(mockInputStream, directory, fileName)
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.item == null)
-        assert(viewModel.status.value.errorMessage == FAILED_TO_LOAD_FILE)
-        assert(viewModel.status.value.exception == null)
+        assert(!sut.status.success)
+        assert(sut.status.item == null)
+        assert(sut.status.errorMessage == FAILED_TO_LOAD_FILE)
+        assert(sut.status.exception == null)
     }
 
     @Test
-    fun `process FAILURE reading InputStream and saving to internal storage due to read all INPUT STREAM throws EXCEPTION `() {
+    fun `process FAILURE reading InputStream and saving to internal storage due to read all INPUT STREAM throws EXCEPTION `() = runBlocking {
         coEvery { mockMoshiStringListRepository.serialize(any()) } returns false
         every { mockCommonSerializationRepoHelper.readAll(any()) } throws Exception("Runtime error!")
 
-        viewModel.process(mockInputStream, directory, fileName)
+        sut.processSuspend(mockInputStream, directory, fileName)
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.item == null)
-        assert(viewModel.status.value.errorMessage == "Runtime error!")
-        assert(viewModel.status.value.exception != null)
+        assert(!sut.status.success)
+        assert(sut.status.item == null)
+        assert(sut.status.errorMessage == "Runtime error!")
+        assert(sut.status.exception != null)
     }
 
     @Test
-    fun `process FAILURE reading InputStream and saving to internal storage due to CREATE DIRECTORY FAILS`() {
+    fun `process FAILURE reading InputStream and saving to internal storage due to CREATE DIRECTORY FAILS`() = runBlocking {
         coEvery { mockMoshiStringListRepository.serialize(any()) } returns true
         every { mockMoshiStringListRepository.getItem() } returns mockk()
         coEvery { mockMoshiStringListRepository.save(any()) } returns true
         every { mockCommonSerializationRepoHelper.readAll(any()) } returns ""
         every { mockCommonSerializationRepoHelper.createDirectory(any()) } returns false
 
-        viewModel.process(mockInputStream, directory, fileName)
+        sut.processSuspend(mockInputStream, directory, fileName)
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.errorMessage == FAILED_TO_CREATE_DIR + directory)
+        assert(!sut.status.success)
+        assert(sut.status.errorMessage == FAILED_TO_CREATE_DIR + directory)
     }
 
     @Test
-    fun `process FAILURE reading InputStream and saving to internal storage due to CREATE DIRECTORY throws EXCEPTION`() {
+    fun `process FAILURE reading InputStream and saving to internal storage due to CREATE DIRECTORY throws EXCEPTION`() = runBlocking {
         coEvery { mockMoshiStringListRepository.serialize(any()) } returns true
         every { mockMoshiStringListRepository.getItem() } returns mockk()
         coEvery { mockMoshiStringListRepository.save(any()) } returns true
         every { mockCommonSerializationRepoHelper.readAll(any()) } returns ""
         every { mockCommonSerializationRepoHelper.createDirectory(any()) } throws SecurityException("An error occurred!")
 
-        viewModel.process(mockInputStream, directory, fileName)
+        sut.processSuspend(mockInputStream, directory, fileName)
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.errorMessage == "An error occurred!")
-        assert(viewModel.status.value.exception != null)
+        assert(!sut.status.success)
+        assert(sut.status.errorMessage == "An error occurred!")
+        assert(sut.status.exception != null)
     }
 
     @Test
-    fun `process FAILURE reading InputStream and saving to internal storage due to saving JSON RETURNS FALSE`() {
+    fun `process FAILURE reading InputStream and saving to internal storage due to saving JSON RETURNS FALSE`() = runBlocking {
         coEvery { mockMoshiStringListRepository.serialize(any()) } returns true
         every { mockMoshiStringListRepository.getItem() } returns mockk()
         coEvery { mockMoshiStringListRepository.save(any()) } returns false
         every { mockCommonSerializationRepoHelper.readAll(any()) } returns ""
         every { mockCommonSerializationRepoHelper.createDirectory(any()) } returns true
 
-        viewModel.process(mockInputStream, directory, fileName)
+        sut.processSuspend(mockInputStream, directory, fileName)
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.errorMessage == FAILED_TO_WRITE_FILE)
+        assert(!sut.status.success)
+        assert(sut.status.errorMessage == FAILED_TO_WRITE_FILE)
     }
 
     private fun setupForReadingFiles() {

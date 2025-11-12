@@ -4,19 +4,14 @@ import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.debug.IInputStreamSerializationRepoHelper
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
-@HiltViewModel
-class InputStreamStringListViewModel@Inject constructor(
+class InputStreamStringList@Inject constructor(
     moshiStringListRepository: IMoshiStringListRepository,
     commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     inputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper,
-    coroutineDispatcher: CoroutineDispatcher
-): InputStreamToJsonTypeToStorageVm<StringListMoshi>(
+): InputStreamToJsonTypeToStorage<StringListMoshi>(
     moshiStringListRepository,
     commonSerializationRepoHelper,
-    inputStreamSerializationRepoHelper,
-    coroutineDispatcher
+    inputStreamSerializationRepoHelper
 )

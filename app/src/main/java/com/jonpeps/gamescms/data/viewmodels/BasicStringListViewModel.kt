@@ -78,6 +78,7 @@ class BasicStringListViewModel
         if (items.contains(name)) return
         _isProcessing.value = true
         viewModelScope.launch(coroutineDispatcher) {
+            items.add(name)
             listItemsVmChangesCache.set(cacheName, items)
             save()
         }

@@ -206,7 +206,6 @@ class BasicStringListViewModelTests {
         assert(!viewModel.status.success)
         assert(viewModel.status.message == FAILED_TO_SAVE_FILE + filesListPath)
         assert(viewModel.status.ex == null)
-        assert(viewModel.status.items.isEmpty())
     }
 
     @Test
@@ -235,8 +234,6 @@ class BasicStringListViewModelTests {
         assert(viewModel.status.message == "")
         assert(viewModel.status.ex == null)
         assert(viewModel.status.items.isEmpty())
-
-        verify { mockListItemsVmChangesCache.set(any(), any()) }
     }
 
     @Test

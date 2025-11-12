@@ -1,15 +1,9 @@
 package com.jonpeps.gamescms.data.viewmodels
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.DataConstants.Companion.JSON_EXTENSION
 import com.jonpeps.gamescms.data.repositories.IBaseSingleItemMoshiJsonRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.debug.IInputStreamSerializationRepoHelper
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import java.io.IOException
 import java.io.InputStream
 
@@ -20,42 +14,21 @@ data class InputStreamToJsonStorageStatus<T>(
     val exception: Exception?
 )
 
-interface IInputStreamToJsonTypeToStorageVm {
-    fun process(inputStream: InputStream, directory: String, fileName: String)
-    suspend fun processSuspend()
+interface IInputStreamToJsonTypeToStorage {
+    suspend fun processSuspend(inputStream: InputStream, directory: String, fileName: String)
 }
 
-open class InputStreamToJsonTypeToStorageVm<T>(
+open class InputStreamToJsonTypeToStorage<T>(
     private val singleItemMoshiJsonRepository: IBaseSingleItemMoshiJsonRepository<T>,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val inputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper,
-    private val coroutineDispatcher: CoroutineDispatcher
-): ViewModel(), IInputStreamToJsonTypeToStorageVm {
-    private lateinit var inputStream: InputStream
-    private lateinit var directory: String
-    private lateinit var fileName: String
-
-    private var _status =
-        MutableStateFlow(InputStreamToJsonStorageStatus<T>(true, null, "", null))
-    val status: StateFlow<InputStreamToJsonStorageStatus<T>> = _status
-
-    private var _isProcessing = MutableStateFlow(false)
-    val isProcessing: StateFlow<Boolean> = _isProcessing
+): IInputStreamToJsonTypeToStorage {
+    lateinit var status: InputStreamToJsonStorageStatus<T>
 
     var exception: Exception? = null
     private var item: T? = null
 
-    override fun process(inputStream: InputStream, directory: String, fileName: String) {
-        this.inputStream = inputStream
-        this.directory = directory
-        this.fileName = fileName
-        _isProcessing.value = true
-        viewModelScope.launch(coroutineDispatcher) {
-            processSuspend()
-        }
-    }
-
-    override suspend fun processSuspend() {
+    override suspend fun processSuspend(inputStream: InputStream, directory: String, fileName: String) {
         exception = null
         var errorMessage = ""
         var success = true
@@ -73,6 +46,7 @@ open class InputStreamToJsonTypeToStorageVm<T>(
             }
         } catch (ex: Exception) {
             exception = ex
+            errorMessage = ex.message.toString()
             success = false
         }
         if (success) {
@@ -81,7 +55,7 @@ open class InputStreamToJsonTypeToStorageVm<T>(
                     success = false
                     errorMessage = FAILED_TO_CREATE_DIR + directory
                 } else {
-                    initWriteFiles(fileName)
+                    initWriteFiles(fileName, directory)
                     if (singleItemMoshiJsonRepository.save(item!!)) {
                         success = true
                         errorMessage = ""
@@ -96,7 +70,7 @@ open class InputStreamToJsonTypeToStorageVm<T>(
                 success = false
             }
         }
-        _status.value = InputStreamToJsonStorageStatus(success, item, errorMessage, exception)
+        status = InputStreamToJsonStorageStatus(success, item, errorMessage, exception)
     }
 
     private fun initReadFiles(inputStream: InputStream) {
@@ -105,7 +79,7 @@ open class InputStreamToJsonTypeToStorageVm<T>(
         )
     }
 
-    private fun initWriteFiles(fileName: String) {
+    private fun initWriteFiles(fileName: String, directory: String) {
         val completeFilename = fileName + JSON_EXTENSION
         singleItemMoshiJsonRepository.setAbsoluteFile(
             commonSerializationRepoHelper.getAbsoluteFile(directory, completeFilename))
