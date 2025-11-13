@@ -15,6 +15,7 @@ data class InputStreamToJsonStorageStatus<T>(
 )
 
 interface IInputStreamToJsonTypeToStorage {
+    suspend fun processSuspend(inputStream: InputStream)
     suspend fun processSuspend(inputStream: InputStream, directory: String, fileName: String)
 }
 
@@ -27,6 +28,30 @@ open class InputStreamToJsonTypeToStorage<T>(
 
     var exception: Exception? = null
     private var item: T? = null
+
+    override suspend fun processSuspend(inputStream: InputStream) {
+        exception = null
+        var errorMessage = ""
+        var success = true
+        try {
+            initReadFiles(inputStream)
+            if (singleItemMoshiJsonRepository.serialize(commonSerializationRepoHelper.readAll(inputStream))) {
+                item = singleItemMoshiJsonRepository.getItem()
+                if (item == null) {
+                    success = false
+                    errorMessage = FAILED_TO_LOAD_FILE
+                }
+            } else {
+                success = false
+                errorMessage = FAILED_TO_LOAD_FILE
+            }
+        } catch (ex: Exception) {
+            exception = ex
+            errorMessage = ex.message.toString()
+            success = false
+        }
+        status = InputStreamToJsonStorageStatus(success, item, errorMessage, exception)
+    }
 
     override suspend fun processSuspend(inputStream: InputStream, directory: String, fileName: String) {
         exception = null

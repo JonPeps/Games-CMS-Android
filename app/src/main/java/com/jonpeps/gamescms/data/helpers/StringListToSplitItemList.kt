@@ -6,7 +6,7 @@ import java.io.InputStream
 import javax.inject.Inject
 
 interface IStringListToSplitItemList {
-    suspend fun loadSuspend(inputStream: InputStream, directory: String, fileName: String)
+    suspend fun loadSuspend(inputStream: InputStream)
 }
 
 class StringListToSplitItemList@Inject constructor(
@@ -14,8 +14,8 @@ class StringListToSplitItemList@Inject constructor(
     private val jsonStringListHelper: JsonStringListHelper
 ) : IStringListToSplitItemList {
     lateinit var status: StringListToSplitItemListData
-    override suspend fun loadSuspend(inputStream: InputStream, directory: String, fileName: String) {
-        inputStreamStringList.processSuspend(inputStream, directory, fileName)
+    override suspend fun loadSuspend(inputStream: InputStream) {
+        inputStreamStringList.processSuspend(inputStream)
 
         var success = true
         var itemNames: List<String> = emptyList()
@@ -28,7 +28,7 @@ class StringListToSplitItemList@Inject constructor(
                 val result = jsonStringListHelper.splitItem(it)
                 itemNames = result.itemNames
                 fileNames = result.fileNames
-                if (itemNames.size != fileNames.size) {
+                if (itemNames.isEmpty() || fileNames.isEmpty() || (itemNames.size != fileNames.size)) {
                     errorMessage = ITEMS_NOT_EQUAL
                     success = false
                 }
@@ -52,6 +52,6 @@ class StringListToSplitItemList@Inject constructor(
 
     companion object {
         const val FAILED_TO_LOAD_FILE = "Failed to load string list from assets!"
-        const val ITEMS_NOT_EQUAL = "Names and file names not equal!"
+        const val ITEMS_NOT_EQUAL = "Names and file names not equal/don't exist!"
     }
 }

@@ -41,7 +41,7 @@ class StringListToSplitItemListTests {
             jsonStringListHelper
         )
 
-        coEvery { inputStreamStringList.processSuspend(inputStream, any(), any()) } returns Unit
+        coEvery { inputStreamStringList.processSuspend(inputStream) } returns Unit
     }
 
     @Test
@@ -54,7 +54,7 @@ class StringListToSplitItemListTests {
             listItems
         )
 
-        sut.loadSuspend(inputStream, "", "")
+        sut.loadSuspend(inputStream)
 
         assert(sut.status.success)
     }
@@ -69,7 +69,7 @@ class StringListToSplitItemListTests {
             listItems
         )
 
-        sut.loadSuspend(inputStream, "", "")
+        sut.loadSuspend(inputStream)
 
         assert(!sut.status.success)
         assert(sut.status.errorMessage == StringListToSplitItemList.Companion.ITEMS_NOT_EQUAL)
@@ -81,7 +81,7 @@ class StringListToSplitItemListTests {
             every { inputStreamStringList.status.success } returns true
             every { inputStreamStringList.status.item } returns null
 
-            sut.loadSuspend(inputStream, "", "")
+            sut.loadSuspend(inputStream)
 
             assert(!sut.status.success)
             assert(sut.status.errorMessage == StringListToSplitItemList.Companion.FAILED_TO_LOAD_FILE)
@@ -93,7 +93,7 @@ class StringListToSplitItemListTests {
         every { inputStreamStringList.status.errorMessage } returns "error message"
         every { inputStreamStringList.status.exception } returns Exception()
 
-        sut.loadSuspend(inputStream, "", "")
+        sut.loadSuspend(inputStream)
 
         assert(!sut.status.success)
         assert(sut.status.errorMessage == "error message")

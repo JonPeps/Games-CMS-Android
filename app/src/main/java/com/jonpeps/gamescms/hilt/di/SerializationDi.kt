@@ -9,7 +9,13 @@ import com.jonpeps.gamescms.data.serialization.string.StringFileStorageStrSerial
 import com.jonpeps.gamescms.data.serialization.string.StringSerialization
 import com.jonpeps.gamescms.data.repositories.TableTemplateMoshiJsonAdapter
 import com.jonpeps.gamescms.data.helpers.IStringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.helpers.JsonStringListHelper
 import com.jonpeps.gamescms.data.helpers.StringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.helpers.StringListToSplitItemList
+import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
+import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
+import com.jonpeps.gamescms.data.serialization.debug.IInputStreamSerializationRepoHelper
+import com.jonpeps.gamescms.data.serialization.moshi.InputStreamStringList
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -49,5 +55,20 @@ class SerializationDiProvider {
     @Provides
     fun providesCommonDeleteFileHelper(): ICommonDeleteFileHelper {
         return CommonDeleteFileHelper()
+    }
+
+    @Provides
+    fun providesInputStreamStringList(moshiStringListRepository: IMoshiStringListRepository,
+                                      commonSerializationRepoHelper: ICommonSerializationRepoHelper,
+                                      inputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper): InputStreamStringList {
+        return InputStreamStringList(moshiStringListRepository,
+            commonSerializationRepoHelper,
+            inputStreamSerializationRepoHelper)
+    }
+
+    @Provides
+    fun providesStringListToSplitItemList(inputStreamStringList: InputStreamStringList,
+                                          jsonStringListHelper: JsonStringListHelper): StringListToSplitItemList {
+        return StringListToSplitItemList(inputStreamStringList, jsonStringListHelper)
     }
 }
