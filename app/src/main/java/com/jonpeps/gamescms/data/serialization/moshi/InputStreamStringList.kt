@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.data.viewmodels
+package com.jonpeps.gamescms.data.serialization.moshi
 
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository

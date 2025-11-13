@@ -1,10 +1,10 @@
-package com.jonpeps.gamescms.viewmodels
+package com.jonpeps.gamescms.data
 
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.helpers.JsonStringFilenamePair
 import com.jonpeps.gamescms.data.helpers.JsonStringListHelper
-import com.jonpeps.gamescms.data.viewmodels.InputStreamStringList
-import com.jonpeps.gamescms.ui.viewmodels.defaults.StringListToSplitItemList
+import com.jonpeps.gamescms.data.helpers.StringListToSplitItemList
+import com.jonpeps.gamescms.data.serialization.moshi.InputStreamStringList
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -45,11 +45,14 @@ class StringListToSplitItemListTests {
     }
 
     @Test
-    fun `SUCCESS with EQUAL list names AND file names`() = runBlocking  {
+    fun `SUCCESS with EQUAL list names AND file names`() = runBlocking {
         every { inputStreamStringList.status.success } returns true
         every { inputStreamStringList.status.item } returns stringListItem
 
-        every { jsonStringListHelper.splitItem(stringListItem) } returns JsonStringFilenamePair(listItems, listItems)
+        every { jsonStringListHelper.splitItem(stringListItem) } returns JsonStringFilenamePair(
+            listItems,
+            listItems
+        )
 
         sut.loadSuspend(inputStream, "", "")
 
@@ -61,24 +64,28 @@ class StringListToSplitItemListTests {
         every { inputStreamStringList.status.success } returns true
         every { inputStreamStringList.status.item } returns stringListItem
 
-        every { jsonStringListHelper.splitItem(stringListItem) } returns JsonStringFilenamePair(emptyList(), listItems)
+        every { jsonStringListHelper.splitItem(stringListItem) } returns JsonStringFilenamePair(
+            emptyList(),
+            listItems
+        )
 
         sut.loadSuspend(inputStream, "", "")
 
         assert(!sut.status.success)
-        assert(sut.status.errorMessage == StringListToSplitItemList.ITEMS_NOT_EQUAL)
+        assert(sut.status.errorMessage == StringListToSplitItemList.Companion.ITEMS_NOT_EQUAL)
     }
 
     @Test
-    fun `FAILURE with JSON ITEM is NULL loaded from InputStreamStringListViewModel view model`() = runBlocking {
-        every { inputStreamStringList.status.success } returns true
-        every { inputStreamStringList.status.item } returns null
+    fun `FAILURE with JSON ITEM is NULL loaded from InputStreamStringListViewModel view model`() =
+        runBlocking {
+            every { inputStreamStringList.status.success } returns true
+            every { inputStreamStringList.status.item } returns null
 
-        sut.loadSuspend(inputStream, "", "")
+            sut.loadSuspend(inputStream, "", "")
 
-        assert(!sut.status.success)
-        assert(sut.status.errorMessage == StringListToSplitItemList.FAILED_TO_LOAD_FILE)
-    }
+            assert(!sut.status.success)
+            assert(sut.status.errorMessage == StringListToSplitItemList.Companion.FAILED_TO_LOAD_FILE)
+        }
 
     @Test
     fun `FAILURE with InputStreamStringListViewModel view model load FAILS`() = runBlocking {

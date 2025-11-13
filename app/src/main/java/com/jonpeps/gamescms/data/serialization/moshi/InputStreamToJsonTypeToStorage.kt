@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.data.viewmodels
+package com.jonpeps.gamescms.data.serialization.moshi
 
 import com.jonpeps.gamescms.data.DataConstants.Companion.JSON_EXTENSION
 import com.jonpeps.gamescms.data.repositories.IBaseSingleItemMoshiJsonRepository

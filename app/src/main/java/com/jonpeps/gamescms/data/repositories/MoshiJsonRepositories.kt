@@ -1,5 +1,6 @@
 package com.jonpeps.gamescms.data.repositories
 
+import com.jonpeps.gamescms.data.dataclasses.TableTemplateStatusList
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.serialization.moshi.MoshiJsonBuilder
@@ -15,6 +16,11 @@ class StringListMoshiJsonAdapter : MoshiJsonAdapter<StringListMoshi> {
 class TableTemplateMoshiJsonAdapter : MoshiJsonAdapter<TableTemplateItemListMoshi> {
     override fun getJsonAdapter(): JsonAdapter<TableTemplateItemListMoshi> =
         MoshiJsonBuilder.build().adapter(TableTemplateItemListMoshi::class.java)
+}
+
+class DefaultTableTemplateStatusMoshiAdapter : MoshiJsonAdapter<TableTemplateStatusList> {
+    override fun getJsonAdapter(): JsonAdapter<TableTemplateStatusList> =
+        MoshiJsonBuilder.build().adapter(TableTemplateStatusList::class.java)
 }
 
 interface IMoshiStringListRepository : IBaseSingleItemMoshiJsonRepository<StringListMoshi>
@@ -42,3 +48,10 @@ class MoshiTableTemplateRepository
     : BaseSingleItemMoshiJsonRepository<TableTemplateItemListMoshi>(tableTemplateItemListMoshiAdapter,
     stringFileStorageStrSerialisation), IMoshiTableTemplateRepository
 
+interface IMoshiTableTemplateStatusListRepository : IBaseSingleItemMoshiJsonRepository<TableTemplateStatusList>
+
+class MoshiTableTemplateStatusListRepository
+@Inject constructor(moshiTableTemplateStatusAdapter: DefaultTableTemplateStatusMoshiAdapter,
+                    stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation)
+    : BaseSingleItemMoshiJsonRepository<TableTemplateStatusList>(moshiTableTemplateStatusAdapter,
+    stringFileStorageStrSerialisation)

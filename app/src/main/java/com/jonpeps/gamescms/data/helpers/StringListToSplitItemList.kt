@@ -1,7 +1,7 @@
-package com.jonpeps.gamescms.ui.viewmodels.defaults
+package com.jonpeps.gamescms.data.helpers
 
-import com.jonpeps.gamescms.data.helpers.JsonStringListHelper
-import com.jonpeps.gamescms.data.viewmodels.InputStreamStringList
+import com.jonpeps.gamescms.data.serialization.moshi.InputStreamStringList
+import com.jonpeps.gamescms.ui.viewmodels.defaults.StringListToSplitItemListData
 import java.io.InputStream
 import javax.inject.Inject
 
@@ -46,7 +46,8 @@ class StringListToSplitItemList@Inject constructor(
             itemNames,
             fileNames,
             errorMessage,
-            exception)
+            exception
+        )
     }
 
     companion object {

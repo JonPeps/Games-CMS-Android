@@ -7,13 +7,3 @@ data class StringListToSplitItemListData(
     val errorMessage: String?,
     val exception: Exception?
 )
-
-data class DefaultTemplateStatus(
-    val success: Boolean,
-    val name: String,
-    val errorMessage: String?,
-)
-
-data class DefaultTemplateStatusList(
-    val items: List<DefaultTemplateStatus>
-)
