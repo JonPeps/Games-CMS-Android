@@ -1,5 +1,6 @@
 package com.jonpeps.gamescms.hilt.di
 
+import android.content.Context
 import android.content.res.AssetManager
 import dagger.Binds
 import dagger.Module
@@ -15,6 +16,8 @@ import kotlinx.coroutines.Dispatchers
 abstract class AppLevelBindings {
     @Binds
     abstract fun provideApplicationContext(context: ApplicationContext): ApplicationContext
+    @Binds
+    abstract fun provideContext(context: Context): Context
     @Binds
     abstract fun provideAssetManager(assetManager: AssetManager): AssetManager
 }

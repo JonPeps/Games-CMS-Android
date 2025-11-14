@@ -2,6 +2,7 @@ package com.jonpeps.gamescms.data.serialization
 
 import java.io.BufferedReader
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileWriter
 import java.io.InputStream
 import javax.inject.Inject
@@ -14,6 +15,7 @@ interface ICommonSerializationRepoHelper {
     fun getFileWriter(directory: String, name: String): FileWriter
     fun readAll(inputStream: InputStream): String
     fun createDirectory(path: String): Boolean
+    fun getInputStream(mainFile: File): FileInputStream?
 }
 
 class CommonSerializationRepoHelper@Inject constructor() : ICommonSerializationRepoHelper {
@@ -55,6 +57,13 @@ class CommonSerializationRepoHelper@Inject constructor() : ICommonSerializationR
             return directory.mkdirs()
         }
         return true
+    }
+
+    override fun getInputStream(mainFile: File): FileInputStream? {
+        if (mainFile.exists()) {
+            return mainFile.inputStream()
+        }
+        return null
     }
 
     companion object {

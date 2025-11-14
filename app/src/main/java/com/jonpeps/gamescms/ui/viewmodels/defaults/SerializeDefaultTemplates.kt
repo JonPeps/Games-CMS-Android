@@ -7,7 +7,9 @@ import com.jonpeps.gamescms.data.dataclasses.TableTemplateStatusList
 import com.jonpeps.gamescms.data.helpers.InputStreamTableTemplate
 import com.jonpeps.gamescms.data.helpers.StringListToSplitItemList
 import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateStatusListRepository
-import okio.IOException
+import com.jonpeps.gamescms.data.serialization.CommonSerializationRepoHelper
+import java.io.File
+import java.io.FileInputStream
 import javax.inject.Inject
 
 data class SerializeDefaultTemplatesStatus(
@@ -16,7 +18,8 @@ data class SerializeDefaultTemplatesStatus(
 )
 
 interface ISerializeDefaultTemplates {
-    suspend fun serialize(tableTemplatesListFilename: String)
+    suspend fun serializeFromAssets(tableTemplatesListFilename: String)
+    suspend fun serializeFromFile(mainFile: File)
 }
 
 class SerializeDefaultTemplates@Inject constructor(
@@ -24,12 +27,13 @@ class SerializeDefaultTemplates@Inject constructor(
     private val assetManager: AssetManager,
     private val stringListToSplitItemList: StringListToSplitItemList,
     private val inputStreamTableTemplate: InputStreamTableTemplate,
-    private val moshiTableTemplateStatusListRepository: MoshiTableTemplateStatusListRepository
+    private val moshiTableTemplateStatusListRepository: MoshiTableTemplateStatusListRepository,
+    private val commonSerializationRepoHelper: CommonSerializationRepoHelper
 ) : ISerializeDefaultTemplates {
     var serializeDefaultTemplatesStatus: SerializeDefaultTemplatesStatus =
         SerializeDefaultTemplatesStatus(false, "")
 
-    override suspend fun serialize(tableTemplatesListFilename: String) {
+    override suspend fun serializeFromAssets(tableTemplatesListFilename: String) {
         var success = true
         var errorMessage = ""
         try {
@@ -40,12 +44,13 @@ class SerializeDefaultTemplates@Inject constructor(
                 val statusList: ArrayList<TableTemplateStatus> = arrayListOf()
                 val filenames = stringListToSplitItemList.status.fileNames
                 val names = stringListToSplitItemList.status.names
+                val externalPath = context.getExternalFilesDir(null)
+                val absolutePath = externalPath?.absolutePath + DEFAULT_TEMPLATES_FOLDER + "/"
                 for (filename in filenames) {
-                    path = DEFAULT_TEMPLATES_FOLDER + filename
+                    path = absolutePath + filename
                     inputStream = assetManager.open(path)
-                    val externalPath = context.getExternalFilesDir(null)
                     inputStreamTableTemplate.processSuspend(inputStream,
-                        externalPath?.absolutePath + DEFAULT_TEMPLATES_FOLDER + "/",
+                        absolutePath,
                         filename)
                     statusList.add(TableTemplateStatus(inputStreamTableTemplate.status.success,
                         names[filenames.indexOf(filename)],
@@ -59,7 +64,7 @@ class SerializeDefaultTemplates@Inject constructor(
                 success = false
                 errorMessage = stringListToSplitItemList.status.errorMessage?:""
             }
-        } catch (ex: IOException) {
+        } catch (ex: Exception) {
             success = false
             errorMessage = ex.message?:""
         }
@@ -67,7 +72,62 @@ class SerializeDefaultTemplates@Inject constructor(
             errorMessage)
     }
 
+    override suspend fun serializeFromFile(mainFile: File) {
+        var success = true
+        var errorMessage = ""
+        if (mainFile.exists()) {
+            try {
+                stringListToSplitItemList.loadSuspend(mainFile.inputStream())
+                if (stringListToSplitItemList.status.success) {
+                    val statusList: ArrayList<TableTemplateStatus> = arrayListOf()
+                    val filenames = stringListToSplitItemList.status.fileNames
+                    val names = stringListToSplitItemList.status.names
+                    val externalPath = context.getExternalFilesDir(null)
+                    val absolutePath = externalPath?.absolutePath + DEFAULT_TEMPLATES_FOLDER + "/"
+                    for (filename in filenames) {
+                        val mainFile = File(absolutePath + filename)
+                        val inputStream: FileInputStream? = commonSerializationRepoHelper.getInputStream(mainFile)
+                        inputStream?.let {
+                            inputStreamTableTemplate.processSuspend(
+                                it,
+                                absolutePath,
+                                filename
+                            )
+                        }?:run {
+                            success = false
+                            errorMessage = FILE_DOES_NOT_EXIST + mainFile.absoluteFile
+                        }
+                        statusList.add(
+                            TableTemplateStatus(
+                                success,
+                                names[filenames.indexOf(filename)],
+                                errorMessage
+                            )
+                        )
+                    }
+                    if (!moshiTableTemplateStatusListRepository
+                        .save(TableTemplateStatusList(statusList))) {
+                        success = false
+                        errorMessage = FAILED_TO_SAVE_TEMPLATES_STATUS
+                    }
+                } else {
+                    success = false
+                    errorMessage = stringListToSplitItemList.status.errorMessage ?: ""
+                }
+            } catch (ex: Exception) {
+                success = false
+                errorMessage = ex.message ?: ""
+            }
+        } else {
+            success = false
+            errorMessage = FILE_DOES_NOT_EXIST + mainFile.absoluteFile.path
+        }
+        serializeDefaultTemplatesStatus = SerializeDefaultTemplatesStatus(success,
+            errorMessage)
+    }
+
     companion object {
+        const val FILE_DOES_NOT_EXIST = "File does not exist: "
         const val DEFAULT_TEMPLATES_FOLDER = "default_templates/"
         const val FAILED_TO_SAVE_TEMPLATES_STATUS = "Failed to save templates status!"
     }
