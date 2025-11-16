@@ -81,12 +81,16 @@ open class InputStreamToJsonTypeToStorage<T>(
                     errorMessage = FAILED_TO_CREATE_DIR + directory
                 } else {
                     initWriteFiles(fileName, directory)
-                    if (singleItemMoshiJsonRepository.save(item!!)) {
-                        success = true
-                        errorMessage = ""
-                    } else {
-                        success = false
-                        errorMessage = FAILED_TO_WRITE_FILE
+                    item?.let {
+                        if (singleItemMoshiJsonRepository.save(it)) {
+                            success = true
+                            errorMessage = ""
+                        } else {
+                            success = false
+                            errorMessage = FAILED_TO_WRITE_FILE
+                        }
+                    }?: run {
+                        throw IOException(ITEM_TO_WRITE_IS_NULL)
                     }
                 }
             } catch (ex: Exception) {

@@ -15,7 +15,8 @@ interface ICommonSerializationRepoHelper {
     fun getFileWriter(directory: String, name: String): FileWriter
     fun readAll(inputStream: InputStream): String
     fun createDirectory(path: String): Boolean
-    fun getInputStream(mainFile: File): FileInputStream?
+    fun getInputStream(mainFile: File): InputStream?
+    fun getFileInputStream(mainFile: File): FileInputStream?
 }
 
 class CommonSerializationRepoHelper@Inject constructor() : ICommonSerializationRepoHelper {
@@ -59,7 +60,14 @@ class CommonSerializationRepoHelper@Inject constructor() : ICommonSerializationR
         return true
     }
 
-    override fun getInputStream(mainFile: File): FileInputStream? {
+    override fun getInputStream(mainFile: File): InputStream? {
+        if (mainFile.exists()) {
+            return mainFile.inputStream()
+        }
+        return null
+    }
+
+    override fun getFileInputStream(mainFile: File): FileInputStream? {
         if (mainFile.exists()) {
             return mainFile.inputStream()
         }
