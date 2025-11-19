@@ -6,6 +6,7 @@ class DataConstants {
         const val MAIN_DIR = "/GamesCMSApp/"
         const val PROJECTS_DIR = "projects/"
         const val TEMPLATES_DIR = "templates/"
+        const val FILE_EXTENSION = ".json"
         const val TEMPLATES_LIST_FILENAME = "table_templates_list.json"
         const val DEFAULT_TEMPLATES_STATUS_FILENAME = "default_templates_status.json"
         const val TEMPLATES_LIST_CACHE_NAME = "template_list"

@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.ui.viewmodels
+package com.jonpeps.gamescms.ui.tabletemplates.serialization
 
 data class StringListToSplitItemListData(
     val success: Boolean,

@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.data
+package com.jonpeps.gamescms.viewmodels
 
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
@@ -17,19 +17,21 @@ class TableTemplateGroupVmChangesCacheTests {
 
     @Before
     fun setup() {
-        dummyData = arrayListOf(TableItemFinal(
-            name = "name1",
-            dataType = ItemType.STRING,
-            isPrimary = true,
-            value = "value1",
-            editable = true,
-        ), TableItemFinal(
-            name = "name2",
-            dataType = ItemType.BOOLEAN,
-            isPrimary = false,
-            value = "true",
-            editable = true,
-        ))
+        dummyData = arrayListOf(
+            TableItemFinal(
+                name = "name1",
+                dataType = ItemType.STRING,
+                isPrimary = true,
+                value = "value1",
+                editable = true,
+            ), TableItemFinal(
+                name = "name2",
+                dataType = ItemType.BOOLEAN,
+                isPrimary = false,
+                value = "true",
+                editable = true,
+            )
+        )
         changesCache = TableTemplateGroupVmChangesCache()
     }
 

@@ -10,7 +10,7 @@ class JsonStringListWithFilenameHelperTests {
         val splitter = JsonStringListHelper()
         val result = splitter.splitItem(
             StringListMoshi(
-                listOf(
+                arrayListOf(
                     "name1:file1",
                     "name2:file2"
                 )

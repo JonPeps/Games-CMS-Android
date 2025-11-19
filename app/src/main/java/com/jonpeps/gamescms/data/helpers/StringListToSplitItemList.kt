@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.data.helpers
 
 import com.jonpeps.gamescms.data.serialization.moshi.InputStreamStringList
-import com.jonpeps.gamescms.ui.viewmodels.StringListToSplitItemListData
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.StringListToSplitItemListData
 import java.io.InputStream
 import javax.inject.Inject
 

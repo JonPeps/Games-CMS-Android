@@ -46,7 +46,7 @@ class BasicMoshiRelatedRepositoryTests {
     private lateinit var fileWriter: FileWriter
 
     private val templateName = "test"
-    private val dummyData = StringListMoshi(listOf("test"))
+    private val dummyData = StringListMoshi(arrayListOf("test"))
 
     private lateinit var moshiStringListRepository: IMoshiStringListRepository
 

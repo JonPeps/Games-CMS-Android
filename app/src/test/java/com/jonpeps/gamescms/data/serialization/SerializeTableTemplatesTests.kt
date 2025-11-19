@@ -2,14 +2,20 @@ package com.jonpeps.gamescms.data.serialization
 
 import android.content.Context
 import android.content.res.AssetManager
+import com.jonpeps.gamescms.data.dataclasses.ItemType
+import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
 import com.jonpeps.gamescms.data.helpers.InputStreamTableTemplate
 import com.jonpeps.gamescms.data.helpers.StringListToSplitItemList
+import com.jonpeps.gamescms.data.repositories.MoshiStringListRepository
+import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateRepository
 import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateStatusListRepository
-import com.jonpeps.gamescms.ui.viewmodels.SerializeTableTemplates
-import com.jonpeps.gamescms.ui.viewmodels.SerializeTableTemplates.Companion.EXCEPTION_THROWN_MSG
-import com.jonpeps.gamescms.ui.viewmodels.SerializeTableTemplates.Companion.EXTERNAL_STORAGE_PATH_IS_NULL
-import com.jonpeps.gamescms.ui.viewmodels.SerializeTableTemplates.Companion.FAILED_TO_SAVE_TEMPLATES_STATUS
-import com.jonpeps.gamescms.ui.viewmodels.SerializeTableTemplates.Companion.FILE_DOES_NOT_EXIST
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.EXCEPTION_THROWN_MSG
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.EXTERNAL_STORAGE_PATH_IS_NULL
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.FAILED_TO_SAVE_TEMPLATES_STATUS
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.FILE_DOES_NOT_EXIST
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -17,7 +23,10 @@ import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.any
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileWriter
 import java.io.InputStream
 
 class SerializeTableTemplatesTests {
@@ -28,15 +37,29 @@ class SerializeTableTemplatesTests {
     @MockK
     private lateinit var mockFile: File
     @MockK
+    private lateinit var mockBufferReader: BufferedReader
+    @MockK
+    private lateinit var mockFileWriter: FileWriter
+    @MockK
     private lateinit var mockStringListToSplitItemList: StringListToSplitItemList
     @MockK
     private lateinit var mockInputStreamTableTemplate: InputStreamTableTemplate
+    @MockK
+    private lateinit var mockMoshiTableTemplateRepository: MoshiTableTemplateRepository
+    @MockK
+    private lateinit var mockStringListRepository: MoshiStringListRepository
     @MockK
     private lateinit var mockMoshiTableTemplateStatusListRepository: MoshiTableTemplateStatusListRepository
     @MockK
     private lateinit var mockCommonSerializationRepoHelper: CommonSerializationRepoHelper
     @MockK
     private lateinit var mockInputStream: InputStream
+
+    private lateinit var tableTemplateItems: List<TableTemplateItemMoshi>
+
+    private lateinit var tableTemplateItemListMoshi: TableTemplateItemListMoshi
+
+    private lateinit var stringListMoshi: StringListMoshi
 
     private lateinit var sut: SerializeTableTemplates
 
@@ -48,25 +71,50 @@ class SerializeTableTemplatesTests {
             mockAssetManager,
             mockStringListToSplitItemList,
             mockInputStreamTableTemplate,
+            mockStringListRepository,
+            mockMoshiTableTemplateRepository,
             mockMoshiTableTemplateStatusListRepository,
             mockCommonSerializationRepoHelper)
 
+        every { mockContext.getExternalFilesDir(any()) } returns mockFile
         coEvery { mockStringListToSplitItemList.loadSuspend(any()) } returns Unit
         every { mockAssetManager.open(any()) } returns mockInputStream
 
         every { mockStringListToSplitItemList.status.fileNames } returns listOf("test.json")
         every { mockStringListToSplitItemList.status.names } returns listOf("test")
         every { mockFile.absolutePath } returns "testFolder/"
+        every { mockStringListToSplitItemList.status.fileNames } returns listOf("test.json")
+        every { mockStringListToSplitItemList.status.names } returns listOf("test")
+
+        tableTemplateItems = arrayListOf(TableTemplateItemMoshi(
+            "test1",
+            ItemType.STRING,
+            true,
+            "value",
+            editable = true,
+            isSortKey = true
+        ), TableTemplateItemMoshi(
+            "test2",
+            ItemType.BOOLEAN,
+            true,
+            "true",
+            editable = true,
+            isSortKey = false
+        ))
+
+        tableTemplateItemListMoshi = TableTemplateItemListMoshi("test", tableTemplateItems)
+        stringListMoshi = StringListMoshi(listOf("test1:test1.json", "test2:test2.json"))
+
+        initMockMoshiTableTemplateInputFiles()
+        initMockStringListRepoInputFiles()
+        initMockCommonSerializationInputFiles()
+        initMockTableTemplateOutputFiles()
     }
 
     @Test
     fun `serialize from ASSETS SUCCESS`() = runBlocking {
         every { mockContext.getExternalFilesDir(any()) } returns mockFile
         every { mockStringListToSplitItemList.status.success } returns true
-        every { mockStringListToSplitItemList.status.fileNames } returns listOf("test.json")
-        every { mockStringListToSplitItemList.status.names } returns listOf("test")
-        every { mockContext.getExternalFilesDir(any()) } returns mockFile
-        every { mockFile.absolutePath } returns "testFolder/"
         coEvery { mockInputStreamTableTemplate.processSuspend(any(), any(), any()) } returns Unit
         every { mockInputStreamTableTemplate.status.success } returns true
         every { mockInputStreamTableTemplate.status.errorMessage } returns ""
@@ -143,7 +191,7 @@ class SerializeTableTemplatesTests {
         every { mockFile.absolutePath } returns "testFolder/"
         coEvery { mockInputStreamTableTemplate.processSuspend(any(), any(), any()) } returns Unit
 
-        sut.serializeItems("test")
+        sut.readItems("test")
 
         assert(sut.serializeTableTemplatesStatus.success)
         assert(sut.serializeTableTemplatesStatus.errorMessage == "")
@@ -158,7 +206,7 @@ class SerializeTableTemplatesTests {
         every { mockCommonSerializationRepoHelper.getInputStream(any()) } returns null
         every { mockStringListToSplitItemList.status.errorMessage } returns FILE_DOES_NOT_EXIST + "test"
 
-        sut.serializeItems("test")
+        sut.readItems("test")
 
         assert(!sut.serializeTableTemplatesStatus.success)
         assert(sut.serializeTableTemplatesStatus.errorMessage == "File does not exist: test")
@@ -168,7 +216,7 @@ class SerializeTableTemplatesTests {
     fun `serialize ITEMS FAILS due to INPUT STREAM throwing EXCEPTION`() = runBlocking {
         every { mockCommonSerializationRepoHelper.getInputStream(any()) } throws Exception("error")
 
-        sut.serializeItems("test")
+        sut.readItems("test")
 
         assert(!sut.serializeTableTemplatesStatus.success)
         assert(sut.serializeTableTemplatesStatus.errorMessage == EXCEPTION_THROWN_MSG + "error")
@@ -180,9 +228,63 @@ class SerializeTableTemplatesTests {
         every { mockStringListToSplitItemList.status.success } returns false
         every { mockStringListToSplitItemList.status.errorMessage } returns FILE_DOES_NOT_EXIST + "test"
 
-        sut.serializeItems("test")
+        sut.readItems("test")
 
         assert(!sut.serializeTableTemplatesStatus.success)
         assert(sut.serializeTableTemplatesStatus.errorMessage == FILE_DOES_NOT_EXIST + "test")
+    }
+
+    @Test
+    fun `update table items SUCCESS`() = runBlocking {
+        coEvery { mockMoshiTableTemplateRepository.save(any()) } returns true
+        every { mockCommonSerializationRepoHelper.getInputStream(any()) } returns mockInputStream
+        every { mockStringListToSplitItemList.status.success } returns true
+        coEvery { mockStringListRepository.load() } returns true
+        every { mockStringListRepository.getItem() } returns stringListMoshi
+        coEvery { mockStringListRepository.save(any()) } returns true
+
+        sut.updateTableTemplate("testTemplate",
+            TableTemplateItemListMoshi("test",
+                tableTemplateItems),
+            "folder/templatesListFilename")
+
+        assert(sut.serializeUpdateTableTemplateStatus.success)
+    }
+
+    private fun initMockMoshiTableTemplateInputFiles() {
+        every { mockMoshiTableTemplateRepository.setAbsoluteFile(mockFile) } returns Unit
+        every { mockMoshiTableTemplateRepository.setBufferReader(any()) } returns Unit
+        every { mockMoshiTableTemplateRepository.setFile(any()) } returns Unit
+        every { mockMoshiTableTemplateRepository.assignDirectoryFile(any()) } returns Unit
+        every { mockMoshiTableTemplateRepository.setFileWriter(any()) } returns Unit
+        every { mockMoshiTableTemplateRepository.setItem(any()) } returns Unit
+    }
+
+    private fun initMockStringListRepoInputFiles() {
+        every { mockStringListRepository.setAbsoluteFile(mockFile) } returns Unit
+        every { mockStringListRepository.setFile(any()) } returns Unit
+        every { mockStringListRepository.assignDirectoryFile(any()) } returns Unit
+        every { mockStringListRepository.setFileWriter(any()) } returns Unit
+        every { mockStringListRepository.setItem(any()) } returns Unit
+    }
+
+    private fun initMockCommonSerializationInputFiles() {
+        every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockFile
+        every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockBufferReader
+        every { mockCommonSerializationRepoHelper.getMainFile(any()) } returns mockFile
+        every { mockCommonSerializationRepoHelper.getDirectoryFile(any()) } returns mockFile
+        every { mockCommonSerializationRepoHelper.getFileWriter(any(), any()) } returns mockFileWriter
+        every { mockCommonSerializationRepoHelper.getInputStream(any()) } returns mockInputStream
+    }
+
+    private fun initMockTableTemplateOutputFiles() {
+        every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockFile
+        every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockBufferReader
+        every { mockCommonSerializationRepoHelper.getMainFile(any()) } returns mockFile
+        every { mockCommonSerializationRepoHelper.getDirectoryFile(any()) } returns mockFile
+        every { mockCommonSerializationRepoHelper.getFileWriter(any(), any()) } returns mockFileWriter
+        every { mockCommonSerializationRepoHelper.getInputStream(any()) } returns mockInputStream
+        every { mockMoshiTableTemplateRepository.getItem() } returns tableTemplateItemListMoshi
+        every { mockStringListRepository.getItem() } returns stringListMoshi
     }
 }

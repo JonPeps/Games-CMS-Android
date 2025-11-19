@@ -1,6 +1,7 @@
 package com.jonpeps.gamescms.data.viewmodels
 
 import androidx.lifecycle.viewModelScope
+import com.jonpeps.gamescms.data.DataConstants.Companion.FILE_EXTENSION
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.repositories.ICachedMoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.ICommonDeleteFileHelper
@@ -138,7 +139,6 @@ class BasicStringListViewModel
     }
 
     companion object {
-        const val FILE_EXTENSION = ".json"
         const val NO_CACHE_NAME = ""
         const val FAILED_TO_LOAD_FILE = "Failed to load file: "
         const val FAILED_TO_SAVE_FILE = "Failed to save file: "

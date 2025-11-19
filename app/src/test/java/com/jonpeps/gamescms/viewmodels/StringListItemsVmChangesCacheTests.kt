@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.data
+package com.jonpeps.gamescms.viewmodels
 
 import com.jonpeps.gamescms.data.helpers.IStringListItemsVmChangesCache
 import com.jonpeps.gamescms.data.helpers.StringListItemsVmChangesCache
