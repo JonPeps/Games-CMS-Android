@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.data.helpers
 
 import com.jonpeps.gamescms.data.serialization.moshi.InputStreamStringList
-import com.jonpeps.gamescms.ui.tabletemplates.serialization.StringListToSplitItemListData
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplatesDataClasses
 import java.io.InputStream
 import javax.inject.Inject
 
@@ -13,7 +13,7 @@ class StringListToSplitItemList@Inject constructor(
     private val inputStreamStringList: InputStreamStringList,
     private val jsonStringListHelper: JsonStringListHelper
 ) : IStringListToSplitItemList {
-    lateinit var status: StringListToSplitItemListData
+    lateinit var status: SerializeTableTemplatesDataClasses
     override suspend fun loadSuspend(inputStream: InputStream) {
         inputStreamStringList.processSuspend(inputStream)
 
@@ -41,7 +41,7 @@ class StringListToSplitItemList@Inject constructor(
             exception = inputStreamStringList.status.exception
             success = false
         }
-        status = StringListToSplitItemListData(
+        status = SerializeTableTemplatesDataClasses(
             success,
             itemNames,
             fileNames,

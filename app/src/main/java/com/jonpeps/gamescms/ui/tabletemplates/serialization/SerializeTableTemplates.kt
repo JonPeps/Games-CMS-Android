@@ -6,32 +6,22 @@ import com.jonpeps.gamescms.data.DataConstants.Companion.FILE_EXTENSION
 import com.jonpeps.gamescms.data.DataConstants.Companion.JSON_EXTENSION
 import com.jonpeps.gamescms.data.dataclasses.TableTemplateStatus
 import com.jonpeps.gamescms.data.dataclasses.TableTemplateStatusList
-import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.helpers.InputStreamTableTemplate
 import com.jonpeps.gamescms.data.helpers.StringListToSplitItemList
-import com.jonpeps.gamescms.data.repositories.MoshiStringListRepository
 import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateRepository
 import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateStatusListRepository
 import com.jonpeps.gamescms.data.serialization.CommonSerializationRepoHelper
 import java.io.File
 import javax.inject.Inject
 
-data class SerializeTableTemplatesStatus(
-    val success: Boolean,
-    val items: List<TableTemplateStatus>?,
-    val errorMessage: String = ""
-)
-
-data class SerializeUpdateTableTemplateStatus(
-    val success: Boolean,
-    val errorMessage: String = ""
-)
-
 interface ISerializeTableTemplates {
     suspend fun serializeFromAssets(filename: String)
     suspend fun readItems(filename: String)
     suspend fun updateTableTemplate(templateName: String, item: TableTemplateItemListMoshi, templatesListFilename: String)
+
+    var serializeTableTemplatesStatus: SerializeTableTemplatesStatus
+    var serializeUpdateTableTemplateStatus: SerializeUpdateTableTemplateStatus
 }
 
 class SerializeTableTemplates@Inject constructor(
@@ -39,14 +29,15 @@ class SerializeTableTemplates@Inject constructor(
     private val assetManager: AssetManager,
     private val stringListToSplitItemList: StringListToSplitItemList,
     private val inputStreamTableTemplate: InputStreamTableTemplate,
-    private val stringListRepository: MoshiStringListRepository,
     private val moshiTableTemplateRepository: MoshiTableTemplateRepository,
     private val moshiTableTemplateStatusListRepository: MoshiTableTemplateStatusListRepository,
-    private val commonSerializationRepoHelper: CommonSerializationRepoHelper
+    private val commonSerializationRepoHelper: CommonSerializationRepoHelper,
+    private val serializeTableTemplateHelpers: SerializeTableTemplateHelpers,
+    private val serializeTableTemplateUpdateCore: SerializeTableTemplateUpdateCore
 ) : ISerializeTableTemplates {
-    var serializeTableTemplatesStatus: SerializeTableTemplatesStatus =
+    override var serializeTableTemplatesStatus: SerializeTableTemplatesStatus =
         SerializeTableTemplatesStatus(false, null,"")
-    var serializeUpdateTableTemplateStatus: SerializeUpdateTableTemplateStatus =
+    override var serializeUpdateTableTemplateStatus: SerializeUpdateTableTemplateStatus =
         SerializeUpdateTableTemplateStatus(false, "")
     private var success = true
     private var errorMessage = ""
@@ -144,29 +135,27 @@ class SerializeTableTemplates@Inject constructor(
         templatesListFilename: String
     ) {
         success = true
-        val templateFilename = getTableTemplateFileName(templateName)
         val externalPath = context.getExternalFilesDir(null)
+        var externalPathValid = ""
         try {
             externalPath?.let {
-                var absolutePath = it.absolutePath + TEMPLATES_FOLDER + "/"
-                initTableTemplateWriteFiles(templateFilename, absolutePath, item)
-                success = moshiTableTemplateRepository.save(item)
-                if (!success) {
-                    serializeUpdateTableTemplateStatus = SerializeUpdateTableTemplateStatus(false, FAILED_TO_SAVE_TEMPLATE)
-                    return
-                }
-                absolutePath = it.absolutePath + TEMPLATES_FOLDER + "/" + templatesListFilename + JSON_EXTENSION
+                externalPathValid = it.absolutePath
+                val absolutePath = it.absolutePath + TEMPLATES_FOLDER + "/" + templatesListFilename + JSON_EXTENSION
                 val file = File(absolutePath)
                 val inputStream = commonSerializationRepoHelper.getInputStream(file)
-                inputStream?.let { item ->
-                    stringListToSplitItemList.loadSuspend(item)
+                inputStream?.let { inputStreamItem ->
+                    stringListToSplitItemList.loadSuspend(inputStreamItem)
                     if (stringListToSplitItemList.status.success) {
-                        coreTableTemplateUpdate(
+                        serializeTableTemplateUpdateCore.update(
                             templatesListFilename,
                             absolutePath,
                             templateName,
-                            templateFilename
+                            stringListToSplitItemList.status.names,
+                            stringListToSplitItemList.status.fileNames
                         )
+                        if (!serializeTableTemplateUpdateCore.status.success) {
+                            setError(serializeTableTemplateUpdateCore.status.errorMessage)
+                        }
                     } else {
                         setError(stringListToSplitItemList.status.errorMessage)
                     }
@@ -176,54 +165,23 @@ class SerializeTableTemplates@Inject constructor(
             }?: run {
                 setError(EXTERNAL_STORAGE_PATH_IS_NULL)
             }
+            if (success) {
+                val absolutePath = "$externalPathValid$TEMPLATES_FOLDER/"
+                initTableTemplateWriteFiles(serializeTableTemplateUpdateCore.status.templateFilename,
+                    absolutePath, item)
+                if (!moshiTableTemplateRepository.save(item)) {
+                    setError(FAILED_TO_SAVE_TEMPLATE)
+                }
+            }
         } catch (ex: Exception) {
             setError(EXCEPTION_THROWN_MSG + ex.message + ex.message)
         }
         serializeUpdateTableTemplateStatus = SerializeUpdateTableTemplateStatus(success, errorMessage)
     }
 
-    private suspend fun coreTableTemplateUpdate(
-        templatesListFilename: String,
-        absolutePath: String,
-        templateName: String,
-        templateFilename: String
-    ) {
-        initReadFiles(templatesListFilename, absolutePath)
-        if (stringListRepository.load()) {
-            val stringList = stringListRepository.getItem()
-            stringList?.let { item ->
-                initTableTemplateStringsListWriteFiles(
-                    TEMPLATES_LIST_FILENAME,
-                    absolutePath
-                )
-                val itemsArrayList = ArrayList(item.items)
-                val existingTemplateNames = stringListToSplitItemList.status.names
-                val index = existingTemplateNames.indexOf(templateName)
-                if (index >= 0) {
-                    itemsArrayList.removeAt(index)
-                }
-                itemsArrayList.add("$templateName:$templateFilename")
-                if (!stringListRepository.save(StringListMoshi(itemsArrayList))) {
-                    setError(FAILED_TO_SAVE_TEMPLATE_LIST)
-                }
-            }?: run {
-                setError(STRING_LIST_ITEM_IS_NULL)
-            }
-        } else {
-            setError(stringListRepository.getErrorMsg())
-        }
-    }
-
     private fun setError(msg: String) {
         success = false
         errorMessage = msg
-    }
-
-    private fun initReadFiles(filename: String, directory: String) {
-        moshiTableTemplateRepository.setAbsoluteFile(
-            commonSerializationRepoHelper.getAbsoluteFile(directory, filename))
-        moshiTableTemplateRepository.setBufferReader(
-            commonSerializationRepoHelper.getBufferReader(directory, filename))
     }
 
     private fun initTableTemplateWriteFiles(filename: String, directory: String, tableTemplates: TableTemplateItemListMoshi) {
@@ -237,29 +195,13 @@ class SerializeTableTemplates@Inject constructor(
         moshiTableTemplateRepository.setItem(tableTemplates)
     }
 
-    private fun initTableTemplateStringsListWriteFiles(filename: String, directory: String) {
-        stringListRepository.setAbsoluteFile(
-            commonSerializationRepoHelper.getAbsoluteFile(directory, filename))
-        stringListRepository.setFile(commonSerializationRepoHelper.getMainFile(filename))
-        stringListRepository.assignDirectoryFile(
-            commonSerializationRepoHelper.getDirectoryFile(directory))
-        stringListRepository.setFileWriter(
-            commonSerializationRepoHelper.getFileWriter(directory, filename))
-    }
-
-    private fun getTableTemplateFileName(name: String): String {
-        return name.lowercase().replace(" ", "_") + FILE_EXTENSION
-    }
-
     companion object {
         const val EXCEPTION_THROWN_MSG = "Exception thrown: "
         const val EXTERNAL_STORAGE_PATH_IS_NULL = "External storage path is null!"
         const val FILE_DOES_NOT_EXIST = "File does not exist: "
         const val STRING_LIST_ITEM_IS_NULL = "StringListMoshi item is null!"
         const val TEMPLATES_FOLDER = "templates/"
-        const val TEMPLATES_LIST_FILENAME = "table_templates_list$JSON_EXTENSION"
         const val FAILED_TO_SAVE_TEMPLATES_STATUS = "Failed to save table templates status!"
         const val FAILED_TO_SAVE_TEMPLATE = "Failed to save table template!"
-        const val FAILED_TO_SAVE_TEMPLATE_LIST = "Failed to save table template list!"
     }
 }
