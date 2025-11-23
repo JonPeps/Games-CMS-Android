@@ -3,7 +3,6 @@ package com.jonpeps.gamescms.ui.tabletemplates.serialization
 import com.jonpeps.gamescms.data.DataConstants.Companion.JSON_EXTENSION
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.repositories.MoshiStringListRepository
-import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateRepository
 import com.jonpeps.gamescms.data.serialization.CommonSerializationRepoHelper
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.STRING_LIST_ITEM_IS_NULL
 import java.io.File
@@ -22,7 +21,6 @@ interface ISerializeTableTemplateUpdateCore {
 class SerializeTableTemplateUpdateCore@Inject constructor(
     private val serializeTableTemplateHelpers: SerializeTableTemplateHelpers,
     private val stringListRepository: MoshiStringListRepository,
-    private val moshiTableTemplateRepository: MoshiTableTemplateRepository,
     private val commonSerializationRepoHelper: CommonSerializationRepoHelper)
     : ISerializeTableTemplateUpdateCore{
 
@@ -37,16 +35,15 @@ class SerializeTableTemplateUpdateCore@Inject constructor(
                                 fileNames: List<String>) {
         var overwriteFilename = false
         var filename = ""
-        initTableTemplateRepoReadFiles(templatesListFilename, absolutePath)
+        val namesArrayList = ArrayList(names)
+        val fileNamesArrayList = ArrayList(fileNames)
+        initFiles(templatesListFilename, absolutePath)
         try {
-            val file = File(absolutePath)
+            val finalPath = absolutePath + templatesListFilename + JSON_EXTENSION
+            val file = File(finalPath)
             val inputStream = commonSerializationRepoHelper.getInputStream(file)
             inputStream?.let { item ->
                 if (stringListRepository.load()) {
-                    initStrListRepoFiles(
-                        TEMPLATES_LIST_FILENAME,
-                        absolutePath
-                    )
                     val stringList = stringListRepository.getItem()
                     stringList?.let { item ->
                         val itemsArrayList = ArrayList(item.items)
@@ -57,6 +54,8 @@ class SerializeTableTemplateUpdateCore@Inject constructor(
                         }
                         filename = serializeTableTemplateHelpers.getFilename(templateName)
                         itemsArrayList.add("$templateName:${filename}")
+                        namesArrayList.add(templateName)
+                        fileNamesArrayList.add(filename)
                         if (!stringListRepository.save(StringListMoshi(itemsArrayList))) {
                             setError(FAILED_TO_SAVE_TEMPLATE_LIST)
                         }
@@ -67,14 +66,14 @@ class SerializeTableTemplateUpdateCore@Inject constructor(
                     setError(stringListRepository.getErrorMsg())
                 }
             }?: run {
-                setError(FILE_DOES_NOT_EXIST + file.name)
+                setError(FILE_DOES_NOT_EXIST + finalPath)
             }
         } catch (ex: Exception) {
             setError(EXCEPTION_THROWN_MSG + ex.message)
         }
         status = SerializeTableTemplateUpdateCoreStatus(success,
             overwriteFilename,
-            names, fileNames, filename,
+            namesArrayList, fileNamesArrayList, filename,
             errorMessage)
     }
 
@@ -83,7 +82,7 @@ class SerializeTableTemplateUpdateCore@Inject constructor(
         errorMessage = msg
     }
 
-    private fun initStrListRepoFiles(filename: String, directory: String) {
+    private fun initFiles(filename: String, directory: String) {
         stringListRepository.setAbsoluteFile(
             commonSerializationRepoHelper.getAbsoluteFile(directory, filename))
         stringListRepository.setFile(commonSerializationRepoHelper.getMainFile(filename))
@@ -91,13 +90,7 @@ class SerializeTableTemplateUpdateCore@Inject constructor(
             commonSerializationRepoHelper.getDirectoryFile(directory))
         stringListRepository.setFileWriter(
             commonSerializationRepoHelper.getFileWriter(directory, filename))
-    }
-
-    private fun initTableTemplateRepoReadFiles(filename: String, directory: String) {
-        moshiTableTemplateRepository.setAbsoluteFile(
-            commonSerializationRepoHelper.getAbsoluteFile(directory, filename))
-        moshiTableTemplateRepository.setBufferReader(
-            commonSerializationRepoHelper.getBufferReader(directory, filename))
+        commonSerializationRepoHelper.getBufferReader(directory, filename)
         stringListRepository.setFile(commonSerializationRepoHelper.getMainFile(filename))
         stringListRepository.assignDirectoryFile(
             commonSerializationRepoHelper.getDirectoryFile(directory))
@@ -109,6 +102,5 @@ class SerializeTableTemplateUpdateCore@Inject constructor(
         const val FAILED_TO_SAVE_TEMPLATE_LIST = "Failed to save table template list!"
         const val EXCEPTION_THROWN_MSG = "Exception thrown: "
         const val FILE_DOES_NOT_EXIST = "File does not exist: "
-        const val TEMPLATES_LIST_FILENAME = "table_templates_list$JSON_EXTENSION"
     }
 }

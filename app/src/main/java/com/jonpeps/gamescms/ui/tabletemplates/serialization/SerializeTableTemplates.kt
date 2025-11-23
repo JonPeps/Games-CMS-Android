@@ -2,7 +2,6 @@ package com.jonpeps.gamescms.ui.tabletemplates.serialization
 
 import android.content.Context
 import android.content.res.AssetManager
-import com.jonpeps.gamescms.data.DataConstants.Companion.FILE_EXTENSION
 import com.jonpeps.gamescms.data.DataConstants.Companion.JSON_EXTENSION
 import com.jonpeps.gamescms.data.dataclasses.TableTemplateStatus
 import com.jonpeps.gamescms.data.dataclasses.TableTemplateStatusList
@@ -32,7 +31,6 @@ class SerializeTableTemplates@Inject constructor(
     private val moshiTableTemplateRepository: MoshiTableTemplateRepository,
     private val moshiTableTemplateStatusListRepository: MoshiTableTemplateStatusListRepository,
     private val commonSerializationRepoHelper: CommonSerializationRepoHelper,
-    private val serializeTableTemplateHelpers: SerializeTableTemplateHelpers,
     private val serializeTableTemplateUpdateCore: SerializeTableTemplateUpdateCore
 ) : ISerializeTableTemplates {
     override var serializeTableTemplatesStatus: SerializeTableTemplatesStatus =
@@ -140,7 +138,8 @@ class SerializeTableTemplates@Inject constructor(
         try {
             externalPath?.let {
                 externalPathValid = it.absolutePath
-                val absolutePath = it.absolutePath + TEMPLATES_FOLDER + "/" + templatesListFilename + JSON_EXTENSION
+                val absoluteFilePath = "$TEMPLATES_FOLDER$templatesListFilename$JSON_EXTENSION"
+                val absolutePath = "$externalPathValid$absoluteFilePath"
                 val file = File(absolutePath)
                 val inputStream = commonSerializationRepoHelper.getInputStream(file)
                 inputStream?.let { inputStreamItem ->
@@ -160,7 +159,7 @@ class SerializeTableTemplates@Inject constructor(
                         setError(stringListToSplitItemList.status.errorMessage)
                     }
                 }?: run {
-                    setError(FILE_DOES_NOT_EXIST + templatesListFilename)
+                    setError(FILE_DOES_NOT_EXIST + absoluteFilePath)
                 }
             }?: run {
                 setError(EXTERNAL_STORAGE_PATH_IS_NULL)
@@ -174,7 +173,7 @@ class SerializeTableTemplates@Inject constructor(
                 }
             }
         } catch (ex: Exception) {
-            setError(EXCEPTION_THROWN_MSG + ex.message + ex.message)
+            setError(EXCEPTION_THROWN_MSG + ex.message)
         }
         serializeUpdateTableTemplateStatus = SerializeUpdateTableTemplateStatus(success, errorMessage)
     }

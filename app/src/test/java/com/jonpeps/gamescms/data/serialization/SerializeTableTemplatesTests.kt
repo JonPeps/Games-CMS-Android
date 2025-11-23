@@ -2,6 +2,7 @@ package com.jonpeps.gamescms.data.serialization
 
 import android.content.Context
 import android.content.res.AssetManager
+import com.jonpeps.gamescms.data.DataConstants.Companion.JSON_EXTENSION
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
@@ -11,13 +12,14 @@ import com.jonpeps.gamescms.data.helpers.StringListToSplitItemList
 import com.jonpeps.gamescms.data.repositories.MoshiStringListRepository
 import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateRepository
 import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateStatusListRepository
-import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplateHelpers
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplateUpdateCore
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.EXCEPTION_THROWN_MSG
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.EXTERNAL_STORAGE_PATH_IS_NULL
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.FAILED_TO_SAVE_TEMPLATE
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.FAILED_TO_SAVE_TEMPLATES_STATUS
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.FILE_DOES_NOT_EXIST
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.TEMPLATES_FOLDER
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -56,8 +58,6 @@ class SerializeTableTemplatesTests {
     @MockK
     private lateinit var mockSerializeTableTemplateUpdateCore: SerializeTableTemplateUpdateCore
     @MockK
-    private lateinit var mockSerializeTableTemplateHelpers: SerializeTableTemplateHelpers
-    @MockK
     private lateinit var mockInputStream: InputStream
 
     private lateinit var tableTemplateItems: List<TableTemplateItemMoshi>
@@ -79,7 +79,6 @@ class SerializeTableTemplatesTests {
             mockMoshiTableTemplateRepository,
             mockMoshiTableTemplateStatusListRepository,
             mockCommonSerializationRepoHelper,
-            mockSerializeTableTemplateHelpers,
             mockSerializeTableTemplateUpdateCore)
 
         every { mockContext.getExternalFilesDir(any()) } returns mockFile
@@ -90,8 +89,6 @@ class SerializeTableTemplatesTests {
         every { mockStringListToSplitItemList.status.fileNames } returns listOf("test1.json", "test2.json")
         every { mockStringListToSplitItemList.status.names } returns listOf("test1", "test2")
         every { mockFile.absolutePath } returns "testFolder/"
-        every { mockSerializeTableTemplateUpdateCore.status.names } returns listOf("test1", "test2")
-        every { mockSerializeTableTemplateUpdateCore.status.fileNames } returns listOf("test1.json", "test2.json")
         every { mockSerializeTableTemplateUpdateCore.status.templateFilename } returns "templatesList.json"
 
         tableTemplateItems = arrayListOf(TableTemplateItemMoshi(
@@ -126,11 +123,11 @@ class SerializeTableTemplatesTests {
         every { mockInputStreamTableTemplate.status.errorMessage } returns ""
         coEvery { mockMoshiTableTemplateStatusListRepository.save(any()) } returns true
 
-        sut.serializeFromAssets("test")
+        sut.serializeFromAssets("test1")
 
         assert(sut.serializeTableTemplatesStatus.success)
-        assert(sut.serializeTableTemplatesStatus.items?.get(0)?.name == "test")
-        assert(sut.serializeTableTemplatesStatus.items?.get(0)?.file == "test.json")
+        assert(sut.serializeTableTemplatesStatus.items?.get(0)?.name == "test1")
+        assert(sut.serializeTableTemplatesStatus.items?.get(0)?.file == "test1.json")
         assert(sut.serializeTableTemplatesStatus.errorMessage == "")
     }
 
@@ -188,7 +185,7 @@ class SerializeTableTemplatesTests {
     }
 
     @Test
-    fun `serialize from ITEMS SUCCESS`() = runBlocking {
+    fun `serialize from readItems SUCCESS`() = runBlocking {
         every { mockCommonSerializationRepoHelper.getInputStream(any()) } returns mockInputStream
         every { mockStringListToSplitItemList.status.success } returns true
         every { mockStringListToSplitItemList.status.fileNames } returns listOf("test.json")
@@ -206,7 +203,7 @@ class SerializeTableTemplatesTests {
     }
 
     @Test
-    fun `serialize FAILS due to INPUT STREAM of main FILE is NULL`() = runBlocking {
+    fun `serialize from readItems FAILS due to INPUT STREAM of main FILE is NULL`() = runBlocking {
         every { mockFile.path } returns "test"
         every { mockFile.absolutePath } returns "testFolder/path"
         every { mockCommonSerializationRepoHelper.getInputStream(any()) } returns null
@@ -219,7 +216,7 @@ class SerializeTableTemplatesTests {
     }
 
     @Test
-    fun `serialize ITEMS FAILS due to INPUT STREAM throwing EXCEPTION`() = runBlocking {
+    fun `serialize from readItems FAILS due to INPUT STREAM throwing EXCEPTION`() = runBlocking {
         every { mockCommonSerializationRepoHelper.getInputStream(any()) } throws Exception("error")
 
         sut.readItems("test")
@@ -229,7 +226,7 @@ class SerializeTableTemplatesTests {
     }
 
     @Test
-    fun `serialize ITEMS FAILS due to StringListToSplitItemList RETURNS FALSE`() = runBlocking {
+    fun `serialize from readItems FAILS due to StringListToSplitItemList RETURNS FALSE`() = runBlocking {
         every { mockCommonSerializationRepoHelper.getInputStream(any()) } returns mockInputStream
         every { mockStringListToSplitItemList.status.success } returns false
         every { mockStringListToSplitItemList.status.errorMessage } returns FILE_DOES_NOT_EXIST + "test"
@@ -238,6 +235,16 @@ class SerializeTableTemplatesTests {
 
         assert(!sut.serializeTableTemplatesStatus.success)
         assert(sut.serializeTableTemplatesStatus.errorMessage == FILE_DOES_NOT_EXIST + "test")
+    }
+
+    @Test
+    fun `serialize from readItems FAILS due to EXTERNAL FILE PATH is NULL`() = runBlocking {
+        every { mockContext.getExternalFilesDir(any()) } returns null
+
+        sut.readItems("test")
+
+        assert(!sut.serializeTableTemplatesStatus.success)
+        assert(sut.serializeTableTemplatesStatus.errorMessage == EXTERNAL_STORAGE_PATH_IS_NULL)
     }
 
     @Test
@@ -253,10 +260,7 @@ class SerializeTableTemplatesTests {
             any(), any(),
             any(), any()) } returns Unit
         every { mockSerializeTableTemplateUpdateCore.status.success } returns true
-
         every { mockSerializeTableTemplateUpdateCore.status.errorMessage } returns ""
-
-
         coEvery { mockMoshiTableTemplateRepository.save(any()) } returns true
 
         sut.updateTableTemplate("testTemplate",
@@ -265,6 +269,102 @@ class SerializeTableTemplatesTests {
             "folder/templatesListFilename")
 
         assert(sut.serializeUpdateTableTemplateStatus.success)
+    }
+
+    @Test
+    fun `update table items FAIL due to EXTERNAL FILE PATH is NULL`() = runBlocking {
+        every { mockContext.getExternalFilesDir(any()) } returns null
+
+        sut.updateTableTemplate("testTemplate",
+            TableTemplateItemListMoshi("test",
+                tableTemplateItems),
+            "folder/templatesListFilename")
+
+        assert(!sut.serializeUpdateTableTemplateStatus.success)
+        assert(sut.serializeUpdateTableTemplateStatus.errorMessage == EXTERNAL_STORAGE_PATH_IS_NULL)
+    }
+
+    @Test
+    fun `update table items FAIL due to INPUT STREAM is NULL`() = runBlocking {
+        every { mockCommonSerializationRepoHelper.getInputStream(any()) } returns null
+
+        sut.updateTableTemplate("testTemplate",
+            TableTemplateItemListMoshi("test",
+                tableTemplateItems),
+            "folder/templatesListFilename")
+
+        val path = TEMPLATES_FOLDER + "folder/templatesListFilename" + JSON_EXTENSION
+        assert(!sut.serializeUpdateTableTemplateStatus.success)
+        assert(sut.serializeUpdateTableTemplateStatus.errorMessage == FILE_DOES_NOT_EXIST + path)
+    }
+
+    @Test
+    fun `update table items FAIL due to INPUT STREAM THROWS EXCEPTION`() = runBlocking {
+        every { mockCommonSerializationRepoHelper.getInputStream(any()) } throws Exception("error!")
+
+        sut.updateTableTemplate("testTemplate",
+            TableTemplateItemListMoshi("test",
+                tableTemplateItems),
+            "folder/templatesListFilename")
+
+        assert(!sut.serializeUpdateTableTemplateStatus.success)
+        assert(sut.serializeUpdateTableTemplateStatus.errorMessage == EXCEPTION_THROWN_MSG + "error!")
+    }
+
+    @Test
+    fun `update table items FAIL due to StringListToSplitItemList RETURNS FALSE`() = runBlocking {
+        every { mockContext.getExternalFilesDir(any()) } returns mockFile
+        every { mockCommonSerializationRepoHelper.getInputStream(any()) } returns mockInputStream
+        every { mockStringListToSplitItemList.status.success } returns false
+        every { mockStringListToSplitItemList.status.errorMessage } returns "error!"
+
+        sut.updateTableTemplate("testTemplate",
+            TableTemplateItemListMoshi("test",
+                tableTemplateItems),
+            "folder/templatesListFilename")
+
+        assert(!sut.serializeUpdateTableTemplateStatus.success)
+        assert(sut.serializeUpdateTableTemplateStatus.errorMessage == "error!")
+    }
+
+    @Test
+    fun `update table items FAIL due to SerializeTableTemplateUpdateCore RETURNS FALSE`() = runBlocking {
+        every { mockContext.getExternalFilesDir(any()) } returns mockFile
+        every { mockCommonSerializationRepoHelper.getInputStream(any()) } returns mockInputStream
+        every { mockStringListToSplitItemList.status.success } returns true
+        coEvery { mockSerializeTableTemplateUpdateCore.update(any(),
+            any(), any(),
+            any(), any()) } returns Unit
+        every { mockSerializeTableTemplateUpdateCore.status.success } returns false
+        every { mockSerializeTableTemplateUpdateCore.status.errorMessage } returns "error!"
+
+        sut.updateTableTemplate("testTemplate",
+            TableTemplateItemListMoshi("test",
+                tableTemplateItems),
+            "folder/templatesListFilename")
+
+        assert(!sut.serializeUpdateTableTemplateStatus.success)
+        assert(sut.serializeUpdateTableTemplateStatus.errorMessage == "error!")
+    }
+
+    @Test
+    fun `update table items FAIL due to MoshiTableTemplateRepository RETURNS FALSE`() = runBlocking {
+        every { mockContext.getExternalFilesDir(any()) } returns mockFile
+        every { mockCommonSerializationRepoHelper.getInputStream(any()) } returns mockInputStream
+        every { mockStringListToSplitItemList.status.success } returns true
+        coEvery { mockSerializeTableTemplateUpdateCore.update(any(),
+            any(), any(),
+            any(), any()) } returns Unit
+        every { mockSerializeTableTemplateUpdateCore.status.success } returns true
+        coEvery { mockMoshiTableTemplateRepository.save(any()) } returns false
+
+        sut.updateTableTemplate("testTemplate",
+            TableTemplateItemListMoshi("test",
+                tableTemplateItems),
+            "folder/templatesListFilename")
+
+        assert(!sut.serializeUpdateTableTemplateStatus.success)
+        assert(sut.serializeUpdateTableTemplateStatus.errorMessage == FAILED_TO_SAVE_TEMPLATE)
     }
 
     private fun initMockMoshiTableTemplateInputFiles() {
