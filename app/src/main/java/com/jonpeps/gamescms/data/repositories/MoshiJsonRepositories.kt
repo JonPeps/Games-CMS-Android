@@ -5,6 +5,7 @@ import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.serialization.moshi.MoshiJsonBuilder
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplatesStatus
 import com.squareup.moshi.JsonAdapter
 import javax.inject.Inject
 
@@ -18,9 +19,9 @@ class TableTemplateMoshiJsonAdapter : MoshiJsonAdapter<TableTemplateItemListMosh
         MoshiJsonBuilder.build().adapter(TableTemplateItemListMoshi::class.java)
 }
 
-class DefaultTableTemplateStatusMoshiAdapter : MoshiJsonAdapter<TableTemplateStatusList> {
-    override fun getJsonAdapter(): JsonAdapter<TableTemplateStatusList> =
-        MoshiJsonBuilder.build().adapter(TableTemplateStatusList::class.java)
+class DefaultTableTemplateStatusMoshiAdapter : MoshiJsonAdapter<SerializeTableTemplatesStatus> {
+    override fun getJsonAdapter(): JsonAdapter<SerializeTableTemplatesStatus> =
+        MoshiJsonBuilder.build().adapter(SerializeTableTemplatesStatus::class.java)
 }
 
 interface IMoshiStringListRepository : IBaseSingleItemMoshiJsonRepository<StringListMoshi>
@@ -48,10 +49,10 @@ class MoshiTableTemplateRepository
     : BaseSingleItemMoshiJsonRepository<TableTemplateItemListMoshi>(tableTemplateItemListMoshiAdapter,
     stringFileStorageStrSerialisation), IMoshiTableTemplateRepository
 
-interface IMoshiTableTemplateStatusListRepository : IBaseSingleItemMoshiJsonRepository<TableTemplateStatusList>
+interface IMoshiTableTemplateStatusListRepository : IBaseSingleItemMoshiJsonRepository<SerializeTableTemplatesStatus>
 
 class MoshiTableTemplateStatusListRepository
 @Inject constructor(moshiTableTemplateStatusAdapter: DefaultTableTemplateStatusMoshiAdapter,
                     stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation)
-    : BaseSingleItemMoshiJsonRepository<TableTemplateStatusList>(moshiTableTemplateStatusAdapter,
+    : BaseSingleItemMoshiJsonRepository<SerializeTableTemplatesStatus>(moshiTableTemplateStatusAdapter,
     stringFileStorageStrSerialisation)

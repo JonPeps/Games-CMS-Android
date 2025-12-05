@@ -8,8 +8,9 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
-import com.jonpeps.gamescms.data.DataConstants
 import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.ADD_DEFAULTS
+import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.INSERT_DEFAULT_PROJECTS
+import com.jonpeps.gamescms.data.DataConstants.KnownScreens.Companion.INSERT_DEFAULT_TEMPLATES
 import com.jonpeps.gamescms.ui.applevel.CustomColours
 import com.jonpeps.gamescms.ui.main.builders.core.BasicFlowComposeBuilder
 import com.jonpeps.gamescms.ui.main.composables.CommonStringListView
@@ -32,14 +33,13 @@ class AddDefaultsActivity: ComponentActivity() {
                     finish()
                     val intent = Intent(this, MainFlowActivity::class.java)
                     startActivity(intent)
-                    }
-                    .showBackIcon(true)
+                }.showBackIcon(true)
                     .addScreenItem(ADD_DEFAULTS,
                         {
                             CommonStringListView(
                                 listOf(
-                                    DataConstants.KnownScreens.Companion.INSERT_DEFAULT_PROJECTS,
-                                    DataConstants.KnownScreens.Companion.INSERT_DEFAULT_TEMPLATES
+                                    INSERT_DEFAULT_PROJECTS,
+                                    INSERT_DEFAULT_TEMPLATES
                                 ), customColours
                             ) { text ->
 

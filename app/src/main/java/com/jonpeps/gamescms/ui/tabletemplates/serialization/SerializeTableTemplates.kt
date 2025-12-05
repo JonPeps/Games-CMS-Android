@@ -4,13 +4,12 @@ import android.content.Context
 import android.content.res.AssetManager
 import com.jonpeps.gamescms.data.DataConstants.Companion.JSON_EXTENSION
 import com.jonpeps.gamescms.data.dataclasses.TableTemplateStatus
-import com.jonpeps.gamescms.data.dataclasses.TableTemplateStatusList
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.helpers.InputStreamTableTemplate
 import com.jonpeps.gamescms.data.helpers.StringListToSplitItemList
 import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateRepository
-import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateStatusListRepository
 import com.jonpeps.gamescms.data.serialization.CommonSerializationRepoHelper
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject
 
@@ -24,12 +23,11 @@ interface ISerializeTableTemplates {
 }
 
 class SerializeTableTemplates@Inject constructor(
-    private val context: Context,
+    @ApplicationContext private val context: Context,
     private val assetManager: AssetManager,
     private val stringListToSplitItemList: StringListToSplitItemList,
     private val inputStreamTableTemplate: InputStreamTableTemplate,
     private val moshiTableTemplateRepository: MoshiTableTemplateRepository,
-    private val moshiTableTemplateStatusListRepository: MoshiTableTemplateStatusListRepository,
     private val commonSerializationRepoHelper: CommonSerializationRepoHelper,
     private val serializeTableTemplateUpdateCore: SerializeTableTemplateUpdateCore
 ) : ISerializeTableTemplates {
@@ -72,9 +70,6 @@ class SerializeTableTemplates@Inject constructor(
                         )
                         counter++
                     }
-                    if (!moshiTableTemplateStatusListRepository.save(TableTemplateStatusList(statusList))) {
-                        setError(FAILED_TO_SAVE_TEMPLATES_STATUS)
-                    }
                 }?: run {
                     setError(EXTERNAL_STORAGE_PATH_IS_NULL)
                 }
@@ -103,14 +98,23 @@ class SerializeTableTemplates@Inject constructor(
                         val filenames = stringListToSplitItemList.status.fileNames
                         val names = stringListToSplitItemList.status.names
                         for (name in names) {
-                            statusList.add(
-                                TableTemplateStatus(
-                                    true,
-                                    name,
-                                    filenames[filename.indexOf(name)],
-                                    null
+                            val absoluteFilePath = "$TEMPLATES_FOLDER$name$JSON_EXTENSION"
+                            val absolutePath = "$externalPath$absoluteFilePath"
+                            val file = File(absolutePath)
+                            val inputStream = commonSerializationRepoHelper.getInputStream(file)
+                            inputStream?.let {
+                                inputStreamTableTemplate.processSuspend(inputStream)
+                                statusList.add(
+                                    TableTemplateStatus(
+                                        inputStreamTableTemplate.status.success,
+                                        name,
+                                        filenames[filename.indexOf(name)],
+                                        inputStreamTableTemplate.status.errorMessage
+                                    )
                                 )
-                            )
+                            }?: run {
+                                setError(TEMPLATE_INPUT_STREAM_IS_NULL)
+                            }
                         }
                     } else {
                         setError(stringListToSplitItemList.status.errorMessage)
@@ -200,6 +204,7 @@ class SerializeTableTemplates@Inject constructor(
         const val FILE_DOES_NOT_EXIST = "File does not exist: "
         const val STRING_LIST_ITEM_IS_NULL = "StringListMoshi item is null!"
         const val TEMPLATES_FOLDER = "templates/"
+        const val TEMPLATE_INPUT_STREAM_IS_NULL = "InputStream for Table Template is null!"
         const val FAILED_TO_SAVE_TEMPLATES_STATUS = "Failed to save table templates status!"
         const val FAILED_TO_SAVE_TEMPLATE = "Failed to save table template!"
     }

@@ -29,3 +29,8 @@ data class SerializeTableTemplateUpdateCoreStatus(
     val templateFilename: String,
     val errorMessage: String = ""
 )
+
+data class SerializeTableTemplatesViewModelData(
+    val success: Boolean,
+    val errorMessage: String = ""
+)

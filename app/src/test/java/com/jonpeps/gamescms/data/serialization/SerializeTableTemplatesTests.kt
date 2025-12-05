@@ -77,7 +77,6 @@ class SerializeTableTemplatesTests {
             mockStringListToSplitItemList,
             mockInputStreamTableTemplate,
             mockMoshiTableTemplateRepository,
-            mockMoshiTableTemplateStatusListRepository,
             mockCommonSerializationRepoHelper,
             mockSerializeTableTemplateUpdateCore)
 
