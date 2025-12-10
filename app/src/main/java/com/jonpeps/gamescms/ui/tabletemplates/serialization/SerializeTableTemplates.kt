@@ -70,6 +70,13 @@ class SerializeTableTemplates@Inject constructor(
                         )
                         counter++
                     }
+                    inputStreamTableTemplate.status.item?.let { item ->
+                        if (!moshiTableTemplateRepository.save(item)) {
+                            setError(FAILED_TO_SAVE_TEMPLATE)
+                        }
+                    }?: run {
+                        setError(inputStreamTableTemplate.status.errorMessage)
+                    }
                 }?: run {
                     setError(EXTERNAL_STORAGE_PATH_IS_NULL)
                 }
@@ -100,8 +107,7 @@ class SerializeTableTemplates@Inject constructor(
                         for (name in names) {
                             val absoluteFilePath = "$TEMPLATES_FOLDER$name$JSON_EXTENSION"
                             val absolutePath = "$externalPath$absoluteFilePath"
-                            val file = File(absolutePath)
-                            val inputStream = commonSerializationRepoHelper.getInputStream(file)
+                            val inputStream = commonSerializationRepoHelper.getInputStreamFromStr(absolutePath)
                             inputStream?.let {
                                 inputStreamTableTemplate.processSuspend(inputStream)
                                 statusList.add(
@@ -205,7 +211,7 @@ class SerializeTableTemplates@Inject constructor(
         const val STRING_LIST_ITEM_IS_NULL = "StringListMoshi item is null!"
         const val TEMPLATES_FOLDER = "templates/"
         const val TEMPLATE_INPUT_STREAM_IS_NULL = "InputStream for Table Template is null!"
-        const val FAILED_TO_SAVE_TEMPLATES_STATUS = "Failed to save table templates status!"
         const val FAILED_TO_SAVE_TEMPLATE = "Failed to save table template!"
+        const val TABLE_TEMPLATES_ARE_NULL = "Table Templates are null!"
     }
 }

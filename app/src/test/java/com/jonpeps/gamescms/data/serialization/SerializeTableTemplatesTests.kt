@@ -17,13 +17,15 @@ import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTempla
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.EXCEPTION_THROWN_MSG
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.EXTERNAL_STORAGE_PATH_IS_NULL
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.FAILED_TO_SAVE_TEMPLATE
-import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.FAILED_TO_SAVE_TEMPLATES_STATUS
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.FILE_DOES_NOT_EXIST
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.TABLE_TEMPLATES_ARE_NULL
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.TEMPLATES_FOLDER
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.TEMPLATE_INPUT_STREAM_IS_NULL
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -121,6 +123,10 @@ class SerializeTableTemplatesTests {
         every { mockInputStreamTableTemplate.status.success } returns true
         every { mockInputStreamTableTemplate.status.errorMessage } returns ""
         coEvery { mockMoshiTableTemplateStatusListRepository.save(any()) } returns true
+        every { mockInputStreamTableTemplate.status.success } returns true
+        every { mockInputStreamTableTemplate.status.item } returns mockk()
+        every { mockInputStreamTableTemplate.status.errorMessage } returns ""
+        coEvery {mockMoshiTableTemplateRepository.save(any()) } returns true
 
         sut.serializeFromAssets("test1")
 
@@ -153,7 +159,7 @@ class SerializeTableTemplatesTests {
     }
 
     @Test
-    fun `serialize from ASSETS FAILS due to saving of status list FAILS`() = runBlocking {
+    fun `serialize from ASSETS FAILS due to saving of Table Template list FAILS`() = runBlocking {
         every { mockStringListToSplitItemList.status.success } returns true
         every { mockStringListToSplitItemList.status.fileNames } returns listOf("test.json")
         every { mockStringListToSplitItemList.status.names } returns listOf("test")
@@ -161,13 +167,32 @@ class SerializeTableTemplatesTests {
         every { mockFile.absolutePath } returns "testFolder/"
         coEvery { mockInputStreamTableTemplate.processSuspend(any(), any(), any()) } returns Unit
         every { mockInputStreamTableTemplate.status.success } returns true
+        every { mockInputStreamTableTemplate.status.item } returns mockk()
         every { mockInputStreamTableTemplate.status.errorMessage } returns ""
-        coEvery { mockMoshiTableTemplateStatusListRepository.save(any()) } returns false
+        coEvery {mockMoshiTableTemplateRepository.save(any()) } returns false
 
         sut.serializeFromAssets("test")
 
         assert(!sut.serializeTableTemplatesStatus.success)
-        assert(sut.serializeTableTemplatesStatus.errorMessage == FAILED_TO_SAVE_TEMPLATES_STATUS)
+        assert(sut.serializeTableTemplatesStatus.errorMessage == FAILED_TO_SAVE_TEMPLATE)
+    }
+
+    @Test
+    fun `serialize from ASSETS FAILS due to Table Template list IS NULL`() = runBlocking {
+        every { mockStringListToSplitItemList.status.success } returns true
+        every { mockStringListToSplitItemList.status.fileNames } returns listOf("test.json")
+        every { mockStringListToSplitItemList.status.names } returns listOf("test")
+        every { mockContext.getExternalFilesDir(any()) } returns mockFile
+        every { mockFile.absolutePath } returns "testFolder/"
+        coEvery { mockInputStreamTableTemplate.processSuspend(any(), any(), any()) } returns Unit
+        every { mockInputStreamTableTemplate.status.success } returns true
+        every { mockInputStreamTableTemplate.status.item } returns null
+        every { mockInputStreamTableTemplate.status.errorMessage } returns TABLE_TEMPLATES_ARE_NULL
+
+        sut.serializeFromAssets("test")
+
+        assert(!sut.serializeTableTemplatesStatus.success)
+        assert(sut.serializeTableTemplatesStatus.errorMessage == TABLE_TEMPLATES_ARE_NULL)
     }
 
     @Test
@@ -186,12 +211,15 @@ class SerializeTableTemplatesTests {
     @Test
     fun `serialize from readItems SUCCESS`() = runBlocking {
         every { mockCommonSerializationRepoHelper.getInputStream(any()) } returns mockInputStream
+        every {mockCommonSerializationRepoHelper.getInputStreamFromStr(any()) } returns mockInputStream
         every { mockStringListToSplitItemList.status.success } returns true
         every { mockStringListToSplitItemList.status.fileNames } returns listOf("test.json")
         every { mockStringListToSplitItemList.status.names } returns listOf("test")
         every { mockContext.getExternalFilesDir(any()) } returns mockFile
         every { mockFile.absolutePath } returns "testFolder/"
-        coEvery { mockInputStreamTableTemplate.processSuspend(any(), any(), any()) } returns Unit
+        coEvery { mockInputStreamTableTemplate.processSuspend(any()) } returns Unit
+        every { mockInputStreamTableTemplate.status.success } returns true
+        every { mockInputStreamTableTemplate.status.errorMessage } returns ""
 
         sut.readItems("test")
 
@@ -212,6 +240,23 @@ class SerializeTableTemplatesTests {
 
         assert(!sut.serializeTableTemplatesStatus.success)
         assert(sut.serializeTableTemplatesStatus.errorMessage == "File does not exist: test")
+    }
+
+    @Test
+    fun `serialize from readItems FAILS due to INPUT STREAM for Table Template list item FILE is NULL`() = runBlocking {
+        every { mockFile.path } returns "test"
+        every { mockFile.absolutePath } returns "testFolder/path"
+        every { mockCommonSerializationRepoHelper.getInputStream(any()) } returns mockInputStream
+        coEvery { mockStringListToSplitItemList.loadSuspend(any()) } returns Unit
+        every { mockStringListToSplitItemList.status.success } returns true
+        every { mockStringListToSplitItemList.status.fileNames } returns listOf("test.json")
+        every { mockStringListToSplitItemList.status.names } returns listOf("test")
+        every { mockCommonSerializationRepoHelper.getInputStreamFromStr(any()) } returns null
+
+        sut.readItems("test")
+
+        assert(!sut.serializeTableTemplatesStatus.success)
+        assert(sut.serializeTableTemplatesStatus.errorMessage == TEMPLATE_INPUT_STREAM_IS_NULL)
     }
 
     @Test

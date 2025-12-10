@@ -16,6 +16,7 @@ interface ICommonSerializationRepoHelper {
     fun readAll(inputStream: InputStream): String
     fun createDirectory(path: String): Boolean
     fun getInputStream(mainFile: File): InputStream?
+    fun getInputStreamFromStr(mainFile: String): InputStream?
     fun getFileInputStream(mainFile: File): FileInputStream?
 }
 
@@ -63,6 +64,14 @@ class CommonSerializationRepoHelper@Inject constructor() : ICommonSerializationR
     override fun getInputStream(mainFile: File): InputStream? {
         if (mainFile.exists()) {
             return mainFile.inputStream()
+        }
+        return null
+    }
+
+    override fun getInputStreamFromStr(mainFile: String): InputStream? {
+        val file = File(mainFile)
+        if (file.exists()) {
+            return file.inputStream()
         }
         return null
     }
