@@ -1,7 +1,8 @@
 package com.jonpeps.gamescms.hilt.di
 
-import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateStatusListRepository
-import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates
+import com.jonpeps.gamescms.data.helpers.InputStreamTableTemplateStatus
+import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateRepository
+import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ISerializeTableTemplatesViewModel
 import com.jonpeps.gamescms.ui.viewmodels.dynamodb.CreateTableViewModel
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmChangesCache
@@ -26,14 +27,16 @@ class ViewModelDiProvider {
 
     @Provides
     fun provideSerializeTableTemplatesViewModel(coroutineDispatcher: CoroutineDispatcher,
-                                                serializeTableTemplates: SerializeTableTemplates,
-                                                moshiTableTemplateStatusListRepository: MoshiTableTemplateStatusListRepository
+                                                inputStreamTableTemplateStatus: InputStreamTableTemplateStatus,
+                                                moshiTableTemplateRepository: MoshiTableTemplateRepository,
+                                                commonSerializationRepoHelper: ICommonSerializationRepoHelper
     )
     : ISerializeTableTemplatesViewModel {
         return SerializeTableTemplatesViewModel(
             coroutineDispatcher,
-            serializeTableTemplates,
-            moshiTableTemplateStatusListRepository)
+            inputStreamTableTemplateStatus,
+            moshiTableTemplateRepository,
+            commonSerializationRepoHelper)
         }
 }
 

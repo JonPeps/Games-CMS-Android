@@ -1,25 +1,6 @@
 package com.jonpeps.gamescms.ui.tabletemplates.serialization
 
-import com.jonpeps.gamescms.data.dataclasses.TableTemplateStatus
-
-data class SerializeTableTemplatesDataClasses(
-    val success: Boolean,
-    val names: List<String>,
-    val fileNames: List<String>,
-    val errorMessage: String = "",
-    val exception: Exception? = null
-)
-
-data class SerializeTableTemplatesStatus(
-    val success: Boolean,
-    val items: List<TableTemplateStatus>?,
-    val errorMessage: String = ""
-)
-
-data class SerializeUpdateTableTemplateStatus(
-    val success: Boolean,
-    val errorMessage: String = ""
-)
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateDetailsListMoshi
 
 data class SerializeTableTemplateUpdateCoreStatus(
     val success: Boolean,
@@ -32,5 +13,6 @@ data class SerializeTableTemplateUpdateCoreStatus(
 
 data class SerializeTableTemplatesViewModelData(
     val success: Boolean,
+    val results: TableTemplateDetailsListMoshi?,
     val errorMessage: String = ""
 )

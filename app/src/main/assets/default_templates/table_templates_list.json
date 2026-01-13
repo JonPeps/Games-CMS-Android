@@ -1,7 +1,19 @@
 {
   "items": [
-    "App Start:app_start_db.json",
-    "Comp Info:comp_info_db.json",
-    "Comp Leaderboard:comp_leaderboard_db.json"
+    {
+      "name": "App Start",
+      "filename": "app_start_db.json",
+      "status": true
+    },
+    {
+      "name": "Comp Info",
+      "filename": "comp_info_db.json",
+      "status": true
+    },
+    {
+      "name": "Comp Leaderboard",
+      "filename": "comp_leaderboard_db.json",
+      "status": true
+    }
   ]
 }
