@@ -1,6 +1,7 @@
 package com.jonpeps.gamescms.hilt.di
 
 import com.jonpeps.gamescms.data.helpers.InputStreamTableTemplateStatus
+import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateDetailsListRepository
 import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ISerializeTableTemplatesViewModel
@@ -29,6 +30,7 @@ class ViewModelDiProvider {
     fun provideSerializeTableTemplatesViewModel(coroutineDispatcher: CoroutineDispatcher,
                                                 inputStreamTableTemplateStatus: InputStreamTableTemplateStatus,
                                                 moshiTableTemplateRepository: MoshiTableTemplateRepository,
+                                                moshiTableTemplateDetailsListRepository: MoshiTableTemplateDetailsListRepository,
                                                 commonSerializationRepoHelper: ICommonSerializationRepoHelper
     )
     : ISerializeTableTemplatesViewModel {
@@ -36,6 +38,7 @@ class ViewModelDiProvider {
             coroutineDispatcher,
             inputStreamTableTemplateStatus,
             moshiTableTemplateRepository,
+            moshiTableTemplateDetailsListRepository,
             commonSerializationRepoHelper)
         }
 }

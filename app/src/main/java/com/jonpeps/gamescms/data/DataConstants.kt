@@ -11,7 +11,7 @@ class DataConstants {
         const val DEFAULT_TEMPLATES_STATUS_FILENAME = "default_templates_status.json"
         const val TEMPLATES_LIST_CACHE_NAME = "template_list"
         const val PROJECT_LIST_CACHE_NAME = "project_list"
-        const val COMMON_SPLIT_PER_STRING_ITEM = ":"
+        const val UNDER_SCORE = "_"
     }
 
     class KnownScreens {

@@ -8,7 +8,7 @@ import java.io.InputStream
 import javax.inject.Inject
 
 interface ICommonSerializationRepoHelper {
-    fun getAbsoluteFile(directory: String, name: String): File
+    fun getAbsoluteFile(directory: String, name: String, createIfDoesNotExists: Boolean = true): File
     fun getBufferReader(directory: String, name: String): BufferedReader
     fun getDirectoryFile(directory: String): File
     fun getMainFile(name: String): File
@@ -22,9 +22,15 @@ interface ICommonSerializationRepoHelper {
 
 class CommonSerializationRepoHelper@Inject constructor() : ICommonSerializationRepoHelper {
     @Throws(RuntimeException::class)
-    override fun getAbsoluteFile(directory: String, name: String): File {
+    override fun getAbsoluteFile(directory: String, name: String, createIfDoesNotExists: Boolean): File {
         if (directory.isEmpty() || name.isEmpty()) {
             throw RuntimeException("Directory or file name is null or empty!")
+        }
+        val directoryFile = File(directory)
+        if (createIfDoesNotExists) {
+            if (!directoryFile.exists()) {
+                directoryFile.mkdirs()
+            }
         }
         return File(getAbsolutePathName(directory, name))
     }

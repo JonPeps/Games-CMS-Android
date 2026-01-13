@@ -16,3 +16,5 @@ data class SerializeTableTemplatesViewModelData(
     val results: TableTemplateDetailsListMoshi?,
     val errorMessage: String = ""
 )
+
+data class UpdatedTableTemplatesViewModelData(val success: Boolean, val errorMessage: String = "")

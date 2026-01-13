@@ -4,5 +4,5 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class TableTemplateDetailsListMoshi(
-    val items: List<TableTemplateDetailsMoshi>
+    val items: ArrayList<TableTemplateDetailsMoshi>
 )

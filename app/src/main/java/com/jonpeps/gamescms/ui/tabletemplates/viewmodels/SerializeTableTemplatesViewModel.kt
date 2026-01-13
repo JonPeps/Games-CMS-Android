@@ -2,11 +2,17 @@ package com.jonpeps.gamescms.ui.tabletemplates.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jonpeps.gamescms.data.DataConstants.Companion.JSON_EXTENSION
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateDetailsListMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateDetailsMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.helpers.InputStreamTableTemplateStatus
+import com.jonpeps.gamescms.data.helpers.toCommonFilename
+import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateDetailsListRepository
 import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplatesViewModelData
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.UpdatedTableTemplatesViewModelData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,9 +21,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 interface ISerializeTableTemplatesViewModel {
-    fun serializeFromAssets(assetPath: String, directory: String, fileName: String)
+    fun readItemsFromAssets(assetPath: String, directory: String, fileName: String)
     fun readItems(directory: String, fileName: String)
-    fun updateTableTemplate(templateName: String, item: TableTemplateItemListMoshi, templatesListFilename: String)
+    fun updateTableTemplate(templateName: String,
+                            templatesListPath: String,
+                            item: TableTemplateItemListMoshi,
+                            details: TableTemplateDetailsListMoshi,
+                            success: Boolean)
 }
 
 @HiltViewModel
@@ -25,48 +35,89 @@ class SerializeTableTemplatesViewModel
 @Inject constructor(private val coroutineDispatcher: CoroutineDispatcher,
                     private val inputStreamTableTemplateStatus: InputStreamTableTemplateStatus,
                     private val moshiTableTemplateRepository: MoshiTableTemplateRepository,
+                    private val moshiTableTemplateDetailsListRepository: MoshiTableTemplateDetailsListRepository,
                     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper
 )
     : ViewModel(), ISerializeTableTemplatesViewModel {
-        private val _status = MutableStateFlow(SerializeTableTemplatesViewModelData(false, null, ""))
-    val status: StateFlow<SerializeTableTemplatesViewModelData> = _status
+        private val _serializeStatus = MutableStateFlow(SerializeTableTemplatesViewModelData(false, null, ""))
+    val serializeStatus: StateFlow<SerializeTableTemplatesViewModelData> = _serializeStatus
 
-    override fun serializeFromAssets(assetPath: String, directory: String, fileName: String) {
+    private val _updatedTableTemplateStatus = MutableStateFlow(
+        UpdatedTableTemplatesViewModelData(
+            false,
+            ""
+        )
+    )
+
+    val updatedTableTemplateStatus: StateFlow<UpdatedTableTemplatesViewModelData> = _updatedTableTemplateStatus
+
+    override fun readItemsFromAssets(assetPath: String, directory: String, fileName: String) {
         viewModelScope.launch(coroutineDispatcher) {
             val inputStream = commonSerializationRepoHelper.getInputStreamFromStr(assetPath)
             inputStream?.let {
                 inputStreamTableTemplateStatus.processSuspend(it, directory, fileName)
-                _status.value = SerializeTableTemplatesViewModelData(
+                _serializeStatus.value = SerializeTableTemplatesViewModelData(
                     inputStreamTableTemplateStatus.status.success,
                     inputStreamTableTemplateStatus.status.item,
                     inputStreamTableTemplateStatus.status.errorMessage)
             }?:run {
-                _status.value = SerializeTableTemplatesViewModelData(false, null,
-                    FAILED_TO_ASSET_FILE)
+                _serializeStatus.value = SerializeTableTemplatesViewModelData(false, null,
+                    FAILED_TO_FIND_ASSET_FILE)
             }
         }
     }
 
     override fun readItems(directory: String, fileName: String) {
         viewModelScope.launch(coroutineDispatcher) {
-            moshiTableTemplateRepository.setAbsoluteFile(commonSerializationRepoHelper.getAbsoluteFile(directory, fileName))
-            if (moshiTableTemplateRepository.load()) {
-                _status.value = SerializeTableTemplatesViewModelData(true, moshiTableTemplateRepository.getItem(), "")
+            moshiTableTemplateRepository.setAbsoluteFile(commonSerializationRepoHelper.getAbsoluteFile(directory,
+                fileName + JSON_EXTENSION))
+            if (moshiTableTemplateDetailsListRepository.load()) {
+                _serializeStatus.value = SerializeTableTemplatesViewModelData(true,
+                    moshiTableTemplateDetailsListRepository.getItem(), "")
             } else {
-                _status.value = SerializeTableTemplatesViewModelData(false, null, moshiTableTemplateRepository.getErrorMsg())
+                _serializeStatus.value = SerializeTableTemplatesViewModelData(false, null,
+                    moshiTableTemplateDetailsListRepository.getErrorMsg())
             }
         }
     }
 
-    override fun updateTableTemplate(
-        templateName: String,
-        item: TableTemplateItemListMoshi,
-        templatesListFilename: String
+    override fun updateTableTemplate(templateName: String,
+                                     templatesListPath: String,
+                                     item: TableTemplateItemListMoshi,
+                                     details: TableTemplateDetailsListMoshi,
+                                     success: Boolean
     ) {
-        TODO("Not yet implemented")
+        viewModelScope.launch(coroutineDispatcher) {
+            val filename = templateName.toCommonFilename() + JSON_EXTENSION
+            val file = commonSerializationRepoHelper.getAbsoluteFile(templatesListPath,
+                filename)
+            moshiTableTemplateRepository.setAbsoluteFile(file)
+            if (moshiTableTemplateRepository.save(item)) {
+                var found = false
+                for (tableTemplateItem in details.items) {
+                    if (tableTemplateItem.name == templateName) {
+                        tableTemplateItem.status = success
+                        found = true
+                        break
+                    }
+                }
+                if (!found) {
+                    details.items.add(TableTemplateDetailsMoshi(templateName, filename, success))
+                }
+                if (moshiTableTemplateDetailsListRepository.save(details)) {
+                    _updatedTableTemplateStatus.value = UpdatedTableTemplatesViewModelData(true, "")
+                } else {
+                    _updatedTableTemplateStatus.value = UpdatedTableTemplatesViewModelData(false,
+                        moshiTableTemplateDetailsListRepository.getErrorMsg())
+                }
+            } else {
+                _updatedTableTemplateStatus.value = UpdatedTableTemplatesViewModelData(false,
+                    moshiTableTemplateRepository.getErrorMsg())
+            }
+        }
     }
 
     companion object {
-        const val FAILED_TO_ASSET_FILE = "Failed to load asset file!"
+        const val FAILED_TO_FIND_ASSET_FILE = "Failed to load asset file!"
     }
 }

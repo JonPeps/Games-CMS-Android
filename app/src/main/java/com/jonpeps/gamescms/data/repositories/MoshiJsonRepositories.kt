@@ -2,6 +2,7 @@ package com.jonpeps.gamescms.data.repositories
 
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateDetailsListMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.serialization.moshi.MoshiJsonBuilder
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
 import com.squareup.moshi.JsonAdapter
@@ -12,7 +13,12 @@ class StringListMoshiJsonAdapter : MoshiJsonAdapter<StringListMoshi> {
         MoshiJsonBuilder.build().adapter(StringListMoshi::class.java)
 }
 
-class TableTemplateMoshiJsonAdapter : MoshiJsonAdapter<TableTemplateDetailsListMoshi> {
+class TableTemplateMoshiJsonAdapter : MoshiJsonAdapter<TableTemplateItemListMoshi> {
+    override fun getJsonAdapter(): JsonAdapter<TableTemplateItemListMoshi> =
+        MoshiJsonBuilder.build().adapter(TableTemplateItemListMoshi::class.java)
+}
+
+class TableTemplateDetailsListMoshiJsonAdapter : MoshiJsonAdapter<TableTemplateDetailsListMoshi> {
     override fun getJsonAdapter(): JsonAdapter<TableTemplateDetailsListMoshi> =
         MoshiJsonBuilder.build().adapter(TableTemplateDetailsListMoshi::class.java)
 }
@@ -40,12 +46,12 @@ class CachedMoshiStringListRepository
     stringFileStorageStrSerialisation,
     tableTemplateStringMoshiJsonCache), ICachedMoshiStringListRepository
 
-interface IMoshiTableTemplateRepository : IBaseSingleItemMoshiJsonRepository<TableTemplateDetailsListMoshi>
+interface IMoshiTableTemplateRepository : IBaseSingleItemMoshiJsonRepository<TableTemplateItemListMoshi>
 
 class MoshiTableTemplateRepository
 @Inject constructor(tableTemplateItemListMoshiAdapter: TableTemplateMoshiJsonAdapter,
                     stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation)
-    : BaseSingleItemMoshiJsonRepository<TableTemplateDetailsListMoshi>(tableTemplateItemListMoshiAdapter,
+    : BaseSingleItemMoshiJsonRepository<TableTemplateItemListMoshi>(tableTemplateItemListMoshiAdapter,
     stringFileStorageStrSerialisation), IMoshiTableTemplateRepository
 
 interface IMoshiTableTemplateDetailsListRepository : IBaseSingleItemMoshiJsonRepository<TableTemplateDetailsListMoshi>
