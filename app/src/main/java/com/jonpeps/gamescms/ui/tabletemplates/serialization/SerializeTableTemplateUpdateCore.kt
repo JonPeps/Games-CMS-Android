@@ -4,7 +4,6 @@ import com.jonpeps.gamescms.data.DataConstants.Companion.JSON_EXTENSION
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.repositories.MoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.CommonSerializationRepoHelper
-import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.STRING_LIST_ITEM_IS_NULL
 import java.io.File
 import javax.inject.Inject
 
@@ -102,5 +101,6 @@ class SerializeTableTemplateUpdateCore@Inject constructor(
         const val FAILED_TO_SAVE_TEMPLATE_LIST = "Failed to save table template list!"
         const val EXCEPTION_THROWN_MSG = "Exception thrown: "
         const val FILE_DOES_NOT_EXIST = "File does not exist: "
+        const val STRING_LIST_ITEM_IS_NULL = "String list item is null!"
     }
 }

@@ -8,7 +8,7 @@ import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTempla
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplateUpdateCore
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplateUpdateCore.Companion.EXCEPTION_THROWN_MSG
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplateUpdateCore.Companion.FAILED_TO_SAVE_TEMPLATE_LIST
-import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplates.Companion.STRING_LIST_ITEM_IS_NULL
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplateUpdateCore.Companion.STRING_LIST_ITEM_IS_NULL
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
