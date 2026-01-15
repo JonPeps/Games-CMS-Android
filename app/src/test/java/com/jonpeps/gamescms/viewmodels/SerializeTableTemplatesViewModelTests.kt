@@ -117,4 +117,49 @@ class SerializeTableTemplatesViewModelTests {
         assert(tableTemplateDetailsListMoshi.items.size == 2)
         assert(viewModel.updatedTableTemplateStatus.value.errorMessage == "")
     }
+
+    @Test
+    fun `update table template SUCCESS WHEN EXISTING ITEM NOT FOUND`() {
+        every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { mockMoshiTableTemplateRepository.setAbsoluteFile(any()) } returns Unit
+        coEvery { mockMoshiTableTemplateRepository.save(any()) } returns true
+        coEvery { mockMoshiTableTemplateDetailsListRepository.save(any()) } returns true
+        every { mockMoshiTableTemplateDetailsListRepository.getErrorMsg() } returns ""
+
+        viewModel.updateTableTemplate("test3", "",
+            mockk(), tableTemplateDetailsListMoshi, true)
+
+        assert(viewModel.updatedTableTemplateStatus.value.success)
+        assert(tableTemplateDetailsListMoshi.items.size == 3)
+        assert(viewModel.updatedTableTemplateStatus.value.errorMessage == "")
+    }
+
+    @Test
+    fun `update table template FAILS WHEN SAVE TableTemplate TO REPO FAILS`() {
+        every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { mockMoshiTableTemplateRepository.setAbsoluteFile(any()) } returns Unit
+        coEvery { mockMoshiTableTemplateRepository.save(any()) } returns false
+        every { mockMoshiTableTemplateRepository.getErrorMsg() } returns "error"
+
+        viewModel.updateTableTemplate("test1", "",
+            mockk(), tableTemplateDetailsListMoshi, true)
+
+        assert(!viewModel.updatedTableTemplateStatus.value.success)
+        assert(viewModel.updatedTableTemplateStatus.value.errorMessage == mockMoshiTableTemplateRepository.getErrorMsg())
+    }
+
+    @Test
+    fun `update table template FAILS WHEN SAVE TableTemplate TO REPO SUCCESS yet SAVE TABLE TEMPLATE DETAILS LIST FAILS`() {
+        every { mockCommonSerializationRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
+        every { mockMoshiTableTemplateRepository.setAbsoluteFile(any()) } returns Unit
+        coEvery { mockMoshiTableTemplateRepository.save(any()) } returns true
+        every { mockMoshiTableTemplateDetailsListRepository.getErrorMsg() } returns "error"
+        coEvery { mockMoshiTableTemplateDetailsListRepository.save(any()) } returns false
+
+        viewModel.updateTableTemplate("test1", "",
+            mockk(), tableTemplateDetailsListMoshi, true)
+
+        assert(!viewModel.updatedTableTemplateStatus.value.success)
+        assert(viewModel.updatedTableTemplateStatus.value.errorMessage == mockMoshiTableTemplateDetailsListRepository.getErrorMsg())
+    }
 }
