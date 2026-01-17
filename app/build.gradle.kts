@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.dynamodb.enhanced)
     implementation(libs.androidx.fragment.compose)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.protolite.well.known.types)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

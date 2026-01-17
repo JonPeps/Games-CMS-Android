@@ -12,6 +12,9 @@ class DataConstants {
         const val TEMPLATES_LIST_CACHE_NAME = "template_list"
         const val PROJECT_LIST_CACHE_NAME = "project_list"
         const val UNDER_SCORE = "_"
+        const val SPACE = " "
+        const val UTC_DATE_FORMAT = "yyyy-MM-dd"
+        const val UTC = "UTC"
     }
 
     class KnownScreens {

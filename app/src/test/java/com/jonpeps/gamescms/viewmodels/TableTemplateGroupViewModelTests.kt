@@ -7,6 +7,7 @@ import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
 import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.ISerializeTableTemplateHelpers
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel.Companion.JSON_ITEM_TO_SAVE_IS_NULL
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmChangesCache
@@ -31,6 +32,8 @@ class TableTemplateGroupViewModelTests {
     private lateinit var tableTemplateGroupVmRepoHelper: ICommonSerializationRepoHelper
     @MockK
     private lateinit var tableTemplateGroupVmChangesCache: ITableTemplateGroupVmChangesCache
+    @MockK
+    private lateinit var serializeTableTemplateHelpers: ISerializeTableTemplateHelpers
 
     private val dummyData = TableTemplateItemListMoshi("test_template",
         listOf(TableTemplateItemMoshi("test",
@@ -49,6 +52,7 @@ class TableTemplateGroupViewModelTests {
             tableTemplateRepository,
             tableTemplateGroupVmRepoHelper,
             tableTemplateGroupVmChangesCache,
+            serializeTableTemplateHelpers,
             dispatcher)
 
         mockkObject(TableItemFinalMapper.Companion) {
@@ -549,6 +553,30 @@ class TableTemplateGroupViewModelTests {
         viewModel.setIndex(0)
         viewModel.setSortKey(false)
         assert(!viewModel.noSortKeyFound.value)
+    }
+
+    @Test
+    fun `test determineIfParseValueError with NO PARSE ERROR`() {
+        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns true
+        viewModel.clearItems()
+        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
+            value = "true", editable = true, dataType = ItemType.BOOLEAN))
+        viewModel.setIndex(0)
+        viewModel.determineIfParseValueError(ItemType.BOOLEAN)
+        assert(!viewModel.parseValueError.value)
+        assert(viewModel.getParseErrorMsg() == "")
+    }
+
+    @Test
+    fun `test determineIfParseValueError with PARSE ERROR`() {
+        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns false
+        viewModel.clearItems()
+        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
+            value = "Not a boolean", editable = true, dataType = ItemType.BOOLEAN))
+        viewModel.setIndex(0)
+        viewModel.determineIfParseValueError(ItemType.BOOLEAN)
+        assert(viewModel.parseValueError.value)
+        assert(viewModel.getParseErrorMsg() == "Value is not a Boolean")
     }
 
     @Test

@@ -8,6 +8,7 @@ import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
 import com.jonpeps.gamescms.data.dataclasses.mappers.TableItemFinalMapper
 import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.ISerializeTableTemplateHelpers
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.factories.TableTemplateGroupViewModelFactory
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -45,6 +46,7 @@ interface ITableTemplateGroupViewModel {
 
     fun hasChanges(): Boolean
     fun reset()
+    fun getParseErrorMsg(): String
 }
 
 @HiltViewModel(assistedFactory = TableTemplateGroupViewModelFactory.ITableTemplateGroupViewModelFactory::class)
@@ -54,6 +56,7 @@ class TableTemplateGroupViewModel
     private val tableTemplateRepository: IMoshiTableTemplateRepository,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val tableTemplateGroupVmChangesCache: ITableTemplateGroupVmChangesCache,
+    private val serializeTableTemplateHelpers: ISerializeTableTemplateHelpers,
     private val coroutineDispatcher: CoroutineDispatcher)
     : ViewModel(), ITableTemplateGroupViewModel {
 
@@ -75,6 +78,9 @@ class TableTemplateGroupViewModel
     private var _rowNameEmpty = MutableStateFlow(true)
     val rowNameEmpty: StateFlow<Boolean> = _rowNameEmpty
 
+    private var _parseValueError = MutableStateFlow(false)
+    val parseValueError: StateFlow<Boolean> = _parseValueError
+
     private var _isProcessing = MutableStateFlow(false)
     val isProcessing: StateFlow<Boolean> = _isProcessing
 
@@ -82,6 +88,8 @@ class TableTemplateGroupViewModel
     private var index = 0
     private var templateName = ""
     private var exception: Exception? = null
+
+    private var parseValueErrorMsg = ""
 
     override fun load(name: String, loadFromCacheIfExists: Boolean) {
         viewModelScope.launch(coroutineDispatcher) {
@@ -181,11 +189,13 @@ class TableTemplateGroupViewModel
 
     override fun setItemType(type: ItemType) {
         items[index].dataType = type
+        determineIfParseValueError(type)
     }
 
     override fun setDefaultValue(value: String) {
         _noValueWithNotEditable.value = value.isEmpty() && !items[index].editable
         items[index].value = value
+        determineIfParseValueError(items[index].dataType)
     }
 
     override fun setPrimary(isPrimary: Boolean) {
@@ -264,6 +274,8 @@ class TableTemplateGroupViewModel
         _status.value = TableTemplateStatus(true, items, index, "", null)
     }
 
+    override fun getParseErrorMsg(): String = parseValueErrorMsg
+
     // For testing:
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun addItem(item: TableItemFinal) {
@@ -279,6 +291,23 @@ class TableTemplateGroupViewModel
     }
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun getIndex() = index
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal fun determineIfParseValueError(type: ItemType) {
+        _parseValueError.value = !serializeTableTemplateHelpers
+            .validateTableTemplateValue(items[index].value, type)
+        parseValueErrorMsg = if (_parseValueError.value) {
+            getParseValueErrorMsg(type)
+        } else {
+            ""
+        }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal fun getParseValueErrorMsg(type: ItemType): String {
+        return "Value is not a $type"
+    }
+
     ///////////////////////////////
 
     private fun decrementPage(): Boolean {

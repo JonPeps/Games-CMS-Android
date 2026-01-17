@@ -19,6 +19,7 @@ import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.debug.IInputStreamSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.debug.InputStreamSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.moshi.InputStreamStringList
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.ISerializeTableTemplateHelpers
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplateHelpers
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplateUpdateCore
 import dagger.Module
@@ -107,5 +108,10 @@ class SerializationDiProvider {
         return InputStreamStringList(moshiStringListRepository,
             commonSerializationRepoHelper,
             inputStreamSerializationRepoHelper)
+    }
+
+    @Provides
+    fun providesSerializeTableTemplateHelpers(): ISerializeTableTemplateHelpers {
+        return SerializeTableTemplateHelpers()
     }
 }
