@@ -5,6 +5,7 @@ import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
 import com.jonpeps.gamescms.data.dataclasses.mappers.TableItemFinalMapper
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
+import com.jonpeps.gamescms.data.helpers.ITableTemplateGroupValidator
 import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.ISerializeTableTemplateHelpers
@@ -33,13 +34,15 @@ class TableTemplateGroupViewModelTests {
     @MockK
     private lateinit var tableTemplateGroupVmChangesCache: ITableTemplateGroupVmChangesCache
     @MockK
+    private lateinit var tableTemplateGroupValidator: ITableTemplateGroupValidator
+    @MockK
     private lateinit var serializeTableTemplateHelpers: ISerializeTableTemplateHelpers
 
     private val dummyData = TableTemplateItemListMoshi("test_template",
         listOf(TableTemplateItemMoshi("test",
         dataType = ItemType.STRING)))
 
-    private lateinit var viewModel: TableTemplateGroupViewModel
+    private lateinit var sut: TableTemplateGroupViewModel
 
     private val path = "test/"
     private val templateName = "my_template"
@@ -48,10 +51,11 @@ class TableTemplateGroupViewModelTests {
     fun setup() {
         MockKAnnotations.init(this)
 
-        viewModel = TableTemplateGroupViewModel(path,
+        sut = TableTemplateGroupViewModel(path,
             tableTemplateRepository,
             tableTemplateGroupVmRepoHelper,
             tableTemplateGroupVmChangesCache,
+            tableTemplateGroupValidator,
             serializeTableTemplateHelpers,
             dispatcher)
 
@@ -74,13 +78,13 @@ class TableTemplateGroupViewModelTests {
         every { tableTemplateRepository.getItem() } returns dummyData
         coEvery { tableTemplateRepository.load() } returns true
 
-        viewModel.load(templateName, false)
+        sut.load(templateName, false)
 
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 1)
-        assert(viewModel.status.value.currentIndex == 0)
+        assert(sut.status.value.success)
+        assert(sut.status.value.message == "")
+        assert(sut.status.value.ex == null)
+        assert(sut.status.value.items.size == 1)
+        assert(sut.status.value.currentIndex == 0)
     }
 
     @Test
@@ -92,11 +96,11 @@ class TableTemplateGroupViewModelTests {
         every { tableTemplateRepository.getErrorMsg() } returns "An error occurred!"
         coEvery { tableTemplateRepository.load() } returns false
 
-        viewModel.load(templateName)
+        sut.load(templateName)
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == tableTemplateRepository.getErrorMsg())
-        assert(viewModel.status.value.ex == null)
+        assert(!sut.status.value.success)
+        assert(sut.status.value.message == tableTemplateRepository.getErrorMsg())
+        assert(sut.status.value.ex == null)
     }
 
     @Test
@@ -104,11 +108,11 @@ class TableTemplateGroupViewModelTests {
         every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(any(), any()) } throws RuntimeException("Runtime error!")
         every { tableTemplateGroupVmChangesCache.isPopulated() } returns false
 
-        viewModel.load(templateName)
+        sut.load(templateName)
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == "Runtime error!")
-        assert(viewModel.status.value.ex != null)
+        assert(!sut.status.value.success)
+        assert(sut.status.value.message == "Runtime error!")
+        assert(sut.status.value.ex != null)
     }
 
     @Test
@@ -119,11 +123,11 @@ class TableTemplateGroupViewModelTests {
         every { tableTemplateGroupVmRepoHelper.getBufferReader(any(), any()) } throws RuntimeException("Runtime error!")
         every { tableTemplateGroupVmChangesCache.isPopulated() } returns false
 
-        viewModel.load(templateName)
+        sut.load(templateName)
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == "Runtime error!")
-        assert(viewModel.status.value.ex != null)
+        assert(!sut.status.value.success)
+        assert(sut.status.value.message == "Runtime error!")
+        assert(sut.status.value.ex != null)
     }
 
     @Test
@@ -134,11 +138,11 @@ class TableTemplateGroupViewModelTests {
         coEvery { tableTemplateRepository.load() } returns true
         every { tableTemplateRepository.getItem() } returns null
 
-        viewModel.load(templateName, false)
+        sut.load(templateName, false)
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == JSON_ITEM_TO_LOAD_IS_NULL + templateName)
-        assert(viewModel.status.value.ex == null)
+        assert(!sut.status.value.success)
+        assert(sut.status.value.message == JSON_ITEM_TO_LOAD_IS_NULL + templateName)
+        assert(sut.status.value.ex == null)
     }
 
     @Test
@@ -148,13 +152,13 @@ class TableTemplateGroupViewModelTests {
             TableItemFinal("test", isPrimary = true, isSortKey = true,
                 value = "test", editable = true, dataType = ItemType.STRING))
 
-        viewModel.load(templateName, true)
+        sut.load(templateName, true)
 
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 1)
-        assert(viewModel.status.value.currentIndex == 0)
+        assert(sut.status.value.success)
+        assert(sut.status.value.message == "")
+        assert(sut.status.value.ex == null)
+        assert(sut.status.value.items.size == 1)
+        assert(sut.status.value.currentIndex == 0)
     }
 
     @Test
@@ -168,11 +172,11 @@ class TableTemplateGroupViewModelTests {
         every { tableTemplateRepository.getItem() } returns dummyData
         coEvery { tableTemplateRepository.save(dummyData) } returns true
 
-        viewModel.save(templateName)
+        sut.save(templateName)
 
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
+        assert(sut.status.value.success)
+        assert(sut.status.value.message == "")
+        assert(sut.status.value.ex == null)
     }
 
     @Test
@@ -185,21 +189,21 @@ class TableTemplateGroupViewModelTests {
         every { tableTemplateGroupVmRepoHelper.getFileWriter(path, templateName) } returns mockk()
         every { tableTemplateRepository.getItem() } returns null
 
-        viewModel.save(templateName)
+        sut.save(templateName)
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == JSON_ITEM_TO_SAVE_IS_NULL + templateName)
+        assert(!sut.status.value.success)
+        assert(sut.status.value.message == JSON_ITEM_TO_SAVE_IS_NULL + templateName)
     }
 
     @Test
     fun `save template FAILURE WHEN IO file THROWS RuntimeException due to INVALID absolute file path`() {
         every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } throws RuntimeException("Runtime error!")
 
-        viewModel.save(templateName)
+        sut.save(templateName)
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == "Runtime error!")
-        assert(viewModel.status.value.ex != null)
+        assert(!sut.status.value.success)
+        assert(sut.status.value.message == "Runtime error!")
+        assert(sut.status.value.ex != null)
     }
 
     @Test
@@ -211,11 +215,11 @@ class TableTemplateGroupViewModelTests {
         every { tableTemplateGroupVmRepoHelper.getDirectoryFile(path) } returns mockk()
         every { tableTemplateGroupVmRepoHelper.getFileWriter(path, templateName) } throws RuntimeException("Runtime error!")
 
-        viewModel.save(templateName)
+        sut.save(templateName)
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == "Runtime error!")
-        assert(viewModel.status.value.ex != null)
+        assert(!sut.status.value.success)
+        assert(sut.status.value.message == "Runtime error!")
+        assert(sut.status.value.ex != null)
     }
 
     @Test
@@ -230,18 +234,18 @@ class TableTemplateGroupViewModelTests {
         every { tableTemplateRepository.getErrorMsg() } returns "An error occurred!"
         coEvery { tableTemplateRepository.save(dummyData) } returns false
 
-        viewModel.save(templateName)
+        sut.save(templateName)
 
-        assert(!viewModel.status.value.success)
-        assert(viewModel.status.value.message == tableTemplateRepository.getErrorMsg())
+        assert(!sut.status.value.success)
+        assert(sut.status.value.message == tableTemplateRepository.getErrorMsg())
     }
 
     @Test
     fun `new template SUCCESS`() {
-        viewModel.new()
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
+        sut.new()
+        assert(sut.status.value.success)
+        assert(sut.status.value.message == "")
+        assert(sut.status.value.ex == null)
     }
 
     @Test
@@ -249,352 +253,386 @@ class TableTemplateGroupViewModelTests {
         every { tableTemplateGroupVmChangesCache.reset(any()) } returns Unit
         every { tableTemplateGroupVmChangesCache.get(any()) } returns listOf()
 
-        viewModel.reset()
+        sut.reset()
 
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
+        assert(sut.status.value.success)
+        assert(sut.status.value.message == "")
+        assert(sut.status.value.ex == null)
     }
 
     @Test
     fun `ADD page WHEN no pages EXIST`() {
-        viewModel.clearItems()
-        viewModel.addPage()
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 1)
-        assert(viewModel.status.value.currentIndex == 0)
+        sut.clearItems()
+        sut.addPage()
+        assert(sut.status.value.success)
+        assert(sut.status.value.message == "")
+        assert(sut.status.value.ex == null)
+        assert(sut.status.value.items.size == 1)
+        assert(sut.status.value.currentIndex == 0)
     }
 
     @Test
     fun `ADD page WHEN pages EXIST`() {
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
-        viewModel.addPage()
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 2)
-        assert(viewModel.status.value.currentIndex == 1)
+        sut.addPage()
+        assert(sut.status.value.success)
+        assert(sut.status.value.message == "")
+        assert(sut.status.value.ex == null)
+        assert(sut.status.value.items.size == 2)
+        assert(sut.status.value.currentIndex == 1)
     }
 
     @Test
     fun `REMOVE page WHEN no pages EXIST`() {
-        viewModel.clearItems()
-        viewModel.removePage()
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.isEmpty())
+        sut.clearItems()
+        sut.removePage()
+        assert(sut.status.value.success)
+        assert(sut.status.value.message == "")
+        assert(sut.status.value.ex == null)
+        assert(sut.status.value.items.isEmpty())
     }
 
     @Test
     fun `REMOVE page WHEN pages EXIST`() {
-        viewModel.clearItems()
-        viewModel.addPage()
-        viewModel.addPage()
-        assert(viewModel.status.value.items.size == 2)
-        viewModel.removePage()
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 1)
+        sut.clearItems()
+        sut.addPage()
+        sut.addPage()
+        assert(sut.status.value.items.size == 2)
+        sut.removePage()
+        assert(sut.status.value.success)
+        assert(sut.status.value.message == "")
+        assert(sut.status.value.ex == null)
+        assert(sut.status.value.items.size == 1)
     }
 
     @Test
     fun `NEXT page WHEN no pages EXIST`() {
-        viewModel.clearItems()
-        viewModel.nextPage()
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.isEmpty())
-        assert(viewModel.status.value.currentIndex == 0)
+        sut.clearItems()
+        sut.nextPage()
+        assert(sut.status.value.success)
+        assert(sut.status.value.message == "")
+        assert(sut.status.value.ex == null)
+        assert(sut.status.value.items.isEmpty())
+        assert(sut.status.value.currentIndex == 0)
     }
 
     @Test
     fun `NEXT page WHEN only one page EXISTS`() {
-        viewModel.clearItems()
-        viewModel.setIndex(0)
-        viewModel.nextPage()
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.isEmpty())
-        assert(viewModel.status.value.currentIndex == 0)
-        assert(viewModel.getIndex() == 0)
+        sut.clearItems()
+        sut.setIndex(0)
+        sut.nextPage()
+        assert(sut.status.value.success)
+        assert(sut.status.value.message == "")
+        assert(sut.status.value.ex == null)
+        assert(sut.status.value.items.isEmpty())
+        assert(sut.status.value.currentIndex == 0)
+        assert(sut.getIndex() == 0)
     }
 
     @Test
     fun `NEXT page WHEN pages EXIST`() {
-        viewModel.clearItems()
-        viewModel.addPage()
-        viewModel.addPage()
-        viewModel.setIndex(0)
-        assert(viewModel.status.value.items.size == 2)
-        viewModel.nextPage()
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.currentIndex == 1)
-        assert(viewModel.getIndex() == 1)
+        sut.clearItems()
+        sut.addPage()
+        sut.addPage()
+        sut.setIndex(0)
+        assert(sut.status.value.items.size == 2)
+        sut.nextPage()
+        assert(sut.status.value.success)
+        assert(sut.status.value.message == "")
+        assert(sut.status.value.ex == null)
+        assert(sut.status.value.currentIndex == 1)
+        assert(sut.getIndex() == 1)
     }
 
     @Test
     fun `PREVIOUS page WHEN no pages EXIST`() {
-        viewModel.clearItems()
-        viewModel.previousPage()
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.isEmpty())
-        assert(viewModel.status.value.currentIndex == 0)
+        sut.clearItems()
+        sut.previousPage()
+        assert(sut.status.value.success)
+        assert(sut.status.value.message == "")
+        assert(sut.status.value.ex == null)
+        assert(sut.status.value.items.isEmpty())
+        assert(sut.status.value.currentIndex == 0)
     }
 
     @Test
     fun `PREVIOUS page WHEN pages EXIST`() {
-        viewModel.clearItems()
-        viewModel.addPage()
-        viewModel.addPage()
-        assert(viewModel.status.value.items.size == 2)
-        viewModel.previousPage()
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.currentIndex == 0)
+        sut.clearItems()
+        sut.addPage()
+        sut.addPage()
+        assert(sut.status.value.items.size == 2)
+        sut.previousPage()
+        assert(sut.status.value.success)
+        assert(sut.status.value.message == "")
+        assert(sut.status.value.ex == null)
+        assert(sut.status.value.currentIndex == 0)
     }
 
     @Test
-    fun `set row name WHEN name is EMPTY`() {
-        viewModel.clearItems()
-        viewModel.setRowName("")
-        assert(viewModel.rowNameEmpty.value)
-        assert(!viewModel.duplicateName.value)
+    fun `set row name SUCCESS WHEN ROW IS NOT EMPTY OR DUPLICATE`() {
+        every { tableTemplateGroupValidator.validateNameIsNotEmpty(any()) } returns true
+        every { tableTemplateGroupValidator.validateNameIsNotDuplicate(any(), any()) } returns true
+
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+            value = "test", editable = true, dataType = ItemType.BOOLEAN))
+        sut.setRowName("test2")
+        val item = sut.getCurrentPage()
+        assert(item.name == "test2")
+        assert(sut.isNotDuplicateName.value)
+        assert(sut.rowNameIsNotEmpty.value)
     }
 
     @Test
-    fun `set row name WHEN name IS NOT EMPTY AND no duplicates`() {
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
-            value = "test", editable = true, dataType = ItemType.STRING))
-        viewModel.setRowName("test2")
-        assert(!viewModel.rowNameEmpty.value)
-        assert(!viewModel.duplicateName.value)
+    fun `set row name FAILURE WHEN ROW IS EMPTY`() {
+        every { tableTemplateGroupValidator.validateNameIsNotEmpty(any()) } returns false
+        every { tableTemplateGroupValidator.validateNameIsNotDuplicate(any(), any()) } returns true
+
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+            value = "test", editable = true, dataType = ItemType.BOOLEAN))
+        sut.setRowName("")
+        val item = sut.getCurrentPage()
+        assert(item.name == "")
+        assert(sut.isNotDuplicateName.value)
+        assert(!sut.rowNameIsNotEmpty.value)
     }
 
     @Test
-    fun `set row name WHEN name IS NOT EMPTY AND is duplicate`() {
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
-            value = "test", editable = true, dataType = ItemType.STRING))
-        viewModel.setRowName("test1")
-        assert(!viewModel.rowNameEmpty.value)
-        assert(viewModel.duplicateName.value)
+    fun `set row name FAILURE WHEN ROW IS DUPLICATE`() {
+        every { tableTemplateGroupValidator.validateNameIsNotEmpty(any()) } returns true
+        every { tableTemplateGroupValidator.validateNameIsNotDuplicate(any(), any()) } returns false
+
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+            value = "test", editable = true, dataType = ItemType.BOOLEAN))
+        sut.new()
+        sut.setRowName("test1")
+        val item = sut.getCurrentPage()
+        assert(item.name == "test1")
+        assert(!sut.isNotDuplicateName.value)
+        assert(sut.rowNameIsNotEmpty.value)
     }
 
     @Test
     fun `set row data type`() {
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns true
+
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.BOOLEAN))
-        var item = viewModel.getCurrentPage()
+        var item = sut.getCurrentPage()
         assert(item.dataType == ItemType.BOOLEAN)
-        viewModel.setItemType(ItemType.STRING)
-        item = viewModel.getCurrentPage()
+        sut.setItemType(ItemType.STRING)
+        item = sut.getCurrentPage()
         assert(item.dataType == ItemType.STRING)
     }
 
     @Test
     fun `set default value WHEN row IS EDITABLE`() {
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns true
+
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
-        viewModel.setDefaultValue("test")
-        val item = viewModel.getCurrentPage()
+        sut.setDefaultValue("test")
+        val item = sut.getCurrentPage()
         assert(item.value == "test")
-        assert(!viewModel.noValueWithNotEditable.value)
+        assert(!sut.noValueWithNotEditable.value)
     }
 
     @Test
     fun `set DEFAULT value WHEN row IS NOT EDITABLE`() {
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns true
+
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = false, dataType = ItemType.STRING))
-        viewModel.setDefaultValue("test")
-        val item = viewModel.getCurrentPage()
+        sut.setDefaultValue("test")
+        val item = sut.getCurrentPage()
         assert(item.value == "test")
-        assert(!viewModel.noValueWithNotEditable.value)
+        assert(!sut.noValueWithNotEditable.value)
     }
 
     @Test
     fun `set NO DEFAULT value WHEN row IS EDITABLE`() {
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns false
+
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = false, dataType = ItemType.STRING))
-        viewModel.setDefaultValue("")
-        val item = viewModel.getCurrentPage()
+        sut.setDefaultValue("")
+        val item = sut.getCurrentPage()
         assert(item.value == "")
-        assert(viewModel.noValueWithNotEditable.value)
+        assert(sut.noValueWithNotEditable.value)
     }
 
     @Test
     fun `set IS EDITABLE WITH NO DEFAULT value REQUIRED`() {
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns true
+
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = false, dataType = ItemType.STRING))
-        viewModel.setIsEditable(true)
-        val item = viewModel.getCurrentPage()
+        sut.setIsEditable(true)
+        val item = sut.getCurrentPage()
         assert(item.editable)
-        assert(!viewModel.noValueWithNotEditable.value)
+        assert(!sut.noValueWithNotEditable.value)
     }
 
     @Test
     fun `set IS EDITABLE WITH DEFAULT value EMPTY`() {
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns true
+
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = false, dataType = ItemType.STRING))
-        viewModel.setDefaultValue("")
-        viewModel.setIsEditable(false)
-        viewModel.setIndex(0)
-        val item = viewModel.getCurrentPage()
+        sut.setDefaultValue("")
+        sut.setIsEditable(false)
+        sut.setIndex(0)
+        val item = sut.getCurrentPage()
         assert(!item.editable)
-        assert(viewModel.noValueWithNotEditable.value)
+        assert(sut.noValueWithNotEditable.value)
     }
 
     @Test
     fun `set IS EDITABLE WITH DEFAULT value REQUIRED`() {
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns false
+
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
-        viewModel.setDefaultValue("")
-        viewModel.setIsEditable(false)
-        val item = viewModel.getCurrentPage()
+        sut.setDefaultValue("")
+        sut.setIsEditable(false)
+        val item = sut.getCurrentPage()
         assert(!item.editable)
-        assert(viewModel.noValueWithNotEditable.value)
+        assert(sut.noValueWithNotEditable.value)
     }
 
     @Test
     fun `set IS EDITABLE WITH DEFAULT value PRESENT`() {
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns true
+
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = false, dataType = ItemType.STRING))
-        viewModel.setDefaultValue("test value")
-        viewModel.setIsEditable(true)
-        val item = viewModel.getCurrentPage()
+        sut.setDefaultValue("test value")
+        sut.setIsEditable(true)
+        val item = sut.getCurrentPage()
         assert(item.editable)
-        assert(!viewModel.noValueWithNotEditable.value)
+        assert(!sut.noValueWithNotEditable.value)
     }
 
     @Test
     fun `set IS PRIMARY`() {
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = false, isSortKey = true,
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = false, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
-        viewModel.setPrimary(true)
-        val item = viewModel.getCurrentPage()
+        sut.setPrimary(true)
+        val item = sut.getCurrentPage()
         assert(item.isPrimary)
-        assert(!viewModel.noPrimaryKeyFound.value)
+        assert(!sut.noPrimaryKeyFound.value)
     }
 
     @Test
     fun `set IS NOT PRIMARY AND no other rows set AS PRIMARY`() {
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = false, isSortKey = true,
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = false, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
-        viewModel.setPrimary(false)
-        val item = viewModel.getCurrentPage()
+        sut.setPrimary(false)
+        val item = sut.getCurrentPage()
         assert(!item.isPrimary)
-        assert(viewModel.noPrimaryKeyFound.value)
+        assert(sut.noPrimaryKeyFound.value)
     }
 
     @Test
     fun `set IS NOT PRIMARY with OTHER row set AS PRIMARY`() {
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
-        viewModel.addItem(TableItemFinal("test2", isPrimary = true, isSortKey = true,
+        sut.addItem(TableItemFinal("test2", isPrimary = true, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
-        viewModel.setIndex(0)
-        viewModel.setPrimary(false)
-        assert(!viewModel.noPrimaryKeyFound.value)
+        sut.setIndex(0)
+        sut.setPrimary(false)
+        assert(!sut.noPrimaryKeyFound.value)
     }
 
     @Test
     fun `set IS SORT KEY`() {
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
             value = "test", editable = true, dataType = ItemType.STRING))
-        viewModel.setSortKey(true)
-        val item = viewModel.getCurrentPage()
+        sut.setSortKey(true)
+        val item = sut.getCurrentPage()
         assert(item.isSortKey)
-        assert(!viewModel.noSortKeyFound.value)
+        assert(!sut.noSortKeyFound.value)
     }
 
     @Test
     fun `set IS NOT SORT KEY WITH no other rows set as SORT KEY`() {
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
-        viewModel.setSortKey(false)
-        val item = viewModel.getCurrentPage()
+        sut.setSortKey(false)
+        val item = sut.getCurrentPage()
         assert(!item.isSortKey)
-        assert(viewModel.noSortKeyFound.value)
+        assert(sut.noSortKeyFound.value)
     }
 
     @Test
     fun `set IS NOT SORT KEY WITH other row set as SORT KEY`() {
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
             value = "test", editable = true, dataType = ItemType.STRING))
-        viewModel.addItem(TableItemFinal("test2", isPrimary = false, isSortKey = true,
+        sut.addItem(TableItemFinal("test2", isPrimary = false, isSortKey = true,
             value = "test", editable = true, dataType = ItemType.STRING))
-        viewModel.setIndex(0)
-        viewModel.setSortKey(false)
-        assert(!viewModel.noSortKeyFound.value)
+        sut.setIndex(0)
+        sut.setSortKey(false)
+        assert(!sut.noSortKeyFound.value)
     }
 
     @Test
     fun `test determineIfParseValueError with NO PARSE ERROR`() {
         every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns true
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
             value = "true", editable = true, dataType = ItemType.BOOLEAN))
-        viewModel.setIndex(0)
-        viewModel.determineIfParseValueError(ItemType.BOOLEAN)
-        assert(!viewModel.parseValueError.value)
-        assert(viewModel.getParseErrorMsg() == "")
+        sut.setIndex(0)
+        sut.determineIfParseValueError(ItemType.BOOLEAN)
+        assert(!sut.parseValueError.value)
+        assert(sut.getParseErrorMsg() == "")
     }
 
     @Test
     fun `test determineIfParseValueError with PARSE ERROR`() {
         every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns false
-        viewModel.clearItems()
-        viewModel.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
+        sut.clearItems()
+        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
             value = "Not a boolean", editable = true, dataType = ItemType.BOOLEAN))
-        viewModel.setIndex(0)
-        viewModel.determineIfParseValueError(ItemType.BOOLEAN)
-        assert(viewModel.parseValueError.value)
-        assert(viewModel.getParseErrorMsg() == "Value is not a Boolean")
+        sut.setIndex(0)
+        sut.determineIfParseValueError(ItemType.BOOLEAN)
+        assert(sut.parseValueError.value)
+        assert(sut.getParseErrorMsg() == "Value is not a Boolean")
     }
 
     @Test
     fun `PAGE COUNT WHEN pages added`() {
-        viewModel.clearItems()
-        viewModel.addPage()
-        viewModel.addPage()
-        assert(viewModel.pageCount() == 2)
+        sut.clearItems()
+        sut.addPage()
+        sut.addPage()
+        assert(sut.pageCount() == 2)
     }
 
     @Test
     fun `NEW table template SUCCESS`() {
-        viewModel.addPage()
-        viewModel.new()
-        assert(viewModel.status.value.success)
-        assert(viewModel.status.value.message == "")
-        assert(viewModel.status.value.ex == null)
-        assert(viewModel.status.value.items.size == 1)
+        sut.addPage()
+        sut.new()
+        assert(sut.status.value.success)
+        assert(sut.status.value.message == "")
+        assert(sut.status.value.ex == null)
+        assert(sut.status.value.items.size == 1)
     }
 
     private fun setupForReadingFiles() {

@@ -9,7 +9,9 @@ import com.jonpeps.gamescms.data.serialization.string.StringFileStorageStrSerial
 import com.jonpeps.gamescms.data.serialization.string.StringSerialization
 import com.jonpeps.gamescms.data.repositories.TableTemplateMoshiJsonAdapter
 import com.jonpeps.gamescms.data.helpers.IStringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.helpers.ITableTemplateGroupValidator
 import com.jonpeps.gamescms.data.helpers.StringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.helpers.TableTemplateGroupValidator
 import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.repositories.MoshiStringListRepository
 import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateRepository
@@ -113,5 +115,11 @@ class SerializationDiProvider {
     @Provides
     fun providesSerializeTableTemplateHelpers(): ISerializeTableTemplateHelpers {
         return SerializeTableTemplateHelpers()
+    }
+
+    @Provides
+    fun providesITableTemplateGroupValidator(serializeTableTemplateHelpers: ISerializeTableTemplateHelpers):
+            ITableTemplateGroupValidator {
+        return TableTemplateGroupValidator(serializeTableTemplateHelpers)
     }
 }

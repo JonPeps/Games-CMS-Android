@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
 import com.jonpeps.gamescms.data.dataclasses.mappers.TableItemFinalMapper
+import com.jonpeps.gamescms.data.helpers.ITableTemplateGroupValidator
 import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.ISerializeTableTemplateHelpers
@@ -56,6 +57,7 @@ class TableTemplateGroupViewModel
     private val tableTemplateRepository: IMoshiTableTemplateRepository,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val tableTemplateGroupVmChangesCache: ITableTemplateGroupVmChangesCache,
+    private val tableTemplateGroupValidator: ITableTemplateGroupValidator,
     private val serializeTableTemplateHelpers: ISerializeTableTemplateHelpers,
     private val coroutineDispatcher: CoroutineDispatcher)
     : ViewModel(), ITableTemplateGroupViewModel {
@@ -63,8 +65,8 @@ class TableTemplateGroupViewModel
     private val _status = MutableStateFlow(TableTemplateStatus(true, arrayListOf(),0, "", null))
     val status: StateFlow<TableTemplateStatus> = _status
 
-    private val _duplicateName = MutableStateFlow(false)
-    val duplicateName: StateFlow<Boolean> = _duplicateName
+    private val _isNotDuplicateName = MutableStateFlow(true)
+    val isNotDuplicateName: StateFlow<Boolean> = _isNotDuplicateName
 
     private val _noPrimaryKeyFound = MutableStateFlow(false)
     val noPrimaryKeyFound: StateFlow<Boolean> = _noPrimaryKeyFound
@@ -75,8 +77,8 @@ class TableTemplateGroupViewModel
     private var _noValueWithNotEditable = MutableStateFlow(false)
     val noValueWithNotEditable: StateFlow<Boolean> = _noValueWithNotEditable
 
-    private var _rowNameEmpty = MutableStateFlow(true)
-    val rowNameEmpty: StateFlow<Boolean> = _rowNameEmpty
+    private var _rowNameIsNotEmpty = MutableStateFlow(true)
+    val rowNameIsNotEmpty: StateFlow<Boolean> = _rowNameIsNotEmpty
 
     private var _parseValueError = MutableStateFlow(false)
     val parseValueError: StateFlow<Boolean> = _parseValueError
@@ -173,18 +175,9 @@ class TableTemplateGroupViewModel
     }
 
     override fun setRowName(name: String) {
-        if (name.isEmpty()) {
-            _rowNameEmpty.value = true
-            _duplicateName.value = false
-        } else {
-            items.forEach {
-                if (it.name == name) {
-                    _duplicateName.value = true
-                }
-            }
-            items[index].name = name
-            _rowNameEmpty.value = false
-        }
+        _rowNameIsNotEmpty.value = tableTemplateGroupValidator.validateNameIsNotEmpty(name)
+        _isNotDuplicateName.value = tableTemplateGroupValidator.validateNameIsNotDuplicate(name, items)
+        items[index].name = name
     }
 
     override fun setItemType(type: ItemType) {
