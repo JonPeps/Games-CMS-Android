@@ -635,6 +635,18 @@ class TableTemplateGroupViewModelTests {
         assert(sut.status.value.items.size == 1)
     }
 
+    @Test
+    fun `test hasChanges returns TRUE`() {
+        every { tableTemplateGroupVmChangesCache.hasChanges(any()) } returns true
+        assert(sut.hasChanges())
+    }
+
+    @Test
+    fun `test hasChanges returns FALSE`() {
+        every { tableTemplateGroupVmChangesCache.hasChanges(any()) } returns false
+        assert(!sut.hasChanges())
+    }
+
     private fun setupForReadingFiles() {
         every { tableTemplateRepository.setAbsoluteFile(any()) } returns Unit
         every { tableTemplateRepository.setBufferReader(any()) } returns Unit
