@@ -25,8 +25,6 @@ class DataConstants {
 
             const val ADD_DEFAULTS = "Add Defaults"
             const val INSERT_DEFAULT_PROJECTS = "Insert Default Project"
-            const val INSERT_DEFAULT_TEMPLATES = "Insert Default Templates"
-            const val INSERT_TEMPLATES = "Insert Templates"
         }
 
         class BundleKeys {

@@ -49,7 +49,8 @@ class MainFlowActivity : ComponentActivity() {
                 .addScreenItem(START, {
                     Box(modifier = Modifier.fillMaxHeight().fillMaxWidth().background(customColours.background)) {
                         CommonStringListView(
-                            listOf(PROJECTS, TABLE_TEMPLATES), customColours
+                            listOf(
+                                PROJECTS, TABLE_TEMPLATES), customColours
                         ) { text ->
                             if (text == PROJECTS) {
                                 viewModel.navigateTo(Screen(PROJECTS))
