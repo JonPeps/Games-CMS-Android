@@ -20,44 +20,51 @@ open class GenericRepoLoader<T>(
     private val cache: IGenericSerializationCache<CommonDataItem<T>>): IGenericRepoLoader<T> {
 
     private var item: CommonDataItem<T>? = null
-    private var exception: Exception? = null
 
     override suspend fun load(name: String,
                               path: String,
                               cacheName: String,
                               loadFromCacheIfExists: Boolean) {
         var dataItem: T? = null
-        exception = null
-        var errorMessage = ""
         var success = true
+        var message = ""
+        var exception: Exception? = null
         if (loadFromCacheIfExists && cache.isPopulated()) {
             item = cache.get(cacheName)
+            return
         } else {
             try {
                 initReadFiles(name, path)
                 if (repository.load()) {
                     dataItem = repository.getItem()
-                    dataItem?.let {
-                        item = CommonDataItem(true,
-                            dataItem,
-                            0,
-                            errorMessage,
-                            exception)
-                    }?:run {
+                    if (dataItem == null) {
                         success = false
-                        errorMessage = JSON_ITEM_TO_SAVE_IS_NULL + name
+                        message = JSON_ITEM_TO_SAVE_IS_NULL + name
                     }
+                } else {
+                    success = false
+                    message = repository.getErrorMsg()
                 }
             } catch (ex: Exception) {
-                exception = ex
-                errorMessage = ex.message.toString()
                 success = false
+                message = ex.message.toString()
+                exception = ex
             }
         }
 
-        if (!loadFromCacheIfExists && success) {
-            item = CommonDataItem(true, dataItem, 0, errorMessage, exception)
+        if (success) {
+            item = CommonDataItem(true,
+                dataItem,
+                0,
+                message,
+                null)
             cache.set(cacheName, item!!)
+        } else {
+            item = CommonDataItem(false,
+                null,
+                0,
+                message,
+                exception)
         }
     }
 

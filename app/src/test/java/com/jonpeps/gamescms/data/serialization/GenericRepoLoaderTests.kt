@@ -4,6 +4,7 @@ import com.jonpeps.gamescms.data.dataclasses.CommonDataItem
 import com.jonpeps.gamescms.data.helpers.IGenericSerializationCache
 import com.jonpeps.gamescms.data.repositories.IBaseSingleItemMoshiJsonRepository
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.GenericRepoLoader
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.GenericRepoLoader.Companion.JSON_ITEM_TO_SAVE_IS_NULL
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -75,5 +76,67 @@ class GenericRepoLoaderTests {
         assert(result?.currentIndex == 0)
         assert(result?.message == "")
         assert(result?.ex == null)
+    }
+
+    @Test
+    fun `GenericRepoLoader load SUCCESS attempting to load from CACHE but CACHE is empty`() = runBlocking {
+        every { mockCache.isPopulated() } returns false
+        coEvery { mockRepository.load() } returns true
+        every { mockRepository.getItem() } returns "test"
+
+        sut.load("test", "path", "cacheName", true)
+
+        val result = sut.getItem()
+        assert(result?.success == true)
+        assert(result?.item == "test")
+        assert(result?.currentIndex == 0)
+        assert(result?.message == "")
+        assert(result?.ex == null)
+    }
+
+    @Test
+    fun `GenericRepoLoader load FAILS due to EXCEPTION THROWN`() = runBlocking {
+        every { mockCache.isPopulated() } returns false
+        coEvery { mockRepository.load() } throws Exception("error!")
+
+        sut.load("test", "path", "cacheName", false)
+
+        val result = sut.getItem()
+        assert(!result?.success!!)
+        assert(result.item == null)
+        assert(result.currentIndex == 0)
+        assert(result.message == "error!")
+        assert(result.ex is Exception)
+    }
+
+    @Test
+    fun `GenericRepoLoader load FAILS due to LOAD from Repository returning FALSE`() = runBlocking {
+        every { mockCache.isPopulated() } returns false
+        coEvery { mockRepository.load() } returns false
+        every { mockRepository.getErrorMsg() } returns "error!"
+
+        sut.load("test", "path", "cacheName", false)
+
+        val result = sut.getItem()
+        assert(!result?.success!!)
+        assert(result.item == null)
+        assert(result.currentIndex == 0)
+        assert(result.message == "error!")
+        assert(result.ex == null)
+    }
+
+    @Test
+    fun `GenericRepoLoader load FAILS due to NULL ITEM from Repository`() = runBlocking {
+        every { mockCache.isPopulated() } returns false
+        coEvery { mockRepository.load() } returns true
+        every { mockRepository.getItem() } returns null
+
+        sut.load("test", "path", "cacheName", false)
+
+        val result = sut.getItem()
+        assert(!result?.success!!)
+        assert(result.item == null)
+        assert(result.currentIndex == 0)
+        assert(result.message == JSON_ITEM_TO_SAVE_IS_NULL + "test")
     }
 }
