@@ -37,7 +37,7 @@ class BasicStringListViewModel
     private var cacheName = ""
 
     override fun load(cacheName: String, loadFromCacheIfExists: Boolean) {
-        _isProcessing.value = true
+        isProcessing.value = true
         this.cacheName = cacheName
         viewModelScope.launch(coroutineDispatcher) {
             items.clear()
@@ -70,14 +70,14 @@ class BasicStringListViewModel
                     listItemsVmChangesCache.set(cacheName, items)
                 }
             }
-            _isProcessing.value = false
+            isProcessing.value = false
             status = StringListStatus(success, items, errorMessage, exception)
         }
     }
 
     override fun add(name: String) {
         if (items.contains(name)) return
-        _isProcessing.value = true
+        isProcessing.value = true
         viewModelScope.launch(coroutineDispatcher) {
             items.add(name)
             listItemsVmChangesCache.set(cacheName, items)
@@ -86,7 +86,7 @@ class BasicStringListViewModel
     }
 
     override fun delete(name: String, directory: String, subDeleteFlag: SubDeleteFlag) {
-        _isProcessing.value = true
+        isProcessing.value = true
         viewModelScope.launch(coroutineDispatcher) {
             items.remove(name)
             when (subDeleteFlag) {
@@ -100,7 +100,7 @@ class BasicStringListViewModel
             }
             save()
             listItemsVmChangesCache.set(cacheName, items)
-            _isProcessing.value = false
+            isProcessing.value = false
         }
     }
 
@@ -109,7 +109,7 @@ class BasicStringListViewModel
             val success =
                 moshiStringListRepository.save(
                     cacheName, StringListMoshi(items))
-            _isProcessing.value = false
+            isProcessing.value = false
             status = StringListStatus(
                 success,
                 items,

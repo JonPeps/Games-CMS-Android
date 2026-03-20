@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.data.serialization.moshi
 
 import com.jonpeps.gamescms.data.DataConstants.Companion.JSON_EXTENSION
-import com.jonpeps.gamescms.data.repositories.IBaseSingleItemMoshiJsonRepository
+import com.jonpeps.gamescms.data.repositories.base.IBaseSingleItemMoshiJsonRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.debug.IInputStreamSerializationRepoHelper
 import java.io.IOException

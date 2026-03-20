@@ -1,10 +1,8 @@
 package com.jonpeps.gamescms.data.serialization
 
-import com.jonpeps.gamescms.data.dataclasses.CommonDataItem
 import com.jonpeps.gamescms.data.helpers.IGenericSerializationCache
-import com.jonpeps.gamescms.data.repositories.IBaseSingleItemMoshiJsonRepository
-import com.jonpeps.gamescms.ui.tabletemplates.serialization.GenericRepoLoader
-import com.jonpeps.gamescms.ui.tabletemplates.serialization.GenericRepoLoader.Companion.JSON_ITEM_TO_SAVE_IS_NULL
+import com.jonpeps.gamescms.data.repositories.base.IBaseSingleItemMoshiJsonRepository
+import com.jonpeps.gamescms.data.serialization.GenericRepoLoader.Companion.JSON_ITEM_TO_SAVE_IS_NULL
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -16,24 +14,44 @@ import java.io.BufferedReader
 import java.io.File
 
 class GenericRepoLoaderTests {
+    data class TempData1(val name: String)
+    data class TempData2(val name: String)
+
     @MockK
-    private lateinit var mockRepository: IBaseSingleItemMoshiJsonRepository<String>
+    private lateinit var mockRepository: IBaseSingleItemMoshiJsonRepository<TempData1>
     @MockK
     private lateinit var mockCommonSerializationRepoHelper: CommonSerializationRepoHelper
     @MockK
-    private lateinit var mockCache: IGenericSerializationCache<CommonDataItem<String>>
+    private lateinit var mockCache: IGenericSerializationCache<TempData2>
     @MockK
     private lateinit var mockFile: File
     @MockK
     private lateinit var mockBufferReader: BufferedReader
 
-    private lateinit var sut: GenericRepoLoader<String>
+    class GenericRepoLoaderSut(
+        repository: IBaseSingleItemMoshiJsonRepository<TempData1>,
+        helper: CommonSerializationRepoHelper,
+        cache: IGenericSerializationCache<TempData2>
+    ): GenericRepoLoader<TempData1, TempData2>(
+        repository,
+        helper,
+        cache
+    ){
+        override fun getParsedValue(item: TempData1): TempData2? {
+            return TempData2(item.name)
+        }
+    }
+
+    private lateinit var sut: GenericRepoLoaderSut
+
+    private val tempData1 = TempData1("test1")
+    private val tempData2 = TempData2("test2")
 
     @Before
     fun setup() {
         MockKAnnotations.init(this)
 
-        sut = GenericRepoLoader(
+        sut = GenericRepoLoaderSut(
             mockRepository,
             mockCommonSerializationRepoHelper,
             mockCache
@@ -50,13 +68,13 @@ class GenericRepoLoaderTests {
     fun `GenericRepoLoader load SUCCESS from File`() = runBlocking {
         every { mockCache.isPopulated() } returns false
         coEvery { mockRepository.load() } returns true
-        every { mockRepository.getItem() } returns "test"
+        every { mockRepository.getItem() } returns tempData1
 
         sut.load("test", "path", "cacheName", false)
 
         val result = sut.getItem()
         assert(result?.success == true)
-        assert(result?.item == "test")
+        assert(result?.item?.name == "test1")
         assert(result?.currentIndex == 0)
         assert(result?.message == "")
         assert(result?.ex == null)
@@ -65,14 +83,14 @@ class GenericRepoLoaderTests {
     @Test
     fun `GenericRepoLoader load SUCCESS from CACHE`() = runBlocking {
         every { mockCache.isPopulated() } returns true
-        every { mockRepository.getItem() } returns "test"
-        every { mockCache.get(any()) } returns CommonDataItem(true, "test", 0, "", null)
+        every { mockRepository.getItem() } returns tempData1
+        every { mockCache.get(any()) } returns tempData2
 
         sut.load("test", "path", "cacheName", true)
 
         val result = sut.getItem()
         assert(result?.success == true)
-        assert(result?.item == "test")
+        assert(result?.item?.name == "test2")
         assert(result?.currentIndex == 0)
         assert(result?.message == "")
         assert(result?.ex == null)
@@ -82,13 +100,13 @@ class GenericRepoLoaderTests {
     fun `GenericRepoLoader load SUCCESS attempting to load from CACHE but CACHE is empty`() = runBlocking {
         every { mockCache.isPopulated() } returns false
         coEvery { mockRepository.load() } returns true
-        every { mockRepository.getItem() } returns "test"
+        every { mockRepository.getItem() } returns tempData1
 
         sut.load("test", "path", "cacheName", true)
 
         val result = sut.getItem()
         assert(result?.success == true)
-        assert(result?.item == "test")
+        assert(result?.item?.name == "test1")
         assert(result?.currentIndex == 0)
         assert(result?.message == "")
         assert(result?.ex == null)

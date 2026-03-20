@@ -1,45 +1,52 @@
-package com.jonpeps.gamescms.ui.tabletemplates.serialization
+package com.jonpeps.gamescms.data.serialization
 
+import androidx.annotation.VisibleForTesting
 import com.jonpeps.gamescms.data.dataclasses.CommonDataItem
 import com.jonpeps.gamescms.data.helpers.IGenericSerializationCache
-import com.jonpeps.gamescms.data.repositories.IBaseSingleItemMoshiJsonRepository
-import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
+import com.jonpeps.gamescms.data.repositories.base.IBaseSingleItemMoshiJsonRepository
 
-interface IGenericRepoLoader<T> {
+interface IGenericRepoLoader<T,K> {
     suspend fun load(name: String,
                      path: String,
                      cacheName: String,
                      loadFromCacheIfExists: Boolean)
 
-    fun getItem(): CommonDataItem<T>?
+    fun getItem(): CommonDataItem<K>?
 }
 
-open class GenericRepoLoader<T>(
+abstract class GenericRepoLoader<T,K>(
     private val repository: IBaseSingleItemMoshiJsonRepository<T>,
     private val repoHelper: ICommonSerializationRepoHelper,
-    private val cache: IGenericSerializationCache<CommonDataItem<T>>): IGenericRepoLoader<T> {
+    private val cache: IGenericSerializationCache<K>
+): IGenericRepoLoader<T,K> {
 
-    private var item: CommonDataItem<T>? = null
+    private var finalItem: CommonDataItem<K>? = null
 
     override suspend fun load(name: String,
                               path: String,
                               cacheName: String,
                               loadFromCacheIfExists: Boolean) {
-        var dataItem: T? = null
         var success = true
         var message = ""
         var exception: Exception? = null
+        var parsedValue: K? = null
         if (loadFromCacheIfExists && cache.isPopulated()) {
-            item = cache.get(cacheName)
+            finalItem = CommonDataItem(true,
+                cache.get(cacheName),
+                0,
+                "",
+                null)
             return
         } else {
             try {
                 initReadFiles(name, path)
                 if (repository.load()) {
-                    dataItem = repository.getItem()
+                    val dataItem = repository.getItem()
                     if (dataItem == null) {
                         success = false
                         message = JSON_ITEM_TO_SAVE_IS_NULL + name
+                    } else {
+                        parsedValue = getParsedValue(dataItem)
                     }
                 } else {
                     success = false
@@ -53,14 +60,14 @@ open class GenericRepoLoader<T>(
         }
 
         if (success) {
-            item = CommonDataItem(true,
-                dataItem,
+            finalItem = CommonDataItem(true,
+                parsedValue,
                 0,
-                message,
+                "",
                 null)
-            cache.set(cacheName, item!!)
+            cache.set(cacheName, parsedValue!!)
         } else {
-            item = CommonDataItem(false,
+            finalItem = CommonDataItem(false,
                 null,
                 0,
                 message,
@@ -68,7 +75,10 @@ open class GenericRepoLoader<T>(
         }
     }
 
-    override fun getItem(): CommonDataItem<T>? = item
+    override fun getItem(): CommonDataItem<K>? = finalItem
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    internal abstract fun getParsedValue(item: T): K?
 
     private fun initReadFiles(name: String, path: String) {
         repository.setAbsoluteFile(repoHelper.getAbsoluteFile(path, name))

@@ -44,7 +44,7 @@ class BasicStrListBuilder private constructor() {
                         it.create(storagePath, cachedName)
                     })
 
-            val isProcessing = viewModel.isProcessing.collectAsState()
+            val isProcessing = viewModel.isProcessingState.collectAsState()
             if (!isProcessing.value) {
                 if (viewModel.status.success) {
                     Column(

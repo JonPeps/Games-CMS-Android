@@ -43,19 +43,24 @@ class MainFlowActivity : ComponentActivity() {
             Surface {
                 val context = applicationContext
                 val customColours = CustomColours(isSystemInDarkTheme())
-
                 val basicFlowComposeBuilder = BasicFlowComposeBuilder
                 .Builder(context, viewModel, customColours)
                 .addScreenItem(START, {
-                    Box(modifier = Modifier.fillMaxHeight().fillMaxWidth().background(customColours.background)) {
+                    Box(modifier
+                        = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth()
+                            .background(customColours.background)) {
                         CommonStringListView(
                             listOf(
                                 PROJECTS, TABLE_TEMPLATES), customColours
                         ) { text ->
                             if (text == PROJECTS) {
-                                viewModel.navigateTo(Screen(PROJECTS))
+                                viewModel.navigateTo(
+                                    Screen(PROJECTS))
                             } else {
-                                viewModel.navigateTo(Screen(TABLE_TEMPLATES))
+                                viewModel.navigateTo(
+                                    Screen(TABLE_TEMPLATES))
                             }
                         }
                     }
@@ -63,11 +68,13 @@ class MainFlowActivity : ComponentActivity() {
                     finish()
                 })
 
-                val buildStrListViewFromFile = BuildStrListViewFromFile.Builder(
-                    context,
-                    viewModel,
-                    basicFlowComposeBuilder.screenFlowBuilder,
-                    customColours
+                val buildStrListViewFromFile
+                    = BuildStrListViewFromFile.Builder(
+                        context,
+                        viewModel,
+                        basicFlowComposeBuilder
+                            .screenFlowBuilder,
+                        customColours
                 )
                 .addStrListItem(
                         PROJECTS,
@@ -83,27 +90,34 @@ class MainFlowActivity : ComponentActivity() {
                 )
                 buildStrListViewFromFile.Build()
 
-                val isOnFirstScreen by viewModel.isOnFirstScreen.collectAsState(true)
-
+                val isOnFirstScreen by viewModel.isOnFirstScreen
+                    .collectAsState(true)
                 if (isOnFirstScreen) {
-                    basicFlowComposeBuilder.addDropdownMenuItem(CustomItemText(
-                        context.getString(R.string.menu_item_defaults),
-                        20.sp,
-                        customColours.primary,
-                        FontStyle.Normal), enabled = true
+                    basicFlowComposeBuilder
+                        .addDropdownMenuItem(
+                            CustomItemText
+                                (context.getString(R.string.menu_item_defaults),
+                                20.sp,
+                                customColours.primary,
+                                FontStyle.Normal),
+                            enabled = true
                     ) {
                         finish()
-                        val intent = Intent(this, AddDefaultsActivity::class.java)
+                        val intent = Intent(this,
+                            AddDefaultsActivity::class.java)
                         startActivity(intent)
                     }
-                    .addDropdownMenuItem(CustomItemText(
-                        context.getString(R.string.menu_item_debug),
-                        20.sp,
-                        customColours.primary,
-                        FontStyle.Normal), enabled = true
+                    .addDropdownMenuItem(
+                        CustomItemText
+                            (context.getString(R.string.menu_item_debug),
+                            20.sp,
+                            customColours.primary,
+                            FontStyle.Normal),
+                        enabled = true
                     ) { }
                 }
-                basicFlowComposeBuilder.showBackIcon(!isOnFirstScreen)
+                basicFlowComposeBuilder
+                    .showBackIcon(!isOnFirstScreen)
                     .showMenuItems(isOnFirstScreen)
                     .Build()
             }

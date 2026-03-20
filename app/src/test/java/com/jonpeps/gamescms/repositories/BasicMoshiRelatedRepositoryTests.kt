@@ -1,9 +1,9 @@
 package com.jonpeps.gamescms.repositories
 
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
-import com.jonpeps.gamescms.data.repositories.BaseMoshiRepo.Companion.CONVERT_TO_JSON_FAILED
-import com.jonpeps.gamescms.data.repositories.BaseMoshiRepo.Companion.EMPTY_JSON_CONTENTS
-import com.jonpeps.gamescms.data.repositories.BaseMoshiRepo.Companion.WRITE_TO_FILE_FAILED
+import com.jonpeps.gamescms.data.repositories.base.BaseMoshiRepo.Companion.CONVERT_TO_JSON_FAILED
+import com.jonpeps.gamescms.data.repositories.base.BaseMoshiRepo.Companion.EMPTY_JSON_CONTENTS
+import com.jonpeps.gamescms.data.repositories.base.BaseMoshiRepo.Companion.WRITE_TO_FILE_FAILED
 import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.repositories.MoshiStringListRepository
 import com.jonpeps.gamescms.data.repositories.StringListMoshiJsonAdapter

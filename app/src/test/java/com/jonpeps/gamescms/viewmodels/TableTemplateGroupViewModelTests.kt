@@ -1,18 +1,17 @@
 package com.jonpeps.gamescms.viewmodels
 
+import com.jonpeps.gamescms.data.dataclasses.CommonDataItem
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
 import com.jonpeps.gamescms.data.dataclasses.mappers.TableItemFinalMapper
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
-import com.jonpeps.gamescms.data.helpers.ITableTemplateGroupValidator
 import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
-import com.jonpeps.gamescms.ui.tabletemplates.serialization.ISerializeTableTemplateHelpers
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.TableTemplateLoader
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel.Companion.JSON_ITEM_TO_SAVE_IS_NULL
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmChangesCache
-import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel.Companion.JSON_ITEM_TO_LOAD_IS_NULL
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -28,19 +27,25 @@ import org.junit.Test
 class TableTemplateGroupViewModelTests {
     private val dispatcher = UnconfinedTestDispatcher()
     @MockK
-    private lateinit var tableTemplateRepository: IMoshiTableTemplateRepository
+    private lateinit var mockTableTemplateLoader: TableTemplateLoader
     @MockK
-    private lateinit var tableTemplateGroupVmRepoHelper: ICommonSerializationRepoHelper
+    private lateinit var mockTableTemplateRepository: IMoshiTableTemplateRepository
     @MockK
-    private lateinit var tableTemplateGroupVmChangesCache: ITableTemplateGroupVmChangesCache
+    private lateinit var mockTableTemplateGroupVmRepoHelper: ICommonSerializationRepoHelper
     @MockK
-    private lateinit var tableTemplateGroupValidator: ITableTemplateGroupValidator
-    @MockK
-    private lateinit var serializeTableTemplateHelpers: ISerializeTableTemplateHelpers
+    private lateinit var mockTableTemplateGroupVmChangesCache: ITableTemplateGroupVmChangesCache
 
     private val dummyData = TableTemplateItemListMoshi("test_template",
         listOf(TableTemplateItemMoshi("test",
         dataType = ItemType.STRING)))
+
+    private val dummyLoadedResult = CommonDataItem<List<TableItemFinal>>(
+        true,
+        arrayListOf(),
+        0,
+        "",
+        null
+    )
 
     private lateinit var sut: TableTemplateGroupViewModel
 
@@ -52,11 +57,10 @@ class TableTemplateGroupViewModelTests {
         MockKAnnotations.init(this)
 
         sut = TableTemplateGroupViewModel(path,
-            tableTemplateRepository,
-            tableTemplateGroupVmRepoHelper,
-            tableTemplateGroupVmChangesCache,
-            tableTemplateGroupValidator,
-            serializeTableTemplateHelpers,
+            mockTableTemplateLoader,
+            mockTableTemplateRepository,
+            mockTableTemplateGroupVmRepoHelper,
+            mockTableTemplateGroupVmChangesCache,
             dispatcher)
 
         mockkObject(TableItemFinalMapper.Companion) {
@@ -66,98 +70,19 @@ class TableTemplateGroupViewModelTests {
             every { TableItemFinalMapper.toTableTemplateItemListMoshi(any(), any()) } returns mockMapperResult2
         }
 
-        every { tableTemplateGroupVmChangesCache.set(any(), any()) } returns Unit
+        every { mockTableTemplateGroupVmChangesCache.set(any(), any()) } returns Unit
+        coEvery { mockTableTemplateLoader.load(any(), any(), any(), any()) } returns Unit
     }
 
     @Test
-    fun `load template SUCCESS WHEN IO files are VALID and load from repository RETURNS TRUE`() {
-        setupForReadingFiles()
-        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
-        every { tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName) } returns mockk()
-        every { tableTemplateGroupVmChangesCache.isPopulated() } returns false
-        every { tableTemplateRepository.getItem() } returns dummyData
-        coEvery { tableTemplateRepository.load() } returns true
+    fun `load template SUCCESS`() {
+        every { mockTableTemplateLoader.getItem() } returns dummyLoadedResult
 
-        sut.load(templateName, false)
+        sut.load(templateName)
 
         assert(sut.status.value.success)
         assert(sut.status.value.message == "")
         assert(sut.status.value.ex == null)
-        assert(sut.status.value.items.size == 1)
-        assert(sut.status.value.currentIndex == 0)
-    }
-
-    @Test
-    fun `load template FAILURE WHEN IO files are VALID AND load from repository RETURNS false`() {
-        setupForReadingFiles()
-        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
-        every { tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName) } returns mockk()
-        every { tableTemplateGroupVmChangesCache.isPopulated() } returns false
-        every { tableTemplateRepository.getErrorMsg() } returns "An error occurred!"
-        coEvery { tableTemplateRepository.load() } returns false
-
-        sut.load(templateName)
-
-        assert(!sut.status.value.success)
-        assert(sut.status.value.message == tableTemplateRepository.getErrorMsg())
-        assert(sut.status.value.ex == null)
-    }
-
-    @Test
-    fun `load template FAILURE WHEN IO files THROW RuntimeException due to INVALID File`() {
-        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(any(), any()) } throws RuntimeException("Runtime error!")
-        every { tableTemplateGroupVmChangesCache.isPopulated() } returns false
-
-        sut.load(templateName)
-
-        assert(!sut.status.value.success)
-        assert(sut.status.value.message == "Runtime error!")
-        assert(sut.status.value.ex != null)
-    }
-
-    @Test
-    fun `load template FAILURE WHEN IO files THROW RuntimeException due to INVALID BufferReader`() {
-        setupForReadingFiles()
-        setupForWritingFiles()
-        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(any(), any()) } returns mockk()
-        every { tableTemplateGroupVmRepoHelper.getBufferReader(any(), any()) } throws RuntimeException("Runtime error!")
-        every { tableTemplateGroupVmChangesCache.isPopulated() } returns false
-
-        sut.load(templateName)
-
-        assert(!sut.status.value.success)
-        assert(sut.status.value.message == "Runtime error!")
-        assert(sut.status.value.ex != null)
-    }
-
-    @Test
-    fun `load template FAILURE WHEN IO files are correct BUT Json item is NULL`() {
-        setupForReadingFiles()
-        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
-        every { tableTemplateGroupVmRepoHelper.getBufferReader(path, templateName) } returns mockk()
-        coEvery { tableTemplateRepository.load() } returns true
-        every { tableTemplateRepository.getItem() } returns null
-
-        sut.load(templateName, false)
-
-        assert(!sut.status.value.success)
-        assert(sut.status.value.message == JSON_ITEM_TO_LOAD_IS_NULL + templateName)
-        assert(sut.status.value.ex == null)
-    }
-
-    @Test
-    fun `load template from cache SUCCESS`() {
-        every { tableTemplateGroupVmChangesCache.isPopulated() } returns true
-        every { tableTemplateGroupVmChangesCache.get(templateName) } returns listOf(
-            TableItemFinal("test", isPrimary = true, isSortKey = true,
-                value = "test", editable = true, dataType = ItemType.STRING))
-
-        sut.load(templateName, true)
-
-        assert(sut.status.value.success)
-        assert(sut.status.value.message == "")
-        assert(sut.status.value.ex == null)
-        assert(sut.status.value.items.size == 1)
         assert(sut.status.value.currentIndex == 0)
     }
 
@@ -165,12 +90,12 @@ class TableTemplateGroupViewModelTests {
     fun `save template SUCCESS WHEN IO files are VALID and save to repository RETURNS TRUE`() {
         setupForReadingFiles()
         setupForWritingFiles()
-        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
-        every { tableTemplateGroupVmRepoHelper.getMainFile(templateName) } returns mockk()
-        every { tableTemplateGroupVmRepoHelper.getDirectoryFile(path) } returns mockk()
-        every { tableTemplateGroupVmRepoHelper.getFileWriter(path, templateName) } returns mockk()
-        every { tableTemplateRepository.getItem() } returns dummyData
-        coEvery { tableTemplateRepository.save(dummyData) } returns true
+        every { mockTableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
+        every { mockTableTemplateGroupVmRepoHelper.getMainFile(templateName) } returns mockk()
+        every { mockTableTemplateGroupVmRepoHelper.getDirectoryFile(path) } returns mockk()
+        every { mockTableTemplateGroupVmRepoHelper.getFileWriter(path, templateName) } returns mockk()
+        every { mockTableTemplateRepository.getItem() } returns dummyData
+        coEvery { mockTableTemplateRepository.save(dummyData) } returns true
 
         sut.save(templateName)
 
@@ -183,11 +108,11 @@ class TableTemplateGroupViewModelTests {
     fun `save template FAILURE WHEN IO files are VALID and Json to save is NULL`() {
         setupForWritingFiles()
         setupForReadingFiles()
-        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
-        every { tableTemplateGroupVmRepoHelper.getMainFile(templateName) } returns mockk()
-        every { tableTemplateGroupVmRepoHelper.getDirectoryFile(path) } returns mockk()
-        every { tableTemplateGroupVmRepoHelper.getFileWriter(path, templateName) } returns mockk()
-        every { tableTemplateRepository.getItem() } returns null
+        every { mockTableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
+        every { mockTableTemplateGroupVmRepoHelper.getMainFile(templateName) } returns mockk()
+        every { mockTableTemplateGroupVmRepoHelper.getDirectoryFile(path) } returns mockk()
+        every { mockTableTemplateGroupVmRepoHelper.getFileWriter(path, templateName) } returns mockk()
+        every { mockTableTemplateRepository.getItem() } returns null
 
         sut.save(templateName)
 
@@ -197,7 +122,7 @@ class TableTemplateGroupViewModelTests {
 
     @Test
     fun `save template FAILURE WHEN IO file THROWS RuntimeException due to INVALID absolute file path`() {
-        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } throws RuntimeException("Runtime error!")
+        every { mockTableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } throws RuntimeException("Runtime error!")
 
         sut.save(templateName)
 
@@ -210,10 +135,10 @@ class TableTemplateGroupViewModelTests {
     fun `test save template fails when IO file throws RuntimeException due to invalid FileWriter`() {
         setupForReadingFiles()
         setupForWritingFiles()
-        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
-        every { tableTemplateGroupVmRepoHelper.getMainFile(templateName) } returns mockk()
-        every { tableTemplateGroupVmRepoHelper.getDirectoryFile(path) } returns mockk()
-        every { tableTemplateGroupVmRepoHelper.getFileWriter(path, templateName) } throws RuntimeException("Runtime error!")
+        every { mockTableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
+        every { mockTableTemplateGroupVmRepoHelper.getMainFile(templateName) } returns mockk()
+        every { mockTableTemplateGroupVmRepoHelper.getDirectoryFile(path) } returns mockk()
+        every { mockTableTemplateGroupVmRepoHelper.getFileWriter(path, templateName) } throws RuntimeException("Runtime error!")
 
         sut.save(templateName)
 
@@ -226,18 +151,18 @@ class TableTemplateGroupViewModelTests {
     fun `save template FAILURE WHEN IO files are VALID BUT save to repository RETURNS FALSE`() {
         setupForReadingFiles()
         setupForWritingFiles()
-        every { tableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
-        every { tableTemplateGroupVmRepoHelper.getMainFile(templateName) } returns mockk()
-        every { tableTemplateGroupVmRepoHelper.getDirectoryFile(path) } returns mockk()
-        every { tableTemplateGroupVmRepoHelper.getFileWriter(path, templateName) } returns mockk()
-        every { tableTemplateRepository.getItem() } returns dummyData
-        every { tableTemplateRepository.getErrorMsg() } returns "An error occurred!"
-        coEvery { tableTemplateRepository.save(dummyData) } returns false
+        every { mockTableTemplateGroupVmRepoHelper.getAbsoluteFile(path, templateName) } returns mockk()
+        every { mockTableTemplateGroupVmRepoHelper.getMainFile(templateName) } returns mockk()
+        every { mockTableTemplateGroupVmRepoHelper.getDirectoryFile(path) } returns mockk()
+        every { mockTableTemplateGroupVmRepoHelper.getFileWriter(path, templateName) } returns mockk()
+        every { mockTableTemplateRepository.getItem() } returns dummyData
+        every { mockTableTemplateRepository.getErrorMsg() } returns "An error occurred!"
+        coEvery { mockTableTemplateRepository.save(dummyData) } returns false
 
         sut.save(templateName)
 
         assert(!sut.status.value.success)
-        assert(sut.status.value.message == tableTemplateRepository.getErrorMsg())
+        assert(sut.status.value.message == mockTableTemplateRepository.getErrorMsg())
     }
 
     @Test
@@ -250,8 +175,8 @@ class TableTemplateGroupViewModelTests {
 
     @Test
     fun `reset all items in view model SUCCESS`() {
-        every { tableTemplateGroupVmChangesCache.reset(any()) } returns Unit
-        every { tableTemplateGroupVmChangesCache.get(any()) } returns listOf()
+        every { mockTableTemplateGroupVmChangesCache.reset(any()) } returns Unit
+        every { mockTableTemplateGroupVmChangesCache.get(any()) } returns listOf()
 
         sut.reset()
 
@@ -371,253 +296,6 @@ class TableTemplateGroupViewModelTests {
     }
 
     @Test
-    fun `set row name SUCCESS WHEN ROW IS NOT EMPTY OR DUPLICATE`() {
-        every { tableTemplateGroupValidator.validateNameIsNotEmpty(any()) } returns true
-        every { tableTemplateGroupValidator.validateNameIsNotDuplicate(any(), any()) } returns true
-
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
-            value = "test", editable = true, dataType = ItemType.BOOLEAN))
-        sut.setRowName("test2")
-        val item = sut.getCurrentPage()
-        assert(item.name == "test2")
-        assert(sut.isNotDuplicateName.value)
-        assert(sut.rowNameIsNotEmpty.value)
-    }
-
-    @Test
-    fun `set row name FAILURE WHEN ROW IS EMPTY`() {
-        every { tableTemplateGroupValidator.validateNameIsNotEmpty(any()) } returns false
-        every { tableTemplateGroupValidator.validateNameIsNotDuplicate(any(), any()) } returns true
-
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
-            value = "test", editable = true, dataType = ItemType.BOOLEAN))
-        sut.setRowName("")
-        val item = sut.getCurrentPage()
-        assert(item.name == "")
-        assert(sut.isNotDuplicateName.value)
-        assert(!sut.rowNameIsNotEmpty.value)
-    }
-
-    @Test
-    fun `set row name FAILURE WHEN ROW IS DUPLICATE`() {
-        every { tableTemplateGroupValidator.validateNameIsNotEmpty(any()) } returns true
-        every { tableTemplateGroupValidator.validateNameIsNotDuplicate(any(), any()) } returns false
-
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
-            value = "test", editable = true, dataType = ItemType.BOOLEAN))
-        sut.new()
-        sut.setRowName("test1")
-        val item = sut.getCurrentPage()
-        assert(item.name == "test1")
-        assert(!sut.isNotDuplicateName.value)
-        assert(sut.rowNameIsNotEmpty.value)
-    }
-
-    @Test
-    fun `set row data type`() {
-        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns true
-
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
-            value = "test", editable = true, dataType = ItemType.BOOLEAN))
-        var item = sut.getCurrentPage()
-        assert(item.dataType == ItemType.BOOLEAN)
-        sut.setItemType(ItemType.STRING)
-        item = sut.getCurrentPage()
-        assert(item.dataType == ItemType.STRING)
-    }
-
-    @Test
-    fun `set default value WHEN row IS EDITABLE`() {
-        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns true
-
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
-            value = "test", editable = true, dataType = ItemType.STRING))
-        sut.setDefaultValue("test")
-        val item = sut.getCurrentPage()
-        assert(item.value == "test")
-        assert(!sut.noValueWithNotEditable.value)
-    }
-
-    @Test
-    fun `set DEFAULT value WHEN row IS NOT EDITABLE`() {
-        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns true
-
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
-            value = "test", editable = false, dataType = ItemType.STRING))
-        sut.setDefaultValue("test")
-        val item = sut.getCurrentPage()
-        assert(item.value == "test")
-        assert(!sut.noValueWithNotEditable.value)
-    }
-
-    @Test
-    fun `set NO DEFAULT value WHEN row IS EDITABLE`() {
-        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns false
-
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
-            value = "test", editable = false, dataType = ItemType.STRING))
-        sut.setDefaultValue("")
-        val item = sut.getCurrentPage()
-        assert(item.value == "")
-        assert(sut.noValueWithNotEditable.value)
-    }
-
-    @Test
-    fun `set IS EDITABLE WITH NO DEFAULT value REQUIRED`() {
-        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns true
-
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
-            value = "test", editable = false, dataType = ItemType.STRING))
-        sut.setIsEditable(true)
-        val item = sut.getCurrentPage()
-        assert(item.editable)
-        assert(!sut.noValueWithNotEditable.value)
-    }
-
-    @Test
-    fun `set IS EDITABLE WITH DEFAULT value EMPTY`() {
-        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns true
-
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
-            value = "test", editable = false, dataType = ItemType.STRING))
-        sut.setDefaultValue("")
-        sut.setIsEditable(false)
-        sut.setIndex(0)
-        val item = sut.getCurrentPage()
-        assert(!item.editable)
-        assert(sut.noValueWithNotEditable.value)
-    }
-
-    @Test
-    fun `set IS EDITABLE WITH DEFAULT value REQUIRED`() {
-        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns false
-
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
-            value = "test", editable = true, dataType = ItemType.STRING))
-        sut.setDefaultValue("")
-        sut.setIsEditable(false)
-        val item = sut.getCurrentPage()
-        assert(!item.editable)
-        assert(sut.noValueWithNotEditable.value)
-    }
-
-    @Test
-    fun `set IS EDITABLE WITH DEFAULT value PRESENT`() {
-        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns true
-
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
-            value = "test", editable = false, dataType = ItemType.STRING))
-        sut.setDefaultValue("test value")
-        sut.setIsEditable(true)
-        val item = sut.getCurrentPage()
-        assert(item.editable)
-        assert(!sut.noValueWithNotEditable.value)
-    }
-
-    @Test
-    fun `set IS PRIMARY`() {
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = false, isSortKey = true,
-            value = "test", editable = true, dataType = ItemType.STRING))
-        sut.setPrimary(true)
-        val item = sut.getCurrentPage()
-        assert(item.isPrimary)
-        assert(!sut.noPrimaryKeyFound.value)
-    }
-
-    @Test
-    fun `set IS NOT PRIMARY AND no other rows set AS PRIMARY`() {
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = false, isSortKey = true,
-            value = "test", editable = true, dataType = ItemType.STRING))
-        sut.setPrimary(false)
-        val item = sut.getCurrentPage()
-        assert(!item.isPrimary)
-        assert(sut.noPrimaryKeyFound.value)
-    }
-
-    @Test
-    fun `set IS NOT PRIMARY with OTHER row set AS PRIMARY`() {
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
-            value = "test", editable = true, dataType = ItemType.STRING))
-        sut.addItem(TableItemFinal("test2", isPrimary = true, isSortKey = true,
-            value = "test", editable = true, dataType = ItemType.STRING))
-        sut.setIndex(0)
-        sut.setPrimary(false)
-        assert(!sut.noPrimaryKeyFound.value)
-    }
-
-    @Test
-    fun `set IS SORT KEY`() {
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
-            value = "test", editable = true, dataType = ItemType.STRING))
-        sut.setSortKey(true)
-        val item = sut.getCurrentPage()
-        assert(item.isSortKey)
-        assert(!sut.noSortKeyFound.value)
-    }
-
-    @Test
-    fun `set IS NOT SORT KEY WITH no other rows set as SORT KEY`() {
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = true,
-            value = "test", editable = true, dataType = ItemType.STRING))
-        sut.setSortKey(false)
-        val item = sut.getCurrentPage()
-        assert(!item.isSortKey)
-        assert(sut.noSortKeyFound.value)
-    }
-
-    @Test
-    fun `set IS NOT SORT KEY WITH other row set as SORT KEY`() {
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
-            value = "test", editable = true, dataType = ItemType.STRING))
-        sut.addItem(TableItemFinal("test2", isPrimary = false, isSortKey = true,
-            value = "test", editable = true, dataType = ItemType.STRING))
-        sut.setIndex(0)
-        sut.setSortKey(false)
-        assert(!sut.noSortKeyFound.value)
-    }
-
-    @Test
-    fun `test determineIfParseValueError with NO PARSE ERROR`() {
-        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns true
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
-            value = "true", editable = true, dataType = ItemType.BOOLEAN))
-        sut.setIndex(0)
-        sut.determineIfParseValueError(ItemType.BOOLEAN)
-        assert(!sut.parseValueError.value)
-        assert(sut.getParseErrorMsg() == "")
-    }
-
-    @Test
-    fun `test determineIfParseValueError with PARSE ERROR`() {
-        every { serializeTableTemplateHelpers.validateTableTemplateValue(any(), any()) } returns false
-        sut.clearItems()
-        sut.addItem(TableItemFinal("test1", isPrimary = true, isSortKey = false,
-            value = "Not a boolean", editable = true, dataType = ItemType.BOOLEAN))
-        sut.setIndex(0)
-        sut.determineIfParseValueError(ItemType.BOOLEAN)
-        assert(sut.parseValueError.value)
-        assert(sut.getParseErrorMsg() == "Value is not a Boolean")
-    }
-
-    @Test
     fun `PAGE COUNT WHEN pages added`() {
         sut.clearItems()
         sut.addPage()
@@ -637,25 +315,25 @@ class TableTemplateGroupViewModelTests {
 
     @Test
     fun `test hasChanges returns TRUE`() {
-        every { tableTemplateGroupVmChangesCache.hasChanges(any()) } returns true
+        every { mockTableTemplateGroupVmChangesCache.hasChanges(any()) } returns true
         assert(sut.hasChanges())
     }
 
     @Test
     fun `test hasChanges returns FALSE`() {
-        every { tableTemplateGroupVmChangesCache.hasChanges(any()) } returns false
+        every { mockTableTemplateGroupVmChangesCache.hasChanges(any()) } returns false
         assert(!sut.hasChanges())
     }
 
     private fun setupForReadingFiles() {
-        every { tableTemplateRepository.setAbsoluteFile(any()) } returns Unit
-        every { tableTemplateRepository.setBufferReader(any()) } returns Unit
+        every { mockTableTemplateRepository.setAbsoluteFile(any()) } returns Unit
+        every { mockTableTemplateRepository.setBufferReader(any()) } returns Unit
     }
 
     private fun setupForWritingFiles() {
-        every { tableTemplateRepository.assignDirectoryFile(any()) } returns Unit
-        every { tableTemplateRepository.setFileWriter(any()) } returns Unit
-        every { tableTemplateRepository.setFile(any()) } returns Unit
-        every { tableTemplateRepository.setItem(any()) } returns Unit
+        every { mockTableTemplateRepository.assignDirectoryFile(any()) } returns Unit
+        every { mockTableTemplateRepository.setFileWriter(any()) } returns Unit
+        every { mockTableTemplateRepository.setFile(any()) } returns Unit
+        every { mockTableTemplateRepository.setItem(any()) } returns Unit
     }
 }

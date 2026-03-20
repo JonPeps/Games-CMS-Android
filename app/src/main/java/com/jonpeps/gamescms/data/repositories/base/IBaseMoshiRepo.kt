@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.data.repositories
+package com.jonpeps.gamescms.data.repositories.base
 
 import java.io.BufferedReader
 import java.io.File

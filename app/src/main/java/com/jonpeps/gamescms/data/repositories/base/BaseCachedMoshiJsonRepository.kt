@@ -1,4 +1,4 @@
-package com.jonpeps.gamescms.data.repositories
+package com.jonpeps.gamescms.data.repositories.base
 
 import com.jonpeps.gamescms.data.helpers.IBasicStringGenericItemCache
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation

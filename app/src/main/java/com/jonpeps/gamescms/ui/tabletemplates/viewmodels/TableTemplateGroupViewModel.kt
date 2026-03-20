@@ -6,10 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
 import com.jonpeps.gamescms.data.dataclasses.mappers.TableItemFinalMapper
-import com.jonpeps.gamescms.data.helpers.ITableTemplateGroupValidator
 import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
-import com.jonpeps.gamescms.ui.tabletemplates.serialization.ISerializeTableTemplateHelpers
+import com.jonpeps.gamescms.ui.tabletemplates.serialization.TableTemplateLoader
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.factories.TableTemplateGroupViewModelFactory
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -31,13 +30,6 @@ interface ITableTemplateGroupViewModel {
     fun save(name: String)
     fun new()
 
-    fun setRowName(name: String)
-    fun setItemType(type: ItemType)
-    fun setDefaultValue(value: String)
-    fun setPrimary(isPrimary: Boolean)
-    fun setSortKey(isSort: Boolean)
-    fun setIsEditable(editable: Boolean)
-
     fun addPage()
     fun removePage()
     fun nextPage()
@@ -47,41 +39,21 @@ interface ITableTemplateGroupViewModel {
 
     fun hasChanges(): Boolean
     fun reset()
-    fun getParseErrorMsg(): String
 }
 
 @HiltViewModel(assistedFactory = TableTemplateGroupViewModelFactory.ITableTemplateGroupViewModelFactory::class)
 class TableTemplateGroupViewModel
 @AssistedInject constructor(
     @Assisted private val tableTemplateFilesPath: String,
+    private val tableTemplateLoader: TableTemplateLoader,
     private val tableTemplateRepository: IMoshiTableTemplateRepository,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val tableTemplateGroupVmChangesCache: ITableTemplateGroupVmChangesCache,
-    private val tableTemplateGroupValidator: ITableTemplateGroupValidator,
-    private val serializeTableTemplateHelpers: ISerializeTableTemplateHelpers,
     private val coroutineDispatcher: CoroutineDispatcher)
     : ViewModel(), ITableTemplateGroupViewModel {
 
     private val _status = MutableStateFlow(TableTemplateStatus(true, arrayListOf(),0, "", null))
     val status: StateFlow<TableTemplateStatus> = _status
-
-    private val _isNotDuplicateName = MutableStateFlow(true)
-    val isNotDuplicateName: StateFlow<Boolean> = _isNotDuplicateName
-
-    private val _noPrimaryKeyFound = MutableStateFlow(false)
-    val noPrimaryKeyFound: StateFlow<Boolean> = _noPrimaryKeyFound
-
-    private val _noSortKeyFound = MutableStateFlow(false)
-    val noSortKeyFound: StateFlow<Boolean> = _noSortKeyFound
-
-    private var _noValueWithNotEditable = MutableStateFlow(false)
-    val noValueWithNotEditable: StateFlow<Boolean> = _noValueWithNotEditable
-
-    private var _rowNameIsNotEmpty = MutableStateFlow(true)
-    val rowNameIsNotEmpty: StateFlow<Boolean> = _rowNameIsNotEmpty
-
-    private var _parseValueError = MutableStateFlow(false)
-    val parseValueError: StateFlow<Boolean> = _parseValueError
 
     private var _isProcessing = MutableStateFlow(false)
     val isProcessing: StateFlow<Boolean> = _isProcessing
@@ -91,45 +63,32 @@ class TableTemplateGroupViewModel
     private var templateName = ""
     private var exception: Exception? = null
 
-    private var parseValueErrorMsg = ""
-
     override fun load(name: String, loadFromCacheIfExists: Boolean) {
         viewModelScope.launch(coroutineDispatcher) {
             _isProcessing.value = true
             templateName = name
-            exception = null
-            var errorMessage = ""
-            var success = true
-            if (loadFromCacheIfExists && tableTemplateGroupVmChangesCache.isPopulated()) {
-                items = ArrayList(tableTemplateGroupVmChangesCache.get(templateName))
-            } else {
-                try {
-                    initReadFiles(name)
-                    if (tableTemplateRepository.load()) {
-                        val tableListItem = tableTemplateRepository.getItem()
-                        tableListItem?.let {
-                            templateName = it.templateName
-                            items.clear()
-                            items.addAll(TableItemFinalMapper.fromTableTemplateListMoshi(it.items))
-                            index = 0
-                        }?:run {
-                            success = false
-                            errorMessage = JSON_ITEM_TO_LOAD_IS_NULL + name
-                        }
-                    } else {
-                        success = false
-                        errorMessage = tableTemplateRepository.getErrorMsg()
-                    }
-                } catch (ex: Exception) {
-                    exception = ex
-                    errorMessage = ex.message.toString()
-                    success = false
-                }
-                if (success) {
-                    tableTemplateGroupVmChangesCache.set(templateName, items)
-                }
+            tableTemplateLoader.load(name,
+                tableTemplateFilesPath,
+                name,
+                loadFromCacheIfExists)
+            val result = tableTemplateLoader.getItem()
+            result?.let {
+                items = it.item as ArrayList<TableItemFinal>
+                index = it.currentIndex
+                _status.value =
+                    TableTemplateStatus(it.success,
+                        items,
+                        index,
+                        it.message,
+                        it.ex)
+            }?:run {
+                index = 0
+                _status.value = TableTemplateStatus(false,
+                    items,
+                    index,
+                    ITEM_FROM_LOADER_IS_NULL + name,
+                    null)
             }
-            _status.value = TableTemplateStatus(success, items, index, errorMessage, exception)
         }
     }
 
@@ -174,58 +133,6 @@ class TableTemplateGroupViewModel
         _status.value = TableTemplateStatus(true, items, index, "", null)
     }
 
-    override fun setRowName(name: String) {
-        _rowNameIsNotEmpty.value = tableTemplateGroupValidator.validateNameIsNotEmpty(name)
-        _isNotDuplicateName.value = tableTemplateGroupValidator.validateNameIsNotDuplicate(name, items)
-        items[index].name = name
-    }
-
-    override fun setItemType(type: ItemType) {
-        items[index].dataType = type
-        determineIfParseValueError(type)
-    }
-
-    override fun setDefaultValue(value: String) {
-        _noValueWithNotEditable.value = value.isEmpty() && !items[index].editable
-        items[index].value = value
-        determineIfParseValueError(items[index].dataType)
-    }
-
-    override fun setPrimary(isPrimary: Boolean) {
-        items[index].isPrimary = isPrimary
-        if (isPrimary) {
-            _noPrimaryKeyFound.value = false
-        } else {
-            items.forEach {
-                if (it.isPrimary) {
-                    _noPrimaryKeyFound.value = false
-                    return
-                }
-            }
-            _noPrimaryKeyFound.value = true
-        }
-    }
-
-    override fun setSortKey(isSort: Boolean) {
-        items[index].isSortKey = isSort
-        if (isSort) {
-            _noSortKeyFound.value = false
-            return
-        }
-        items.forEach {
-            if (it.isSortKey) {
-                _noSortKeyFound.value = false
-                return
-            }
-        }
-        _noSortKeyFound.value = true
-    }
-
-    override fun setIsEditable(editable: Boolean) {
-        items[index].editable = editable
-        _noValueWithNotEditable.value = items[index].value.isEmpty() && !editable
-    }
-
     override fun addPage() {
         if (items.isNotEmpty()) {
             index++
@@ -257,17 +164,15 @@ class TableTemplateGroupViewModel
 
     override fun pageCount() = items.size
 
-    override fun getCurrentPage(): TableItemFinal = items[index]
+    override fun getCurrentPage() = items[index]
 
-    override fun hasChanges(): Boolean = tableTemplateGroupVmChangesCache.hasChanges(templateName)
+    override fun hasChanges() = tableTemplateGroupVmChangesCache.hasChanges(templateName)
 
     override fun reset() {
         tableTemplateGroupVmChangesCache.reset(templateName)
         items = ArrayList(tableTemplateGroupVmChangesCache.get(templateName))
         _status.value = TableTemplateStatus(true, items, index, "", null)
     }
-
-    override fun getParseErrorMsg(): String = parseValueErrorMsg
 
     // For testing:
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -284,22 +189,6 @@ class TableTemplateGroupViewModel
     }
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun getIndex() = index
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    internal fun determineIfParseValueError(type: ItemType) {
-        _parseValueError.value = !serializeTableTemplateHelpers
-            .validateTableTemplateValue(items[index].value, type)
-        parseValueErrorMsg = if (_parseValueError.value) {
-            getParseValueErrorMsg(type)
-        } else {
-            ""
-        }
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    internal fun getParseValueErrorMsg(type: ItemType): String {
-        return "Value is not a $type"
-    }
 
     ///////////////////////////////
 
@@ -333,5 +222,7 @@ class TableTemplateGroupViewModel
     companion object {
         const val JSON_ITEM_TO_SAVE_IS_NULL = "Json item to save is null for table template: "
         const val JSON_ITEM_TO_LOAD_IS_NULL = "Json item to load is null for table template: "
+        const val ITEM_FROM_LOADER_IS_NULL = "Item from loader is null for table template: "
+
     }
 }

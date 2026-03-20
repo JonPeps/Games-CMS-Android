@@ -1,15 +1,12 @@
 package com.jonpeps.gamescms.hilt.di
 
 import com.jonpeps.gamescms.data.helpers.InputStreamTableTemplateStatus
-import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateDetailsListRepository
-import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ISerializeTableTemplatesViewModel
 import com.jonpeps.gamescms.ui.viewmodels.dynamodb.CreateTableViewModel
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmChangesCache
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.SerializeTableTemplatesViewModel
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupVmChangesCache
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,13 +38,8 @@ class ViewModelDiProvider {
             moshiTableTemplateDetailsListRepository,
             commonSerializationRepoHelper)
         }
-}
-
-@Module
-@InstallIn(ViewModelComponent::class)
-abstract class ViewModelHelperDiBindings {
-    @Binds
-    abstract fun bindTableTemplateGroupVmChangesCache(
-        tableTemplateGroupVmChangesCacheImpl: TableTemplateGroupVmChangesCache
-    ): ITableTemplateGroupVmChangesCache
+    @Provides
+    fun provideTableTemplateGroupVmChangesCache(): ITableTemplateGroupVmChangesCache {
+        return TableTemplateGroupVmChangesCache()
+    }
 }

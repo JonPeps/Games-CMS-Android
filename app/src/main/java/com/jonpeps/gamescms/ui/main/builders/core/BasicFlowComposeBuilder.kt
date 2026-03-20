@@ -22,9 +22,12 @@ class BasicFlowComposeBuilder private constructor() {
             customMenuItemText: CustomItemText,
             enabled: Boolean,
             onClick: () -> Unit
-        ) = apply { customMenuItems.add(CustomMenuItem(customMenuItemText, enabled, onClick)) }
+        ) = apply { customMenuItems.add(CustomMenuItem(
+            customMenuItemText, enabled, onClick)) }
 
-        fun addScreenItem(screenName: String, content: @Composable () -> Unit) = apply {
+        fun addScreenItem(screenName: String,
+                          content: @Composable () -> Unit)
+        = apply {
             screenFlowBuilder.add(screenName, content)
         }
 
