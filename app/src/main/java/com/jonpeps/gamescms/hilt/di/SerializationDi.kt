@@ -1,5 +1,6 @@
 package com.jonpeps.gamescms.hilt.di
 
+import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.serialization.CommonDeleteFileHelper
 import com.jonpeps.gamescms.data.serialization.ICommonDeleteFileHelper
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
@@ -11,14 +12,14 @@ import com.jonpeps.gamescms.data.helpers.ITableTemplateGroupValidator
 import com.jonpeps.gamescms.data.helpers.StringListItemsVmChangesCache
 import com.jonpeps.gamescms.data.helpers.TableTemplateGroupValidator
 import com.jonpeps.gamescms.data.repositories.IMoshiJsonCachesFactory
-import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
 import com.jonpeps.gamescms.data.repositories.IStringListMoshiJsonCache
 import com.jonpeps.gamescms.data.repositories.ITableTemplateStringMoshiJsonCache
+import com.jonpeps.gamescms.data.repositories.base.ISingleItemMoshiJsonRepository
 import com.jonpeps.gamescms.data.serialization.CommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.debug.IInputStreamSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.debug.InputStreamSerializationRepoHelper
-import com.jonpeps.gamescms.data.serialization.moshi.InputStreamStringList
+import com.jonpeps.gamescms.data.serialization.moshi.ISToJsonTypeToStorage
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.ISerializeTableTemplateHelpers
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplateHelpers
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplateUpdateCore
@@ -66,7 +67,7 @@ class SerializationDiProvider {
     @Provides
     fun providesSerializationTableTemplateUpdateCore(
         serializeTableTemplateHelpers: SerializeTableTemplateHelpers,
-        stringListRepository: IMoshiStringListRepository,
+        stringListRepository: ISingleItemMoshiJsonRepository<StringListMoshi>,
         commonSerializationRepoHelper: CommonSerializationRepoHelper)
     : SerializeTableTemplateUpdateCore {
         return SerializeTableTemplateUpdateCore(
@@ -82,11 +83,11 @@ class SerializationDiProvider {
 
     @Provides
     fun providesInputStreamStringList(
-        moshiStringListRepository: IMoshiStringListRepository,
+        moshiStringListRepository: ISingleItemMoshiJsonRepository<StringListMoshi>,
         commonSerializationRepoHelper: ICommonSerializationRepoHelper,
         inputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper
-    ) : InputStreamStringList {
-            return InputStreamStringList(
+    ) : ISToJsonTypeToStorage<StringListMoshi> {
+            return ISToJsonTypeToStorage<StringListMoshi>(
                 moshiStringListRepository,
                 commonSerializationRepoHelper,
                 inputStreamSerializationRepoHelper)

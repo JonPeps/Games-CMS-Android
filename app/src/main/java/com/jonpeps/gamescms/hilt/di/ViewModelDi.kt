@@ -1,9 +1,10 @@
 package com.jonpeps.gamescms.hilt.di
 
-import com.jonpeps.gamescms.data.helpers.InputStreamTableTemplateStatus
-import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateDetailsListRepository
-import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateDetailsListMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
+import com.jonpeps.gamescms.data.repositories.base.ISingleItemMoshiJsonRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
+import com.jonpeps.gamescms.data.serialization.moshi.ISToJsonTypeToStorage
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ISerializeTableTemplatesViewModel
 import com.jonpeps.gamescms.ui.viewmodels.dynamodb.CreateTableViewModel
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmChangesCache
@@ -27,9 +28,9 @@ class ViewModelDiProvider {
 
     @Provides
     fun provideSerializeTableTemplatesViewModel(coroutineDispatcher: CoroutineDispatcher,
-                                                inputStreamTableTemplateStatus: InputStreamTableTemplateStatus,
-                                                moshiTableTemplateRepository: IMoshiTableTemplateRepository,
-                                                moshiTableTemplateDetailsListRepository: IMoshiTableTemplateDetailsListRepository,
+                                                inputStreamTableTemplateStatus: ISToJsonTypeToStorage<TableTemplateDetailsListMoshi>,
+                                                moshiTableTemplateRepository: ISingleItemMoshiJsonRepository<TableTemplateItemListMoshi>,
+                                                moshiTableTemplateDetailsListRepository: ISingleItemMoshiJsonRepository<TableTemplateDetailsListMoshi>,
                                                 commonSerializationRepoHelper: ICommonSerializationRepoHelper
     )
     : ISerializeTableTemplatesViewModel {

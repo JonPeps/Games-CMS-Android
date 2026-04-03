@@ -6,11 +6,10 @@ import com.jonpeps.gamescms.data.DataConstants.Companion.JSON_EXTENSION
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateDetailsListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateDetailsMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
-import com.jonpeps.gamescms.data.helpers.InputStreamTableTemplateStatus
 import com.jonpeps.gamescms.data.helpers.toCommonFilename
-import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateDetailsListRepository
-import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
+import com.jonpeps.gamescms.data.repositories.base.ISingleItemMoshiJsonRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
+import com.jonpeps.gamescms.data.serialization.moshi.ISToJsonTypeToStorage
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplatesViewModelData
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.UpdatedTableTemplatesViewModelData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,10 +32,14 @@ interface ISerializeTableTemplatesViewModel {
 @HiltViewModel
 class SerializeTableTemplatesViewModel
 @Inject constructor(private val coroutineDispatcher: CoroutineDispatcher,
-                    private val inputStreamTableTemplateStatus: InputStreamTableTemplateStatus,
-                    private val moshiTableTemplateRepository: IMoshiTableTemplateRepository,
-                    private val moshiTableTemplateDetailsListRepository: IMoshiTableTemplateDetailsListRepository,
-                    private val commonSerializationRepoHelper: ICommonSerializationRepoHelper
+                    private val inputStreamTableTemplateStatus
+                        : ISToJsonTypeToStorage<TableTemplateDetailsListMoshi>,
+                    private val moshiTableTemplateRepository
+                        : ISingleItemMoshiJsonRepository<TableTemplateItemListMoshi>,
+                    private val moshiTableTemplateDetailsListRepository
+                        : ISingleItemMoshiJsonRepository<TableTemplateDetailsListMoshi>,
+                    private val commonSerializationRepoHelper
+                        : ICommonSerializationRepoHelper
 )
     : ViewModel(), ISerializeTableTemplatesViewModel {
         private val _serializeStatus = MutableStateFlow(SerializeTableTemplatesViewModelData(false, null, ""))
@@ -49,9 +52,12 @@ class SerializeTableTemplatesViewModel
         )
     )
 
-    val updatedTableTemplateStatus: StateFlow<UpdatedTableTemplatesViewModelData> = _updatedTableTemplateStatus
+    val updatedTableTemplateStatus: StateFlow<UpdatedTableTemplatesViewModelData>
+        = _updatedTableTemplateStatus
 
-    override fun readItemsFromAssets(assetPath: String, directory: String, fileName: String) {
+    override fun readItemsFromAssets(assetPath: String,
+                                     directory: String,
+                                     fileName: String) {
         viewModelScope.launch(coroutineDispatcher) {
             val inputStream = commonSerializationRepoHelper
                 .getInputStreamFromStr(assetPath)
@@ -110,7 +116,8 @@ class SerializeTableTemplatesViewModel
                     }
                 }
                 if (!found) {
-                    details.items.add(TableTemplateDetailsMoshi(templateName, filename, success))
+                    details.items.add(TableTemplateDetailsMoshi(templateName,
+                        filename, success))
                 }
                 if (moshiTableTemplateDetailsListRepository.save(details)) {
                     _updatedTableTemplateStatus.value =

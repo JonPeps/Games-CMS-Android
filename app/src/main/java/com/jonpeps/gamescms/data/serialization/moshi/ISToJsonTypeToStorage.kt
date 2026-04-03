@@ -18,23 +18,26 @@ interface IInputStreamToJsonTypeToStorage {
     suspend fun processSuspend(inputStream: InputStream, directory: String, fileName: String)
 }
 
-open class InputStreamToJsonTypeToStorage<T>(
+open class ISToJsonTypeToStorage<T>(
     private val singleItemMoshiJsonRepository: ISingleItemMoshiJsonRepository<T>,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
-    private val inputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper,
+    private val serializationRepoHelper: IInputStreamSerializationRepoHelper,
 ): IInputStreamToJsonTypeToStorage {
     lateinit var status: InputStreamToJsonStorageStatus<T>
 
     var exception: Exception? = null
     private var item: T? = null
 
-    override suspend fun processSuspend(inputStream: InputStream, directory: String, fileName: String) {
+    override suspend fun processSuspend(inputStream: InputStream,
+                                        directory: String,
+                                        fileName: String) {
         exception = null
         var errorMessage = ""
         var success = true
         try {
             initReadFiles(inputStream)
-            if (singleItemMoshiJsonRepository.serialize(commonSerializationRepoHelper.readAll(inputStream))) {
+            if (singleItemMoshiJsonRepository
+                .serialize(commonSerializationRepoHelper.readAll(inputStream))) {
                 item = singleItemMoshiJsonRepository.getItem()
                 if (item == null) {
                     success = false
@@ -79,15 +82,17 @@ open class InputStreamToJsonTypeToStorage<T>(
 
     private fun initReadFiles(inputStream: InputStream) {
         singleItemMoshiJsonRepository.setBufferReader(
-            inputStreamSerializationRepoHelper.getBufferReader(inputStream)
+            serializationRepoHelper.getBufferReader(inputStream)
         )
     }
 
     private fun initWriteFiles(fileName: String, directory: String) {
         val completeFilename = fileName + JSON_EXTENSION
         singleItemMoshiJsonRepository.setAbsoluteFile(
-            commonSerializationRepoHelper.getAbsoluteFile(directory, completeFilename))
-        singleItemMoshiJsonRepository.setFile(commonSerializationRepoHelper.getMainFile(completeFilename))
+            commonSerializationRepoHelper
+                .getAbsoluteFile(directory, completeFilename))
+        singleItemMoshiJsonRepository
+            .setFile(commonSerializationRepoHelper.getMainFile(completeFilename))
         singleItemMoshiJsonRepository.assignDirectoryFile(
             commonSerializationRepoHelper.getDirectoryFile(directory))
         singleItemMoshiJsonRepository.setFileWriter(

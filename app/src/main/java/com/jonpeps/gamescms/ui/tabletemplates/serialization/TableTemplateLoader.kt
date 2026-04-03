@@ -2,14 +2,14 @@ package com.jonpeps.gamescms.ui.tabletemplates.serialization
 
 import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
-import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
+import com.jonpeps.gamescms.data.repositories.base.ISingleItemMoshiJsonRepository
 import com.jonpeps.gamescms.data.serialization.GenericRepoLoader
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmChangesCache
 import javax.inject.Inject
 
 class TableTemplateLoader
-@Inject constructor(repository: IMoshiTableTemplateRepository,
+@Inject constructor(repository: ISingleItemMoshiJsonRepository<TableTemplateItemListMoshi>,
                     repoHelper: ICommonSerializationRepoHelper,
                     cache: ITableTemplateGroupVmChangesCache
 )

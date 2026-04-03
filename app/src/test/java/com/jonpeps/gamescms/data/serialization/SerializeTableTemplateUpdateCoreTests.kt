@@ -1,8 +1,8 @@
 package com.jonpeps.gamescms.data.serialization
 
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
-import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
-import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
+import com.jonpeps.gamescms.data.repositories.base.SingleItemMoshiJsonRepository
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.ISerializeTableTemplateUpdateCore
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplateHelpers
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplateUpdateCore
@@ -33,9 +33,9 @@ class SerializeTableTemplateUpdateCoreTests {
     @MockK
     private lateinit var mockSerializeTableTemplateHelpers: SerializeTableTemplateHelpers
     @MockK
-    private lateinit var mockStringListRepository: IMoshiStringListRepository
+    private lateinit var mockStringListRepository: SingleItemMoshiJsonRepository<StringListMoshi>
     @MockK
-    private lateinit var mockMoshiTableTemplateRepository: IMoshiTableTemplateRepository
+    private lateinit var mockMoshiTableTemplateRepository: SingleItemMoshiJsonRepository<TableTemplateItemListMoshi>
     @MockK
     private lateinit var mockCommonSerializationRepoHelper: CommonSerializationRepoHelper
 

@@ -2,7 +2,7 @@ package com.jonpeps.gamescms.ui.tabletemplates.serialization
 
 import com.jonpeps.gamescms.data.DataConstants.Companion.JSON_EXTENSION
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
-import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
+import com.jonpeps.gamescms.data.repositories.base.ISingleItemMoshiJsonRepository
 import com.jonpeps.gamescms.data.serialization.CommonSerializationRepoHelper
 import java.io.File
 import javax.inject.Inject
@@ -19,7 +19,7 @@ interface ISerializeTableTemplateUpdateCore {
 
 class SerializeTableTemplateUpdateCore@Inject constructor(
     private val serializeTableTemplateHelpers: SerializeTableTemplateHelpers,
-    private val stringListRepository: IMoshiStringListRepository,
+    private val stringListRepository: ISingleItemMoshiJsonRepository<StringListMoshi>,
     private val commonSerializationRepoHelper: CommonSerializationRepoHelper)
     : ISerializeTableTemplateUpdateCore{
 

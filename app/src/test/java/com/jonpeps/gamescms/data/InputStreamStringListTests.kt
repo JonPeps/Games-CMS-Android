@@ -1,10 +1,11 @@
 package com.jonpeps.gamescms.data
 
-import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
+import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
+import com.jonpeps.gamescms.data.repositories.base.ISingleItemMoshiJsonRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.debug.IInputStreamSerializationRepoHelper
-import com.jonpeps.gamescms.data.serialization.moshi.InputStreamStringList
-import com.jonpeps.gamescms.data.serialization.moshi.InputStreamToJsonTypeToStorage
+import com.jonpeps.gamescms.data.serialization.moshi.ISToJsonTypeToStorage
+import com.jonpeps.gamescms.data.serialization.moshi.InputStreamFactoryImpl
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -23,13 +24,13 @@ class InputStreamStringListTests {
     @MockK
     private lateinit var mockInputStream: InputStream
     @MockK
-    private lateinit var mockMoshiStringListRepository: IMoshiStringListRepository
+    private lateinit var mockMoshiStringListRepository: ISingleItemMoshiJsonRepository<StringListMoshi>
     @MockK
     private lateinit var mockCommonSerializationRepoHelper: ICommonSerializationRepoHelper
     @MockK
     private lateinit var mockInputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper
 
-    private lateinit var sut: InputStreamStringList
+    private lateinit var sut: ISToJsonTypeToStorage<StringListMoshi>
 
     private val directory = "directory"
     private val fileName = "fileName"
@@ -39,11 +40,12 @@ class InputStreamStringListTests {
     fun setup() {
         MockKAnnotations.init(this)
 
-        sut = InputStreamStringList(
+        val factory = InputStreamFactoryImpl(
             mockMoshiStringListRepository,
             mockCommonSerializationRepoHelper,
             mockInputStreamSerializationRepoHelper
         )
+        sut = factory.inputStreamToStringListStorage()
 
         setupForReadingFiles()
         setupForWritingFiles()
@@ -75,7 +77,7 @@ class InputStreamStringListTests {
 
             assert(!sut.status.success)
             assert(sut.status.item == null)
-            assert(sut.status.errorMessage == InputStreamToJsonTypeToStorage.Companion.FAILED_TO_LOAD_FILE)
+            assert(sut.status.errorMessage == ISToJsonTypeToStorage.Companion.FAILED_TO_LOAD_FILE)
             assert(sut.status.exception == null)
         }
 
@@ -90,7 +92,7 @@ class InputStreamStringListTests {
 
             assert(!sut.status.success)
             assert(sut.status.item == null)
-            assert(sut.status.errorMessage == InputStreamToJsonTypeToStorage.Companion.FAILED_TO_LOAD_FILE)
+            assert(sut.status.errorMessage == ISToJsonTypeToStorage.Companion.FAILED_TO_LOAD_FILE)
             assert(sut.status.exception == null)
         }
 
@@ -120,7 +122,7 @@ class InputStreamStringListTests {
             sut.processSuspend(mockInputStream, directory, fileName)
 
             assert(!sut.status.success)
-            assert(sut.status.errorMessage == InputStreamToJsonTypeToStorage.Companion.FAILED_TO_CREATE_DIR + directory)
+            assert(sut.status.errorMessage == ISToJsonTypeToStorage.Companion.FAILED_TO_CREATE_DIR + directory)
         }
 
     @Test
@@ -153,7 +155,7 @@ class InputStreamStringListTests {
             sut.processSuspend(mockInputStream, directory, fileName)
 
             assert(!sut.status.success)
-            assert(sut.status.errorMessage == InputStreamToJsonTypeToStorage.Companion.FAILED_TO_WRITE_FILE)
+            assert(sut.status.errorMessage == ISToJsonTypeToStorage.Companion.FAILED_TO_WRITE_FILE)
         }
 
     private fun setupForReadingFiles() {

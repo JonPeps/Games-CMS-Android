@@ -3,7 +3,7 @@ package com.jonpeps.gamescms.data.serialization
 import com.jonpeps.gamescms.data.dataclasses.ItemType
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
-import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
+import com.jonpeps.gamescms.data.repositories.base.ISingleItemMoshiJsonRepository
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.TableTemplateLoader
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.ITableTemplateGroupVmChangesCache
 import io.mockk.MockKAnnotations
@@ -13,7 +13,7 @@ import org.junit.Test
 
 class TableTemplateLoaderTests {
     @MockK
-    private lateinit var mockRepository: IMoshiTableTemplateRepository
+    private lateinit var mockRepository: ISingleItemMoshiJsonRepository<TableTemplateItemListMoshi>
     @MockK
     private lateinit var mockCommonSerializationRepoHelper: CommonSerializationRepoHelper
     @MockK

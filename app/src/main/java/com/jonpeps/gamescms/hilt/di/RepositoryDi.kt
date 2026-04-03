@@ -1,10 +1,11 @@
 package com.jonpeps.gamescms.hilt.di
 
-import com.jonpeps.gamescms.data.repositories.ICachedMoshiStringListRepository
+import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateDetailsListMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.repositories.IMoshiJsonRepositoryFactory
-import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
-import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateDetailsListRepository
-import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
+import com.jonpeps.gamescms.data.repositories.base.IBaseCachedMoshiJsonRepository
+import com.jonpeps.gamescms.data.repositories.base.ISingleItemMoshiJsonRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,22 +16,22 @@ import dagger.hilt.components.SingletonComponent
 class RepositoryDi {
     @Provides
     fun providesStringListRepository(repositoryFactory: IMoshiJsonRepositoryFactory)
-        : IMoshiStringListRepository {
+        : ISingleItemMoshiJsonRepository<StringListMoshi> {
             return repositoryFactory.moshiStringListRepository()
     }
     @Provides
     fun providesCachedStrListRepository(repositoryFactory: IMoshiJsonRepositoryFactory)
-        : ICachedMoshiStringListRepository {
+        : IBaseCachedMoshiJsonRepository<StringListMoshi> {
             return repositoryFactory.moshiCachedStrListRepository()
     }
     @Provides
     fun providesTableTemplateRepository(repositoryFactory: IMoshiJsonRepositoryFactory)
-        : IMoshiTableTemplateRepository {
+        : ISingleItemMoshiJsonRepository<TableTemplateItemListMoshi> {
             return repositoryFactory.moshiTableTemplateRepository()
     }
     @Provides
     fun providesTableTemplateDetailsListRepository(repositoryFactory: IMoshiJsonRepositoryFactory)
-        : IMoshiTableTemplateDetailsListRepository {
+        : ISingleItemMoshiJsonRepository<TableTemplateDetailsListMoshi> {
             return repositoryFactory.moshiTableTemplateDetailsListRepository()
     }
 }

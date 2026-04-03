@@ -2,10 +2,10 @@ package com.jonpeps.gamescms.viewmodels
 
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateDetailsListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateDetailsMoshi
-import com.jonpeps.gamescms.data.helpers.InputStreamTableTemplateStatus
-import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateDetailsListRepository
-import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
+import com.jonpeps.gamescms.data.repositories.base.ISingleItemMoshiJsonRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
+import com.jonpeps.gamescms.data.serialization.moshi.ISToJsonTypeToStorage
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.SerializeTableTemplatesViewModel
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -21,11 +21,11 @@ import org.junit.Test
 class SerializeTableTemplatesViewModelTests {
     private val dispatcher = UnconfinedTestDispatcher()
     @MockK
-    private lateinit var mockInputStreamTableTemplateStatus: InputStreamTableTemplateStatus
+    private lateinit var mockInputStreamTableTemplateStatus:ISToJsonTypeToStorage<TableTemplateDetailsListMoshi>
     @MockK
-    private lateinit var mockMoshiTableTemplateRepository: IMoshiTableTemplateDetailsListRepository
+    private lateinit var mockMoshiTableTemplateRepository: ISingleItemMoshiJsonRepository<TableTemplateItemListMoshi>
     @MockK
-    private lateinit var mockMoshiTableTemplateDetailsListRepository: IMoshiTableTemplateRepository
+    private lateinit var mockMoshiTableTemplateDetailsListRepository: ISingleItemMoshiJsonRepository<TableTemplateDetailsListMoshi>
     @MockK
     private lateinit var mockCommonSerializationRepoHelper: ICommonSerializationRepoHelper
 
@@ -37,11 +37,13 @@ class SerializeTableTemplatesViewModelTests {
     fun setup() {
         MockKAnnotations.init(this)
 
-        viewModel = SerializeTableTemplatesViewModel(dispatcher,
+        viewModel = SerializeTableTemplatesViewModel(
+            dispatcher,
             mockInputStreamTableTemplateStatus,
-            mockMoshiTableTemplateDetailsListRepository,
             mockMoshiTableTemplateRepository,
-            mockCommonSerializationRepoHelper)
+            mockMoshiTableTemplateDetailsListRepository,
+            mockCommonSerializationRepoHelper
+        )
 
         tableTemplateDetailsListMoshi = TableTemplateDetailsListMoshi(
             arrayListOf(
