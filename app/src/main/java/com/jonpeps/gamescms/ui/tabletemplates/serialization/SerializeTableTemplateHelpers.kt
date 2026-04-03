@@ -13,7 +13,9 @@ interface ISerializeTableTemplateHelpers {
 
 class SerializeTableTemplateHelpers : ISerializeTableTemplateHelpers {
     override fun getFilename(templateName: String): String {
-        return templateName.lowercase().replace(SPACE, UNDER_SCORE) + JSON_EXTENSION
+        return templateName
+                .lowercase()
+                .replace(SPACE, UNDER_SCORE) + JSON_EXTENSION
     }
 
     override fun validateTableTemplateValue(

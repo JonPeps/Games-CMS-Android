@@ -2,7 +2,7 @@ package com.jonpeps.gamescms.data.repositories.base
 
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
 
-interface IBaseSingleItemMoshiJsonRepository<T>: IBaseMoshiRepo {
+interface ISingleItemMoshiJsonRepository<T>: IBaseMoshiRepo {
     suspend fun load(): Boolean
     suspend fun serialize(contents: String): Boolean
     suspend fun save(item: T): Boolean
@@ -11,10 +11,10 @@ interface IBaseSingleItemMoshiJsonRepository<T>: IBaseMoshiRepo {
     fun setItem(item: T?)
 }
 
-abstract class BaseSingleItemMoshiJsonRepository<T>(
+class SingleItemMoshiJsonRepository<T>(
     private val moshiJsonAdapter: MoshiJsonAdapter<T>,
     private val stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation,
-): BaseMoshiRepo(), IBaseSingleItemMoshiJsonRepository<T>  {
+): BaseMoshiRepo(), ISingleItemMoshiJsonRepository<T>  {
     private var item: T? = null
 
     override suspend fun load(): Boolean {

@@ -10,7 +10,7 @@ import dagger.assisted.AssistedFactory
 class BasicStringListViewModelFactory {
     @AssistedFactory
     interface IBasicStringListViewModelFactory {
-        fun create(@Assisted("param1") directoryPath: String, @Assisted("param2") listPath: String): BasicStringListViewModel
+        fun create(@Assisted("directoryPath") directoryPath: String, @Assisted("listPath") listPath: String): BasicStringListViewModel
     }
 
     companion object {

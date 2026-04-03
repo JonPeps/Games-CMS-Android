@@ -3,8 +3,8 @@ package com.jonpeps.gamescms.viewmodels
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateDetailsListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateDetailsMoshi
 import com.jonpeps.gamescms.data.helpers.InputStreamTableTemplateStatus
-import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateDetailsListRepository
-import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateRepository
+import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateDetailsListRepository
+import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.SerializeTableTemplatesViewModel
 import io.mockk.MockKAnnotations
@@ -23,9 +23,9 @@ class SerializeTableTemplatesViewModelTests {
     @MockK
     private lateinit var mockInputStreamTableTemplateStatus: InputStreamTableTemplateStatus
     @MockK
-    private lateinit var mockMoshiTableTemplateRepository: MoshiTableTemplateRepository
+    private lateinit var mockMoshiTableTemplateRepository: IMoshiTableTemplateDetailsListRepository
     @MockK
-    private lateinit var mockMoshiTableTemplateDetailsListRepository: MoshiTableTemplateDetailsListRepository
+    private lateinit var mockMoshiTableTemplateDetailsListRepository: IMoshiTableTemplateRepository
     @MockK
     private lateinit var mockCommonSerializationRepoHelper: ICommonSerializationRepoHelper
 
@@ -39,8 +39,8 @@ class SerializeTableTemplatesViewModelTests {
 
         viewModel = SerializeTableTemplatesViewModel(dispatcher,
             mockInputStreamTableTemplateStatus,
-            mockMoshiTableTemplateRepository,
             mockMoshiTableTemplateDetailsListRepository,
+            mockMoshiTableTemplateRepository,
             mockCommonSerializationRepoHelper)
 
         tableTemplateDetailsListMoshi = TableTemplateDetailsListMoshi(

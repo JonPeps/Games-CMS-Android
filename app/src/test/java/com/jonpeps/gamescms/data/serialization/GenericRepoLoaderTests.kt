@@ -1,7 +1,7 @@
 package com.jonpeps.gamescms.data.serialization
 
 import com.jonpeps.gamescms.data.helpers.IGenericSerializationCache
-import com.jonpeps.gamescms.data.repositories.base.IBaseSingleItemMoshiJsonRepository
+import com.jonpeps.gamescms.data.repositories.base.ISingleItemMoshiJsonRepository
 import com.jonpeps.gamescms.data.serialization.GenericRepoLoader.Companion.JSON_ITEM_TO_SAVE_IS_NULL
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -18,7 +18,7 @@ class GenericRepoLoaderTests {
     data class TempData2(val name: String)
 
     @MockK
-    private lateinit var mockRepository: IBaseSingleItemMoshiJsonRepository<TempData1>
+    private lateinit var mockRepository: ISingleItemMoshiJsonRepository<TempData1>
     @MockK
     private lateinit var mockCommonSerializationRepoHelper: CommonSerializationRepoHelper
     @MockK
@@ -29,7 +29,7 @@ class GenericRepoLoaderTests {
     private lateinit var mockBufferReader: BufferedReader
 
     class GenericRepoLoaderSut(
-        repository: IBaseSingleItemMoshiJsonRepository<TempData1>,
+        repository: ISingleItemMoshiJsonRepository<TempData1>,
         helper: CommonSerializationRepoHelper,
         cache: IGenericSerializationCache<TempData2>
     ): GenericRepoLoader<TempData1, TempData2>(

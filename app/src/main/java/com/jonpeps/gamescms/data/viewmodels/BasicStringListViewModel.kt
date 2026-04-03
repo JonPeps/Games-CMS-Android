@@ -26,8 +26,8 @@ interface IBasicStringListViewModel {
 @HiltViewModel(assistedFactory = BasicStringListViewModelFactory.IBasicStringListViewModelFactory::class)
 class BasicStringListViewModel
 @AssistedInject constructor(
-    @Assisted("param1") private val directory: String,
-    @Assisted("param2") private val fileName: String,
+    @Assisted("directoryPath") private val directory: String,
+    @Assisted("listPath") private val fileName: String,
     private val moshiStringListRepository: ICachedMoshiStringListRepository,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val listItemsVmChangesCache: IStringListItemsVmChangesCache,

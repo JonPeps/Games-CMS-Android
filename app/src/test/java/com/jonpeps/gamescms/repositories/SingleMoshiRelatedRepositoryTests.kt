@@ -4,11 +4,9 @@ import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
 import com.jonpeps.gamescms.data.repositories.base.BaseMoshiRepo.Companion.CONVERT_TO_JSON_FAILED
 import com.jonpeps.gamescms.data.repositories.base.BaseMoshiRepo.Companion.EMPTY_JSON_CONTENTS
 import com.jonpeps.gamescms.data.repositories.base.BaseMoshiRepo.Companion.WRITE_TO_FILE_FAILED
-import com.jonpeps.gamescms.data.repositories.IMoshiStringListRepository
-import com.jonpeps.gamescms.data.repositories.MoshiStringListRepository
-import com.jonpeps.gamescms.data.repositories.StringListMoshiJsonAdapter
+import com.jonpeps.gamescms.data.repositories.base.MoshiJsonAdapter
+import com.jonpeps.gamescms.data.repositories.base.SingleItemMoshiJsonRepository
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
-import com.squareup.moshi.JsonAdapter
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -25,13 +23,11 @@ import java.io.File
 import java.io.FileWriter
 
 @RunWith(JUnit4::class)
-class BasicMoshiRelatedRepositoryTests {
+class SingleMoshiRelatedRepositoryTests {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val dispatcher = UnconfinedTestDispatcher()
     @MockK
-    private lateinit var stringListMoshiJsonAdapter: StringListMoshiJsonAdapter
-    @MockK
-    private lateinit var mockMoshiJsonAdapter: JsonAdapter<StringListMoshi>
+    private lateinit var mockMoshiJsonAdapter: MoshiJsonAdapter<StringListMoshi>
     @MockK
     private lateinit var stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation
     @MockK
@@ -45,17 +41,16 @@ class BasicMoshiRelatedRepositoryTests {
     @MockK
     private lateinit var fileWriter: FileWriter
 
-    private val templateName = "test"
     private val dummyData = StringListMoshi(arrayListOf("test"))
 
-    private lateinit var moshiStringListRepository: IMoshiStringListRepository
+    private lateinit var moshiStringListRepository: SingleItemMoshiJsonRepository<StringListMoshi>
 
     @Before
     fun setup() {
         MockKAnnotations.init(this)
 
-        moshiStringListRepository = MoshiStringListRepository(
-            stringListMoshiJsonAdapter,
+        moshiStringListRepository = SingleItemMoshiJsonRepository<StringListMoshi>(
+            mockMoshiJsonAdapter,
             stringFileStorageStrSerialisation)
 
         moshiStringListRepository.setAbsoluteFile(absolutePath)
@@ -63,8 +58,6 @@ class BasicMoshiRelatedRepositoryTests {
         moshiStringListRepository.assignDirectoryFile(directoryFile)
         moshiStringListRepository.setBufferReader(bufferedReader)
         moshiStringListRepository.setFileWriter(fileWriter)
-
-        every { stringListMoshiJsonAdapter.getJsonAdapter() } returns mockMoshiJsonAdapter
     }
 
     @Test
@@ -72,7 +65,6 @@ class BasicMoshiRelatedRepositoryTests {
         assert(moshiStringListRepository.getErrorMsg() == "")
         coEvery { stringFileStorageStrSerialisation.read(bufferedReader) } returns true
         every { stringFileStorageStrSerialisation.getContents() } returns "test"
-        every { mockMoshiJsonAdapter.fromJson("test") } returns dummyData
         val result = moshiStringListRepository.load()
         assert(result)
     }
@@ -101,7 +93,6 @@ class BasicMoshiRelatedRepositoryTests {
     fun `LOAD string list WITH READ JSON file SUCCESS BUT JSON parsing RETURNS FALSE`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
         every { stringFileStorageStrSerialisation.getContents() } returns "test"
-        every { mockMoshiJsonAdapter.fromJson("test") } returns null
         coEvery { stringFileStorageStrSerialisation.read(bufferedReader) } returns true
         val result = moshiStringListRepository.load()
         assert(!result)
@@ -111,7 +102,6 @@ class BasicMoshiRelatedRepositoryTests {
     fun `SAVE string list SUCCESS`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
         coEvery { stringFileStorageStrSerialisation.write(directoryFile, file, absolutePath, fileWriter, "test") } returns true
-        every { mockMoshiJsonAdapter.toJson(dummyData) } returns "test"
         val result = moshiStringListRepository.save(dummyData)
         assert(result)
         assert(moshiStringListRepository.getErrorMsg() == "")
@@ -120,7 +110,6 @@ class BasicMoshiRelatedRepositoryTests {
     @Test
     fun `SAVE string list WITH CONVERT to JSON string RETURNS NULL`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
-        every { mockMoshiJsonAdapter.toJson(dummyData) } returns null
         val result = moshiStringListRepository.save(dummyData)
         assert(!result)
         assert(moshiStringListRepository.getErrorMsg() == CONVERT_TO_JSON_FAILED)
@@ -129,7 +118,6 @@ class BasicMoshiRelatedRepositoryTests {
     @Test
     fun `SAVE string list WITH CONVERT to JSON RETURNS EMPTY STRING`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
-        every { mockMoshiJsonAdapter.toJson(dummyData) } returns ""
         val result = moshiStringListRepository.save(dummyData)
         assert(!result)
         assert(moshiStringListRepository.getErrorMsg() == CONVERT_TO_JSON_FAILED)
@@ -138,7 +126,6 @@ class BasicMoshiRelatedRepositoryTests {
     @Test
     fun `SAVE to JSON item FAILS WHEN WRITING to file`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
-        every { mockMoshiJsonAdapter.toJson(dummyData) } returns "test"
         coEvery { stringFileStorageStrSerialisation.write(directoryFile, file, absolutePath, fileWriter, "test") } returns false
         val result = moshiStringListRepository.save(dummyData)
         assert(!result)
@@ -148,7 +135,6 @@ class BasicMoshiRelatedRepositoryTests {
     @Test
     fun `SERIALIZE string list SUCCESS`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
-        every { mockMoshiJsonAdapter.fromJson("test") } returns dummyData
         val result = moshiStringListRepository.serialize("test")
         assert(result)
     }
@@ -156,7 +142,6 @@ class BasicMoshiRelatedRepositoryTests {
     @Test
     fun `SERIALIZE string list FAILURE WHEN CONVERTING to JSON`() = runTest(dispatcher) {
         assert(moshiStringListRepository.getErrorMsg() == "")
-        every { mockMoshiJsonAdapter.fromJson("test") } returns null
         val result = moshiStringListRepository.serialize("test")
         assert(!result)
         assert(moshiStringListRepository.getErrorMsg() == EMPTY_JSON_CONTENTS)

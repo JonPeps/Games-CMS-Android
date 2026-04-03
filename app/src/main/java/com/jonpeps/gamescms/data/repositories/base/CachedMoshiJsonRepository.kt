@@ -12,7 +12,7 @@ interface IBaseCachedMoshiJsonRepository<T>: IBaseMoshiRepo {
     fun setItem(cacheName: String, item: T?)
 }
 
-abstract class BaseCachedMoshiJsonRepository<T>(
+class CachedMoshiJsonRepository<T>(
     private val moshiJsonAdapter: MoshiJsonAdapter<T>,
     private val stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation,
     private val basicStringGenericItemCache: IBasicStringGenericItemCache<T>

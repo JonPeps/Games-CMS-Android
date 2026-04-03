@@ -8,8 +8,8 @@ import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateDetailsMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.helpers.InputStreamTableTemplateStatus
 import com.jonpeps.gamescms.data.helpers.toCommonFilename
-import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateDetailsListRepository
-import com.jonpeps.gamescms.data.repositories.MoshiTableTemplateRepository
+import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateDetailsListRepository
+import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplatesViewModelData
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.UpdatedTableTemplatesViewModelData
@@ -34,8 +34,8 @@ interface ISerializeTableTemplatesViewModel {
 class SerializeTableTemplatesViewModel
 @Inject constructor(private val coroutineDispatcher: CoroutineDispatcher,
                     private val inputStreamTableTemplateStatus: InputStreamTableTemplateStatus,
-                    private val moshiTableTemplateRepository: MoshiTableTemplateRepository,
-                    private val moshiTableTemplateDetailsListRepository: MoshiTableTemplateDetailsListRepository,
+                    private val moshiTableTemplateRepository: IMoshiTableTemplateRepository,
+                    private val moshiTableTemplateDetailsListRepository: IMoshiTableTemplateDetailsListRepository,
                     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper
 )
     : ViewModel(), ISerializeTableTemplatesViewModel {
@@ -53,15 +53,19 @@ class SerializeTableTemplatesViewModel
 
     override fun readItemsFromAssets(assetPath: String, directory: String, fileName: String) {
         viewModelScope.launch(coroutineDispatcher) {
-            val inputStream = commonSerializationRepoHelper.getInputStreamFromStr(assetPath)
+            val inputStream = commonSerializationRepoHelper
+                .getInputStreamFromStr(assetPath)
             inputStream?.let {
-                inputStreamTableTemplateStatus.processSuspend(it, directory, fileName)
-                _serializeStatus.value = SerializeTableTemplatesViewModelData(
+                inputStreamTableTemplateStatus
+                    .processSuspend(it, directory, fileName)
+                _serializeStatus.value =
+                    SerializeTableTemplatesViewModelData(
                     inputStreamTableTemplateStatus.status.success,
                     inputStreamTableTemplateStatus.status.item,
                     inputStreamTableTemplateStatus.status.errorMessage)
             }?:run {
-                _serializeStatus.value = SerializeTableTemplatesViewModelData(false, null,
+                _serializeStatus.value =
+                    SerializeTableTemplatesViewModelData(false, null,
                     FAILED_TO_FIND_ASSET_FILE)
             }
         }
@@ -69,13 +73,16 @@ class SerializeTableTemplatesViewModel
 
     override fun readItems(directory: String, fileName: String) {
         viewModelScope.launch(coroutineDispatcher) {
-            moshiTableTemplateRepository.setAbsoluteFile(commonSerializationRepoHelper.getAbsoluteFile(directory,
+            moshiTableTemplateRepository
+                .setAbsoluteFile(commonSerializationRepoHelper.getAbsoluteFile(directory,
                 fileName + JSON_EXTENSION))
             if (moshiTableTemplateDetailsListRepository.load()) {
-                _serializeStatus.value = SerializeTableTemplatesViewModelData(true,
+                _serializeStatus.value =
+                    SerializeTableTemplatesViewModelData(true,
                     moshiTableTemplateDetailsListRepository.getItem(), "")
             } else {
-                _serializeStatus.value = SerializeTableTemplatesViewModelData(false, null,
+                _serializeStatus.value =
+                    SerializeTableTemplatesViewModelData(false, null,
                     moshiTableTemplateDetailsListRepository.getErrorMsg())
             }
         }
@@ -89,7 +96,8 @@ class SerializeTableTemplatesViewModel
     ) {
         viewModelScope.launch(coroutineDispatcher) {
             val filename = templateName.toCommonFilename() + JSON_EXTENSION
-            val file = commonSerializationRepoHelper.getAbsoluteFile(templatesListPath,
+            val file = commonSerializationRepoHelper
+                .getAbsoluteFile(templatesListPath,
                 filename)
             moshiTableTemplateRepository.setAbsoluteFile(file)
             if (moshiTableTemplateRepository.save(item)) {
@@ -105,13 +113,16 @@ class SerializeTableTemplatesViewModel
                     details.items.add(TableTemplateDetailsMoshi(templateName, filename, success))
                 }
                 if (moshiTableTemplateDetailsListRepository.save(details)) {
-                    _updatedTableTemplateStatus.value = UpdatedTableTemplatesViewModelData(true, "")
+                    _updatedTableTemplateStatus.value =
+                        UpdatedTableTemplatesViewModelData(true, "")
                 } else {
-                    _updatedTableTemplateStatus.value = UpdatedTableTemplatesViewModelData(false,
+                    _updatedTableTemplateStatus.value =
+                        UpdatedTableTemplatesViewModelData(false,
                         moshiTableTemplateDetailsListRepository.getErrorMsg())
                 }
             } else {
-                _updatedTableTemplateStatus.value = UpdatedTableTemplatesViewModelData(false,
+                _updatedTableTemplateStatus.value =
+                    UpdatedTableTemplatesViewModelData(false,
                     moshiTableTemplateRepository.getErrorMsg())
             }
         }

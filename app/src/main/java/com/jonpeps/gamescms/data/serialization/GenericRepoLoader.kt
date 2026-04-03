@@ -3,7 +3,7 @@ package com.jonpeps.gamescms.data.serialization
 import androidx.annotation.VisibleForTesting
 import com.jonpeps.gamescms.data.dataclasses.CommonDataItem
 import com.jonpeps.gamescms.data.helpers.IGenericSerializationCache
-import com.jonpeps.gamescms.data.repositories.base.IBaseSingleItemMoshiJsonRepository
+import com.jonpeps.gamescms.data.repositories.base.ISingleItemMoshiJsonRepository
 
 interface IGenericRepoLoader<T,K> {
     suspend fun load(name: String,
@@ -15,7 +15,7 @@ interface IGenericRepoLoader<T,K> {
 }
 
 abstract class GenericRepoLoader<T,K>(
-    private val repository: IBaseSingleItemMoshiJsonRepository<T>,
+    private val repository: ISingleItemMoshiJsonRepository<T>,
     private val repoHelper: ICommonSerializationRepoHelper,
     private val cache: IGenericSerializationCache<K>
 ): IGenericRepoLoader<T,K> {

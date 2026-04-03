@@ -10,12 +10,14 @@ import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
 class TableItemFinalMapperTests {
-
     @Test
     fun `FROM table template moshi TO table item final`() {
         val result = TableItemFinalMapper
             .fromTableTemplateMoshi(
-                TableTemplateItemMoshi("name", ItemType.STRING, true, "value",
+                TableTemplateItemMoshi("name",
+                    ItemType.STRING,
+                    true,
+                    "value",
             editable = true,
             isSortKey = true
         ))
@@ -31,7 +33,9 @@ class TableItemFinalMapperTests {
     fun `FROM table item final TO table template moshi`() {
         val result = TableItemFinalMapper
             .toTableTemplateItemMoshi(
-                TableItemFinal("name", ItemType.STRING, true, "value",
+                TableItemFinal("name",
+                    ItemType.STRING,
+                    true, "value",
                     editable = true, isSortKey = true))
         assert(result.name == "name")
         assert(result.dataType == ItemType.STRING)
@@ -45,11 +49,17 @@ class TableItemFinalMapperTests {
     fun `FROM template moshi list TO table item final list`() {
         val result = TableItemFinalMapper
             .fromTableTemplateListMoshi(listOf(TableTemplateItemMoshi(
-                "name1", ItemType.STRING, false, "value1",
+                "name1",
+                ItemType.STRING,
+                false,
+                "value1",
                 editable = true,
                 isSortKey = false),
                 TableTemplateItemMoshi(
-                    "name2", ItemType.BOOLEAN, true, "value2",
+                    "name2",
+                    ItemType.BOOLEAN,
+                    true,
+                    "value2",
                 editable = false,
                 isSortKey = true)))
 

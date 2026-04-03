@@ -6,6 +6,7 @@ import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.repositories.base.MoshiJsonAdapter
 import com.jonpeps.gamescms.data.serialization.moshi.MoshiJsonBuilder
 import com.squareup.moshi.JsonAdapter
+import javax.inject.Inject
 
 interface IMoshiJsonAdapterFactory {
     fun jsonStringList(): MoshiJsonAdapter<StringListMoshi>
@@ -13,19 +14,22 @@ interface IMoshiJsonAdapterFactory {
     fun jsonTableTemplateDetailsList(): MoshiJsonAdapter<TableTemplateDetailsListMoshi>
 }
 
-class MoshiJsonAdapterFactoryImpl : IMoshiJsonAdapterFactory {
-    override fun jsonStringList() = object : MoshiJsonAdapter<StringListMoshi> {
-        override fun getJsonAdapter(): JsonAdapter<StringListMoshi> =
-            MoshiJsonBuilder.build().adapter(StringListMoshi::class.java)
-    }
-
-    override fun jsonTableTemplateItemList() = object : MoshiJsonAdapter<TableTemplateItemListMoshi> {
-        override fun getJsonAdapter(): JsonAdapter<TableTemplateItemListMoshi> =
-            MoshiJsonBuilder.build().adapter(TableTemplateItemListMoshi::class.java)
+class MoshiJsonAdapterFactoryImpl @Inject constructor() : IMoshiJsonAdapterFactory {
+    override fun jsonStringList()
+        = object : MoshiJsonAdapter<StringListMoshi> {
+            override fun getJsonAdapter(): JsonAdapter<StringListMoshi> =
+                MoshiJsonBuilder.build().adapter(StringListMoshi::class.java)
         }
 
-    override fun jsonTableTemplateDetailsList() = object : MoshiJsonAdapter<TableTemplateDetailsListMoshi> {
-        override fun getJsonAdapter(): JsonAdapter<TableTemplateDetailsListMoshi> =
-            MoshiJsonBuilder.build().adapter(TableTemplateDetailsListMoshi::class.java)
-    }
+    override fun jsonTableTemplateItemList()
+        = object : MoshiJsonAdapter<TableTemplateItemListMoshi> {
+            override fun getJsonAdapter(): JsonAdapter<TableTemplateItemListMoshi> =
+                MoshiJsonBuilder.build().adapter(TableTemplateItemListMoshi::class.java)
+        }
+
+    override fun jsonTableTemplateDetailsList()
+        = object : MoshiJsonAdapter<TableTemplateDetailsListMoshi> {
+            override fun getJsonAdapter(): JsonAdapter<TableTemplateDetailsListMoshi> =
+                MoshiJsonBuilder.build().adapter(TableTemplateDetailsListMoshi::class.java)
+        }
 }

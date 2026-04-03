@@ -16,7 +16,7 @@ interface IBaseMoshiRepo {
     fun getErrorMsg(): String
 }
 
-abstract class BaseMoshiRepo: IBaseMoshiRepo {
+open class BaseMoshiRepo: IBaseMoshiRepo {
     protected var errorMessage = ""
     protected lateinit var directoryFile: File
     protected lateinit var mainFile: File
