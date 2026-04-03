@@ -26,7 +26,7 @@ interface IMoshiJsonRepositoryFactory {
     fun moshiStringListRepository()
         : SingleItemMoshiJsonRepository<StringListMoshi>
     fun moshiCachedStrListRepository()
-        : ICachedMoshiStringListRepository
+        : CachedMoshiJsonRepository<StringListMoshi>
     fun moshiTableTemplateRepository()
         : SingleItemMoshiJsonRepository<TableTemplateItemListMoshi>
     fun moshiTableTemplateDetailsListRepository()
@@ -47,12 +47,12 @@ class MoshiJsonRepositoryFactoryImpl @Inject constructor(
         )
     }
 
-    override fun moshiCachedStrListRepository(): ICachedMoshiStringListRepository {
-        return object : CachedMoshiJsonRepository<StringListMoshi>(
+    override fun moshiCachedStrListRepository(): CachedMoshiJsonRepository<StringListMoshi> {
+        return CachedMoshiJsonRepository(
             moshiJsonAdapterFactory.jsonStringList(),
             stringFileStorageStrSerialisation,
             tableTemplateStringMoshiJsonCache
-        ), ICachedMoshiStringListRepository {}
+        )
     }
 
     override fun moshiTableTemplateRepository()
