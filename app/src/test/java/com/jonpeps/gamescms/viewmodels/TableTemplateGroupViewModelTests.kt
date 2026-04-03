@@ -6,7 +6,7 @@ import com.jonpeps.gamescms.data.dataclasses.TableItemFinal
 import com.jonpeps.gamescms.data.dataclasses.mappers.TableItemFinalMapper
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemMoshi
-import com.jonpeps.gamescms.data.repositories.IMoshiTableTemplateRepository
+import com.jonpeps.gamescms.data.repositories.base.ISingleItemMoshiJsonRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.TableTemplateLoader
 import com.jonpeps.gamescms.ui.tabletemplates.viewmodels.TableTemplateGroupViewModel
@@ -29,13 +29,17 @@ class TableTemplateGroupViewModelTests {
     @MockK
     private lateinit var mockTableTemplateLoader: TableTemplateLoader
     @MockK
-    private lateinit var mockTableTemplateRepository: IMoshiTableTemplateRepository
+    private lateinit var mockTableTemplateRepository
+        : ISingleItemMoshiJsonRepository<TableTemplateItemListMoshi>
     @MockK
-    private lateinit var mockTableTemplateGroupVmRepoHelper: ICommonSerializationRepoHelper
+    private lateinit var mockTableTemplateGroupVmRepoHelper
+        : ICommonSerializationRepoHelper
     @MockK
-    private lateinit var mockTableTemplateGroupVmChangesCache: ITableTemplateGroupVmChangesCache
+    private lateinit var mockTableTemplateGroupVmChangesCache
+        : ITableTemplateGroupVmChangesCache
 
-    private val dummyData = TableTemplateItemListMoshi("test_template",
+    private val dummyData = TableTemplateItemListMoshi(
+        "test_template",
         listOf(TableTemplateItemMoshi("test",
         dataType = ItemType.STRING)))
 

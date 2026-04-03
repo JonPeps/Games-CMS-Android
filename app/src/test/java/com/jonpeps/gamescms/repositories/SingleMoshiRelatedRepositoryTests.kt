@@ -27,9 +27,11 @@ class SingleMoshiRelatedRepositoryTests {
     @OptIn(ExperimentalCoroutinesApi::class)
     private val dispatcher = UnconfinedTestDispatcher()
     @MockK
-    private lateinit var mockMoshiJsonAdapter: MoshiJsonAdapter<StringListMoshi>
+    private lateinit var mockMoshiJsonAdapter
+        : MoshiJsonAdapter<StringListMoshi>
     @MockK
-    private lateinit var stringFileStorageStrSerialisation: IStringFileStorageStrSerialisation
+    private lateinit var stringFileStorageStrSerialisation
+        : IStringFileStorageStrSerialisation
     @MockK
     private lateinit var directoryFile: File
     @MockK
@@ -43,13 +45,14 @@ class SingleMoshiRelatedRepositoryTests {
 
     private val dummyData = StringListMoshi(arrayListOf("test"))
 
-    private lateinit var moshiStringListRepository: SingleItemMoshiJsonRepository<StringListMoshi>
+    private lateinit var moshiStringListRepository
+        : SingleItemMoshiJsonRepository<StringListMoshi>
 
     @Before
     fun setup() {
         MockKAnnotations.init(this)
 
-        moshiStringListRepository = SingleItemMoshiJsonRepository<StringListMoshi>(
+        moshiStringListRepository = SingleItemMoshiJsonRepository(
             mockMoshiJsonAdapter,
             stringFileStorageStrSerialisation)
 
@@ -65,6 +68,7 @@ class SingleMoshiRelatedRepositoryTests {
         assert(moshiStringListRepository.getErrorMsg() == "")
         coEvery { stringFileStorageStrSerialisation.read(bufferedReader) } returns true
         every { stringFileStorageStrSerialisation.getContents() } returns "test"
+        every { mockMoshiJsonAdapter.getJsonAdapter().fromJson(any<String>()) } returns dummyData
         val result = moshiStringListRepository.load()
         assert(result)
     }

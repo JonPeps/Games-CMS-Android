@@ -1,6 +1,8 @@
 package com.jonpeps.gamescms.hilt.di
 
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateDetailsListMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.serialization.CommonDeleteFileHelper
 import com.jonpeps.gamescms.data.serialization.ICommonDeleteFileHelper
 import com.jonpeps.gamescms.data.serialization.string.IStringFileStorageStrSerialisation
@@ -19,7 +21,9 @@ import com.jonpeps.gamescms.data.serialization.CommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.debug.IInputStreamSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.debug.InputStreamSerializationRepoHelper
+import com.jonpeps.gamescms.data.serialization.moshi.IInputStreamFactory
 import com.jonpeps.gamescms.data.serialization.moshi.ISToJsonTypeToStorage
+import com.jonpeps.gamescms.data.serialization.moshi.InputStreamFactoryImpl
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.ISerializeTableTemplateHelpers
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplateHelpers
 import com.jonpeps.gamescms.ui.tabletemplates.serialization.SerializeTableTemplateUpdateCore
@@ -114,5 +118,23 @@ class SerializationDiProvider {
     fun providesTableTemplateStringJsonCache(cachesFactory: IMoshiJsonCachesFactory)
     : ITableTemplateStringMoshiJsonCache {
         return cachesFactory.tableTemplateStringMoshiJson()
+    }
+
+    @Provides
+    fun providesISToStringListStorage(inputStreamFactory: IInputStreamFactory)
+            : ISToJsonTypeToStorage<StringListMoshi> {
+        return inputStreamFactory.inputStreamToStringListStorage()
+    }
+
+    @Provides
+    fun providesISToTemplateListStorage(inputStreamFactory: IInputStreamFactory)
+            : ISToJsonTypeToStorage<TableTemplateItemListMoshi> {
+        return inputStreamFactory.inputStreamToTemplateListStorage()
+    }
+
+    @Provides
+    fun providesISToTableTemplateDetailsListMoshi(inputStreamFactory: IInputStreamFactory)
+        : ISToJsonTypeToStorage<TableTemplateDetailsListMoshi> {
+            return inputStreamFactory.inputStreamToTemplateDetailsListStorage()
     }
 }

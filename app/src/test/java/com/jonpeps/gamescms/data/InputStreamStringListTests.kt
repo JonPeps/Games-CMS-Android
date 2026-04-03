@@ -1,6 +1,8 @@
 package com.jonpeps.gamescms.data
 
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateDetailsListMoshi
+import com.jonpeps.gamescms.data.dataclasses.moshi.TableTemplateItemListMoshi
 import com.jonpeps.gamescms.data.repositories.base.ISingleItemMoshiJsonRepository
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.debug.IInputStreamSerializationRepoHelper
@@ -24,11 +26,19 @@ class InputStreamStringListTests {
     @MockK
     private lateinit var mockInputStream: InputStream
     @MockK
-    private lateinit var mockMoshiStringListRepository: ISingleItemMoshiJsonRepository<StringListMoshi>
+    private lateinit var mockMoshiStringListRepository
+        : ISingleItemMoshiJsonRepository<StringListMoshi>
+    @MockK
+    private lateinit var moshiTableTemplateRepository
+            : ISingleItemMoshiJsonRepository<TableTemplateItemListMoshi>
+    @MockK
+    private lateinit var mockTableTemplateDetailsListRepository
+        : ISingleItemMoshiJsonRepository<TableTemplateDetailsListMoshi>
     @MockK
     private lateinit var mockCommonSerializationRepoHelper: ICommonSerializationRepoHelper
     @MockK
-    private lateinit var mockInputStreamSerializationRepoHelper: IInputStreamSerializationRepoHelper
+    private lateinit var mockInputStreamSerializationRepoHelper
+        : IInputStreamSerializationRepoHelper
 
     private lateinit var sut: ISToJsonTypeToStorage<StringListMoshi>
 
@@ -42,6 +52,8 @@ class InputStreamStringListTests {
 
         val factory = InputStreamFactoryImpl(
             mockMoshiStringListRepository,
+            moshiTableTemplateRepository,
+            mockTableTemplateDetailsListRepository,
             mockCommonSerializationRepoHelper,
             mockInputStreamSerializationRepoHelper
         )

@@ -3,13 +3,13 @@ package com.jonpeps.gamescms.data.viewmodels
 import androidx.lifecycle.viewModelScope
 import com.jonpeps.gamescms.data.DataConstants.Companion.FILE_EXTENSION
 import com.jonpeps.gamescms.data.dataclasses.moshi.StringListMoshi
-import com.jonpeps.gamescms.data.repositories.ICachedMoshiStringListRepository
 import com.jonpeps.gamescms.data.serialization.ICommonDeleteFileHelper
 import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.serialization.StringListStatus
 import com.jonpeps.gamescms.data.serialization.SubDeleteFlag
 import com.jonpeps.gamescms.data.viewmodels.factories.BasicStringListViewModelFactory
 import com.jonpeps.gamescms.data.helpers.IStringListItemsVmChangesCache
+import com.jonpeps.gamescms.data.repositories.base.IBaseCachedMoshiJsonRepository
 import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel.Companion.NO_CACHE_NAME
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -20,7 +20,9 @@ import kotlinx.coroutines.launch
 interface IBasicStringListViewModel {
     fun load(cacheName: String = NO_CACHE_NAME, loadFromCacheIfExists: Boolean = true)
     fun add(name: String)
-    fun delete(name: String, directory: String, subDeleteFlag: SubDeleteFlag = SubDeleteFlag.NONE)
+    fun delete(name: String,
+               directory: String,
+               subDeleteFlag: SubDeleteFlag = SubDeleteFlag.NONE)
 }
 
 @HiltViewModel(assistedFactory = BasicStringListViewModelFactory.IBasicStringListViewModelFactory::class)
@@ -28,7 +30,7 @@ class BasicStringListViewModel
 @AssistedInject constructor(
     @Assisted("directoryPath") private val directory: String,
     @Assisted("listPath") private val fileName: String,
-    private val moshiStringListRepository: ICachedMoshiStringListRepository,
+    private val moshiStringListRepository: IBaseCachedMoshiJsonRepository<StringListMoshi>,
     private val commonSerializationRepoHelper: ICommonSerializationRepoHelper,
     private val listItemsVmChangesCache: IStringListItemsVmChangesCache,
     private val commonDeleteFileHelper: ICommonDeleteFileHelper,

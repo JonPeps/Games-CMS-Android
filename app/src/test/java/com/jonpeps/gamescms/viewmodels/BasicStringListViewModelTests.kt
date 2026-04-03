@@ -6,7 +6,7 @@ import com.jonpeps.gamescms.data.serialization.ICommonSerializationRepoHelper
 import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel
 import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel.Companion.FAILED_TO_LOAD_FILE
 import com.jonpeps.gamescms.data.helpers.IStringListItemsVmChangesCache
-import com.jonpeps.gamescms.data.repositories.ICachedMoshiStringListRepository
+import com.jonpeps.gamescms.data.repositories.base.IBaseCachedMoshiJsonRepository
 import com.jonpeps.gamescms.data.serialization.SubDeleteFlag
 import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel.Companion.FAILED_TO_SAVE_FILE
 import com.jonpeps.gamescms.data.viewmodels.BasicStringListViewModel.Companion.NO_CACHE_NAME
@@ -25,7 +25,7 @@ import org.junit.Test
 class BasicStringListViewModelTests {
     private val dispatcher = UnconfinedTestDispatcher()
     @MockK
-    private lateinit var mockMoshiStringListRepository: ICachedMoshiStringListRepository
+    private lateinit var mockMoshiCacheStringListRepository: IBaseCachedMoshiJsonRepository<StringListMoshi>
     @MockK
     private lateinit var mockCommonSerializationRepoHelper: ICommonSerializationRepoHelper
     @MockK
@@ -49,7 +49,7 @@ class BasicStringListViewModelTests {
         viewModel = BasicStringListViewModel(
             filesDirectoryPath,
             filesListPath,
-            mockMoshiStringListRepository,
+            mockMoshiCacheStringListRepository,
             mockCommonSerializationRepoHelper,
             mockListItemsVmChangesCache,
             mockCommonDeleteFileHelper,
@@ -69,9 +69,9 @@ class BasicStringListViewModelTests {
         every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
 
         every { mockListItemsVmChangesCache.isPopulated() } returns false
-        coEvery { mockMoshiStringListRepository.load(cachedListName) } returns true
-        every { mockMoshiStringListRepository.getItem(cachedListName) } returns dummyData
-        every { mockMoshiStringListRepository.getErrorMsg() } returns ""
+        coEvery { mockMoshiCacheStringListRepository.load(cachedListName) } returns true
+        every { mockMoshiCacheStringListRepository.getItem(cachedListName) } returns dummyData
+        every { mockMoshiCacheStringListRepository.getErrorMsg() } returns ""
         every { mockListItemsVmChangesCache.get(cachedListName) } returns dummyListData
 
         viewModel.load(cachedListName, false)
@@ -90,9 +90,9 @@ class BasicStringListViewModelTests {
         every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
 
         every { mockListItemsVmChangesCache.isPopulated() } returns false
-        coEvery { mockMoshiStringListRepository.load(NO_CACHE_NAME) } returns true
-        every { mockMoshiStringListRepository.getItem(NO_CACHE_NAME) } returns dummyData
-        every { mockMoshiStringListRepository.getErrorMsg() } returns ""
+        coEvery { mockMoshiCacheStringListRepository.load(NO_CACHE_NAME) } returns true
+        every { mockMoshiCacheStringListRepository.getItem(NO_CACHE_NAME) } returns dummyData
+        every { mockMoshiCacheStringListRepository.getErrorMsg() } returns ""
 
         viewModel.load(NO_CACHE_NAME, false)
 
@@ -108,9 +108,9 @@ class BasicStringListViewModelTests {
         every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
 
         every { mockListItemsVmChangesCache.isPopulated() } returns false
-        coEvery { mockMoshiStringListRepository.load(cachedListName) } returns true
-        every { mockMoshiStringListRepository.getItem(cachedListName) } returns dummyData
-        every { mockMoshiStringListRepository.getErrorMsg() } returns ""
+        coEvery { mockMoshiCacheStringListRepository.load(cachedListName) } returns true
+        every { mockMoshiCacheStringListRepository.getItem(cachedListName) } returns dummyData
+        every { mockMoshiCacheStringListRepository.getErrorMsg() } returns ""
 
         viewModel.load(cachedListName, true)
 
@@ -126,7 +126,7 @@ class BasicStringListViewModelTests {
     fun `load string list SUCCESS WHEN items are cached`() {
         every { mockListItemsVmChangesCache.isPopulated() } returns true
         every { mockListItemsVmChangesCache.get(cachedListName) } returns dummyListData
-        coEvery { mockMoshiStringListRepository.load(cachedListName) } returns true
+        coEvery { mockMoshiCacheStringListRepository.load(cachedListName) } returns true
 
         viewModel.load(cachedListName, true)
 
@@ -142,7 +142,7 @@ class BasicStringListViewModelTests {
         every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
 
         every { mockListItemsVmChangesCache.isPopulated() } returns false
-        coEvery { mockMoshiStringListRepository.load(cachedListName) } returns false
+        coEvery { mockMoshiCacheStringListRepository.load(cachedListName) } returns false
 
         viewModel.load(cachedListName, false)
 
@@ -158,8 +158,8 @@ class BasicStringListViewModelTests {
         every { mockCommonSerializationRepoHelper.getBufferReader(any(), any()) } returns mockk()
 
         every { mockListItemsVmChangesCache.isPopulated() } returns false
-        coEvery { mockMoshiStringListRepository.load(cachedListName) } returns true
-        every { mockMoshiStringListRepository.getItem(cachedListName) } returns null
+        coEvery { mockMoshiCacheStringListRepository.load(cachedListName) } returns true
+        every { mockMoshiCacheStringListRepository.getItem(cachedListName) } returns null
 
         viewModel.load(cachedListName, false)
 
@@ -184,7 +184,7 @@ class BasicStringListViewModelTests {
 
     @Test
     fun `add string list EXITS due to ITEM ALREADY EXISTS`() {
-        coEvery { mockMoshiStringListRepository.save(any(), any()) } returns true
+        coEvery { mockMoshiCacheStringListRepository.save(any(), any()) } returns true
         every { mockListItemsVmChangesCache.set(any(), any()) } returns Unit
 
         viewModel.add("test")
@@ -198,7 +198,7 @@ class BasicStringListViewModelTests {
 
     @Test
     fun `add string FAILS due to SAVE TO REPO FAILS`() {
-        coEvery { mockMoshiStringListRepository.save(any(), any()) } returns false
+        coEvery { mockMoshiCacheStringListRepository.save(any(), any()) } returns false
         every { mockListItemsVmChangesCache.set(any(), any()) } returns Unit
 
         viewModel.add("test")
@@ -210,7 +210,7 @@ class BasicStringListViewModelTests {
 
     @Test
     fun `add string list SUCCESS WHEN IO files are VALID and save to repository RETURNS TRUE`() {
-        coEvery { mockMoshiStringListRepository.save(any(), any()) } returns true
+        coEvery { mockMoshiCacheStringListRepository.save(any(), any()) } returns true
 
         viewModel.add("test")
 
@@ -263,16 +263,16 @@ class BasicStringListViewModelTests {
     }
 
     private fun setupForReadingFiles() {
-        every { mockMoshiStringListRepository.setAbsoluteFile(any()) } returns Unit
-        every { mockMoshiStringListRepository.setBufferReader(any()) } returns Unit
+        every { mockMoshiCacheStringListRepository.setAbsoluteFile(any()) } returns Unit
+        every { mockMoshiCacheStringListRepository.setBufferReader(any()) } returns Unit
     }
 
     private fun setupForWritingFiles() {
-        every { mockMoshiStringListRepository.setAbsoluteFile(any()) } returns Unit
-        every { mockMoshiStringListRepository.assignDirectoryFile(any()) } returns Unit
-        every { mockMoshiStringListRepository.setFile(any()) } returns Unit
-        every { mockMoshiStringListRepository.setFileWriter(any()) } returns Unit
-        every { mockMoshiStringListRepository.setItem(any(), any()) } returns Unit
+        every { mockMoshiCacheStringListRepository.setAbsoluteFile(any()) } returns Unit
+        every { mockMoshiCacheStringListRepository.assignDirectoryFile(any()) } returns Unit
+        every { mockMoshiCacheStringListRepository.setFile(any()) } returns Unit
+        every { mockMoshiCacheStringListRepository.setFileWriter(any()) } returns Unit
+        every { mockMoshiCacheStringListRepository.setItem(any(), any()) } returns Unit
     }
 
     private fun setupCommonFiles() {
