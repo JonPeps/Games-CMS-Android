@@ -56,8 +56,7 @@ class SingleItemMoshiJsonRepository<T>(
 
     override suspend fun serialize(contents: String): Boolean {
         errorMessage = ""
-        val jsonAdapter = moshiJsonAdapter.getJsonAdapter()
-        item = jsonAdapter.fromJson(contents)
+        item = moshiJsonAdapter.getJsonAdapter().fromJson(contents)
         return if (item != null) {
             true
         } else {
